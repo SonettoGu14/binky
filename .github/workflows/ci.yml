@@ -1,0 +1,33 @@
+# Build + unit tests on every PR and on main. Pair with branch protection:
+# Settings → Branches → Add rule for `main` → require this check, require PR.
+# Do not pass CODE_SIGNING_ALLOWED=NO — macOS test bundles need ad-hoc signing to launch.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    # macOS 26 + Xcode 26 (e.g. SwiftUI `.glassEffect()`); macos-15 images only ship Xcode 16.x.
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test
+        run: |
+          set -eo pipefail
+          xcodebuild \
+            -project Binky.xcodeproj \
+            -scheme Binky \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=NO \
+            test

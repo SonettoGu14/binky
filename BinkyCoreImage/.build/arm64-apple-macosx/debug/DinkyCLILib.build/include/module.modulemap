@@ -1,0 +1,3 @@
+module DinkyCLILib {
+    header "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/include/DinkyCLILib-Swift.h"
+}

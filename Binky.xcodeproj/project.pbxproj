@@ -1,0 +1,859 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5CBDB89C2F9041F600E7E9C0 /* avifenc in Resources */ = {isa = PBXBuildFile; fileRef = 5CBDB8972F9041F600E7E9C0 /* avifenc */; };
+		5CBDB89D2F9041F600E7E9C0 /* oxipng in Resources */ = {isa = PBXBuildFile; fileRef = 5CBDB89A2F9041F600E7E9C0 /* oxipng */; };
+		5CBDB89E2F9041F600E7E9C0 /* cwebp in Resources */ = {isa = PBXBuildFile; fileRef = 5CBDB8992F9041F600E7E9C0 /* cwebp */; };
+		AI000001000000000000001 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = AI100001000000000000001 /* AppIcon.icon */; };
+		QP000001000000000000001 /* qpdf in Resources */ = {isa = PBXBuildFile; fileRef = QP100001000000000000001 /* qpdf */; };
+		AA000001000000000000001 /* BinkyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1983E259BC5A494A9D936B63 /* BinkyApp.swift */; };
+		AA000002000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F9AD6A1BD04233828DC140 /* ContentView.swift */; };
+		ORGVM00000100000000000001 /* OrganizerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ORGVM10000100000000000001 /* OrganizerViewModel.swift */; };
+		ORGMAIN001000000000000001 /* OrganizerMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ORGMAIN100001000000000001 /* OrganizerMainView.swift */; };
+		OES000001000000000000001 /* OrganizerEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OES100001000000000000001 /* OrganizerEmptyStateView.swift */; };
+		SRTINT001000000000000001 /* SortFilesWithBinkyIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRTINT100001000000000001 /* SortFilesWithBinkyIntent.swift */; };
+		AA000003000000000000003 /* CompressionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB16B6B1534C999F261F79 /* CompressionService.swift */; };
+		AA000004000000000000004 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89ED8C350A5D404EA5F1CCF6 /* PreferencesView.swift */; };
+		AA000005000000000000005 /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FE17DC818E44D3F88D6F88A /* Strings.swift */; };
+		AA000006000000000000006 /* ImageItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFDD8F0AED14F8CA2C3F9A7 /* ImageItem.swift */; };
+		PE000001000000000000001 /* PDFPreserveExperimentalMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = PE100001000000000000001 /* PDFPreserveExperimentalMode.swift */; };
+		AA000007000000000000007 /* CompressionFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC05EE39C6DE4195A1EF551B /* CompressionFormat.swift */; };
+		AA000008000000000000008 /* BinkyPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D3DAE858994431BC84C13F /* BinkyPreferences.swift */; };
+		AA000009000000000000009 /* DropZoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D9DE1C999B470FBB27E454 /* DropZoneView.swift */; };
+		AA000010000000000000010 /* ResultsRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B63EBD7088E4C9BAB7A45DC /* ResultsRowView.swift */; };
+		CCS000001000000000000001 /* CompressionConfirmationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCS100001000000000000001 /* CompressionConfirmationSheet.swift */; };
+		AA000011000000000000011 /* AntyMascotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1032BF7B7A74FAF99A74DB7 /* AntyMascotView.swift */; };
+		AA000012000000000000012 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74EE7205601D464484113FEB /* Assets.xcassets */; };
+		AA000013000000000000013 /* Preview Content/Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E71A34AFC5CA41FDACAEE19D /* Preview Content/Preview Assets.xcassets */; };
+		BB000001000000000000001 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB100001000000000000001 /* SidebarView.swift */; };
+		SC000001000000000000001 /* SettingsChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC100001000000000000001 /* SettingsChrome.swift */; };
+		DD000003000000000000003 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD000002000000000000002 /* AppDelegate.swift */; };
+		UC000001000000000000001 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = UC100001000000000000001 /* UpdateChecker.swift */; };
+		UB000001000000000000001 /* UpdateBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = UB100001000000000000001 /* UpdateBanner.swift */; };
+		RB000001000000000000001 /* ReviewPromptBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = RB100001000000000000001 /* ReviewPromptBanner.swift */; };
+		CC000001000000000000001 /* ContentClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC100001000000000000001 /* ContentClassifier.swift */; };
+		ICFR0000010000000000001 /* ImageCompressionFormatResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = ICFR1000010000000000001 /* ImageCompressionFormatResolver.swift */; };
+		AG000001000000000000001 /* View+AdaptiveGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AG100001000000000000001 /* View+AdaptiveGlass.swift */; };
+		LB000001000000000000001 /* lib in Resources */ = {isa = PBXBuildFile; fileRef = LB100001000000000000001 /* lib */; };
+		CI000001000000000000001 /* ClipboardImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CI100001000000000000001 /* ClipboardImporter.swift */; };
+		OH000001000000000000001 /* OriginalsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = OH100001000000000000001 /* OriginalsHandler.swift */; };
+		CU000001000000000000001 /* CompressionUndo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CU100001000000000000001 /* CompressionUndo.swift */; };
+		UD000001000000000000001 /* URLDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = UD100001000000000000001 /* URLDownloader.swift */; };
+		LL000001000000000000001 /* LaunchAtLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LL100001000000000000001 /* LaunchAtLoginManager.swift */; };
+		FW000001000000000000001 /* FolderWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = FW100001000000000000001 /* FolderWatcher.swift */; };
+		DST00009900000000000001 /* DownloadSortServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = DST10009900000000000001 /* DownloadSortServices.swift */; };
+		IPS00001000000000000001 /* ImagePreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = IPS10001000000000000001 /* ImagePreviewSheet.swift */; };
+		HS000001000000000000001 /* HistorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = HS100001000000000000001 /* HistorySheet.swift */; };
+		BC000001000000000000001 /* BatchCompletionSummarySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC100001000000000000001 /* BatchCompletionSummarySheet.swift */; };
+		SSR000001000000000000001 /* SummaryStatRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = SSR100001000000000000001 /* SummaryStatRow.swift */; };
+		CRD000001000000000000001 /* CompressionResultDetailSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = CRD100001000000000000001 /* CompressionResultDetailSheets.swift */; };
+		CP000001000000000000001 /* CompressionPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = CP100001000000000000001 /* CompressionPreset.swift */; };
+		SR000001000000000000001 /* SessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = SR100001000000000000001 /* SessionRecord.swift */; };
+		ASH00001000000000000001 /* BinkyAppShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = ASH10001000000000000001 /* BinkyAppShortcuts.swift */; };
+		MT000001000000000000001 /* MediaType.swift in Sources */ = {isa = PBXBuildFile; fileRef = MT100001000000000000001 /* MediaType.swift */; };
+		PC000001000000000000001 /* PDFCompressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = PC100001000000000000001 /* PDFCompressor.swift */; };
+		VC000001000000000000001 /* VideoCompressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = VC100001000000000000001 /* VideoCompressor.swift */; };
+		PQ000001000000000000001 /* PDFSmartQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = PQ100001000000000000001 /* PDFSmartQuality.swift */; };
+		DS000001000000000000001 /* PDFDocumentSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DS100001000000000000001 /* PDFDocumentSampler.swift */; };
+		OC000001000000000000001 /* PDFOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC100001000000000000001 /* PDFOCRService.swift */; };
+		PH000001000000000000001 /* PDFPreserveHeuristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = PH100001000000000000001 /* PDFPreserveHeuristics.swift */; };
+		VQ000001000000000000001 /* VideoSmartQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = VQ100001000000000000001 /* VideoSmartQuality.swift */; };
+		VCC0001000000000000001 /* VideoContentClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = VCC1001000000000000001 /* VideoContentClassifier.swift */; };
+		WR000001000000000000001 /* WatchRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = WR100001000000000000001 /* WatchRegistry.swift */; };
+		HW000001000000000000001 /* HelpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = HW100001000000000000001 /* HelpWindow.swift */; };
+		HM000001000000000000001 /* Help.md in Resources */ = {isa = PBXBuildFile; fileRef = HMVGRP00000000000000001 /* Help.md */; };
+		LCAT00000100000000000001 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = LCATREF0000000000000001 /* Localizable.xcstrings */; };
+		ICAT00000100000000000001 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = ICATREF0000000000000001 /* InfoPlist.xcstrings */; };
+		KS000001000000000000001 /* CustomShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = KS100001000000000000001 /* CustomShortcut.swift */; };
+		SH000001000000000000001 /* ShortcutRecorderField.swift in Sources */ = {isa = PBXBuildFile; fileRef = SH100001000000000000001 /* ShortcutRecorderField.swift */; };
+		GH000001000000000000001 /* GlobalHotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH100001000000000000001 /* GlobalHotkeyManager.swift */; };
+		DR000001000000000000001 /* DiagnosticsReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DR100001000000000000001 /* DiagnosticsReporter.swift */; };
+		CT000001000000000000001 /* CompressionTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = CT100001000000000000001 /* CompressionTiming.swift */; };
+		PM000001000000000000001 /* PDFCompressionMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = PM100001000000000000001 /* PDFCompressionMetrics.swift */; };
+		PI000001000000000000001 /* PDFImageDownsampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = PI100001000000000000001 /* PDFImageDownsampler.swift */; };
+		FC000001000000000000001 /* FinderCommentsCopier.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC100001000000000000001 /* FinderCommentsCopier.swift */; };
+		OP000001000000000000001 /* OutputPathUniqueness.swift in Sources */ = {isa = PBXBuildFile; fileRef = OP100001000000000000001 /* OutputPathUniqueness.swift */; };
+		SP000001000000000000001 /* SavingsPerspective.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP100001000000000000001 /* SavingsPerspective.swift */; };
+		XTBLD00000000000000001 /* PDFScanDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = XTREF00000000000000001 /* PDFScanDetectionTests.swift */; };
+		XTBLD00000000000000002 /* DownloadSortClassificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = XTREF00000000000000002 /* DownloadSortClassificationTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		06FD4F8D9AC8412C83F517C6 /* Binky.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Binky.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1983E259BC5A494A9D936B63 /* BinkyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyApp.swift; sourceTree = "<group>"; };
+		AI100001000000000000001 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
+		4FE17DC818E44D3F88D6F88A /* Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
+		4FFDD8F0AED14F8CA2C3F9A7 /* ImageItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageItem.swift; sourceTree = "<group>"; };
+		AI100001000000000000001 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
+		PE100001000000000000001 /* PDFPreserveExperimentalMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFPreserveExperimentalMode.swift; sourceTree = "<group>"; };
+		56D9DE1C999B470FBB27E454 /* DropZoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropZoneView.swift; sourceTree = "<group>"; };
+		5B63EBD7088E4C9BAB7A45DC /* ResultsRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsRowView.swift; sourceTree = "<group>"; };
+		CCS100001000000000000001 /* CompressionConfirmationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionConfirmationSheet.swift; sourceTree = "<group>"; };
+		5BC7D00FC2B14EF09CB7F833 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		5BEB16B6B1534C999F261F79 /* CompressionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionService.swift; sourceTree = "<group>"; };
+		5CBDB8972F9041F600E7E9C0 /* avifenc */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = avifenc; sourceTree = "<group>"; };
+		LB100001000000000000001 /* lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = lib; sourceTree = "<group>"; };
+		5CBDB8992F9041F600E7E9C0 /* cwebp */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cwebp; sourceTree = "<group>"; };
+		5CBDB89A2F9041F600E7E9C0 /* oxipng */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = oxipng; sourceTree = "<group>"; };
+		QP100001000000000000001 /* qpdf */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = qpdf; sourceTree = "<group>"; };
+		74EE7205601D464484113FEB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		89ED8C350A5D404EA5F1CCF6 /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
+		96F9AD6A1BD04233828DC140 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		ORGVM10000100000000000001 /* OrganizerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerViewModel.swift; sourceTree = "<group>"; };
+		ORGMAIN100001000000000001 /* OrganizerMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerMainView.swift; sourceTree = "<group>"; };
+		OES100001000000000000001 /* OrganizerEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerEmptyStateView.swift; sourceTree = "<group>"; };
+		SRTINT100001000000000001 /* SortFilesWithBinkyIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortFilesWithBinkyIntent.swift; sourceTree = "<group>"; };
+		AC05EE39C6DE4195A1EF551B /* CompressionFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionFormat.swift; sourceTree = "<group>"; };
+		BB100001000000000000001 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		SC100001000000000000001 /* SettingsChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsChrome.swift; sourceTree = "<group>"; };
+		UC100001000000000000001 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
+		UB100001000000000000001 /* UpdateBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateBanner.swift; sourceTree = "<group>"; };
+		RB100001000000000000001 /* ReviewPromptBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptBanner.swift; sourceTree = "<group>"; };
+		CC100001000000000000001 /* ContentClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentClassifier.swift; sourceTree = "<group>"; };
+		ICFR1000010000000000001 /* ImageCompressionFormatResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompressionFormatResolver.swift; sourceTree = "<group>"; };
+		AG100001000000000000001 /* View+AdaptiveGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+AdaptiveGlass.swift"; sourceTree = "<group>"; };
+		D1032BF7B7A74FAF99A74DB7 /* AntyMascotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AntyMascotView.swift; sourceTree = "<group>"; };
+		DD000001000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DD000002000000000000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E71A34AFC5CA41FDACAEE19D /* Preview Content/Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Content/Preview Assets.xcassets"; sourceTree = "<group>"; };
+		F5D3DAE858994431BC84C13F /* BinkyPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyPreferences.swift; sourceTree = "<group>"; };
+		F68BBF685BAD4911BEC725DB /* Binky.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Binky.entitlements; sourceTree = "<group>"; };
+		CI100001000000000000001 /* ClipboardImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardImporter.swift; sourceTree = "<group>"; };
+		OH100001000000000000001 /* OriginalsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OriginalsHandler.swift; sourceTree = "<group>"; };
+		CU100001000000000000001 /* CompressionUndo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionUndo.swift; sourceTree = "<group>"; };
+		UD100001000000000000001 /* URLDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLDownloader.swift; sourceTree = "<group>"; };
+		LL100001000000000000001 /* LaunchAtLoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginManager.swift; sourceTree = "<group>"; };
+		FW100001000000000000001 /* FolderWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderWatcher.swift; sourceTree = "<group>"; };
+		DST10009900000000000001 /* DownloadSortServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSortServices.swift; sourceTree = "<group>"; };
+		IPS10001000000000000001 /* ImagePreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewSheet.swift; sourceTree = "<group>"; };
+		HS100001000000000000001 /* HistorySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistorySheet.swift; sourceTree = "<group>"; };
+		BC100001000000000000001 /* BatchCompletionSummarySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchCompletionSummarySheet.swift; sourceTree = "<group>"; };
+		SSR100001000000000000001 /* SummaryStatRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryStatRow.swift; sourceTree = "<group>"; };
+		CRD100001000000000000001 /* CompressionResultDetailSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionResultDetailSheets.swift; sourceTree = "<group>"; };
+		CP100001000000000000001 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
+		SR100001000000000000001 /* SessionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRecord.swift; sourceTree = "<group>"; };
+		ASH10001000000000000001 /* BinkyAppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyAppShortcuts.swift; sourceTree = "<group>"; };
+		MT100001000000000000001 /* MediaType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaType.swift; sourceTree = "<group>"; };
+		PC100001000000000000001 /* PDFCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFCompressor.swift; sourceTree = "<group>"; };
+		VC100001000000000000001 /* VideoCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCompressor.swift; sourceTree = "<group>"; };
+		PQ100001000000000000001 /* PDFSmartQuality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFSmartQuality.swift; sourceTree = "<group>"; };
+		DS100001000000000000001 /* PDFDocumentSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFDocumentSampler.swift; sourceTree = "<group>"; };
+		OC100001000000000000001 /* PDFOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFOCRService.swift; sourceTree = "<group>"; };
+		PH100001000000000000001 /* PDFPreserveHeuristics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFPreserveHeuristics.swift; sourceTree = "<group>"; };
+		VQ100001000000000000001 /* VideoSmartQuality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoSmartQuality.swift; sourceTree = "<group>"; };
+		VCC1001000000000000001 /* VideoContentClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoContentClassifier.swift; sourceTree = "<group>"; };
+		WR100001000000000000001 /* WatchRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRegistry.swift; sourceTree = "<group>"; };
+		HW100001000000000000001 /* HelpWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpWindow.swift; sourceTree = "<group>"; };
+		HMVGRP00000000000000001 /* Help.md */ = {
+			isa = PBXVariantGroup;
+			children = (
+				HMEN0000000000000000001 /* Help.md */,
+				HMDE0000000000000000001 /* Help.md */,
+				HMES0000000000000000001 /* Help.md */,
+				HMFR0000000000000000001 /* Help.md */,
+				HMIT0000000000000000001 /* Help.md */,
+				HMJA0000000000000000001 /* Help.md */,
+				HMKO0000000000000000001 /* Help.md */,
+				HMNL0000000000000000001 /* Help.md */,
+				HMPT0000000000000000001 /* Help.md */,
+				HMRU0000000000000000001 /* Help.md */,
+				HMTR0000000000000000001 /* Help.md */,
+				HMZH0000000000000000001 /* Help.md */,
+				HMZHT000000000000000001 /* Help.md */,
+			);
+			name = Help.md;
+			sourceTree = "<group>";
+		};
+		HMEN0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = en.lproj/Help.md; sourceTree = "<group>"; };
+		HMDE0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = de.lproj/Help.md; sourceTree = "<group>"; };
+		HMES0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = es.lproj/Help.md; sourceTree = "<group>"; };
+		HMFR0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = fr.lproj/Help.md; sourceTree = "<group>"; };
+		HMIT0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = it.lproj/Help.md; sourceTree = "<group>"; };
+		HMJA0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = ja.lproj/Help.md; sourceTree = "<group>"; };
+		HMKO0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = ko.lproj/Help.md; sourceTree = "<group>"; };
+		HMNL0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = nl.lproj/Help.md; sourceTree = "<group>"; };
+		HMPT0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = "pt-BR.lproj/Help.md"; sourceTree = "<group>"; };
+		HMRU0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = ru.lproj/Help.md; sourceTree = "<group>"; };
+		HMTR0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = tr.lproj/Help.md; sourceTree = "<group>"; };
+		HMZH0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = "zh-Hans.lproj/Help.md"; sourceTree = "<group>"; };
+		HMZHT000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = "zh-Hant.lproj/Help.md"; sourceTree = "<group>"; };
+		LCATREF0000000000000001 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		ICATREF0000000000000001 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		KS100001000000000000001 /* CustomShortcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomShortcut.swift; sourceTree = "<group>"; };
+		SH100001000000000000001 /* ShortcutRecorderField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderField.swift; sourceTree = "<group>"; };
+		GH100001000000000000001 /* GlobalHotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalHotkeyManager.swift; sourceTree = "<group>"; };
+		DR100001000000000000001 /* DiagnosticsReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsReporter.swift; sourceTree = "<group>"; };
+		CT100001000000000000001 /* CompressionTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionTiming.swift; sourceTree = "<group>"; };
+		PM100001000000000000001 /* PDFCompressionMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFCompressionMetrics.swift; sourceTree = "<group>"; };
+		PI100001000000000000001 /* PDFImageDownsampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFImageDownsampler.swift; sourceTree = "<group>"; };
+		FC100001000000000000001 /* FinderCommentsCopier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderCommentsCopier.swift; sourceTree = "<group>"; };
+		OP100001000000000000001 /* OutputPathUniqueness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputPathUniqueness.swift; sourceTree = "<group>"; };
+		SP100001000000000000001 /* SavingsPerspective.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsPerspective.swift; sourceTree = "<group>"; };
+		XTREF00000000000000001 /* PDFScanDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFScanDetectionTests.swift; sourceTree = "<group>"; };
+		XTREF00000000000000002 /* DownloadSortClassificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSortClassificationTests.swift; sourceTree = "<group>"; };
+		XTPRD00000000000000001 /* BinkyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BinkyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E21DF18078534E6AAFC3CD56 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		XTFR00000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0E8A023749E745F7BB24F03D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4FFDD8F0AED14F8CA2C3F9A7 /* ImageItem.swift */,
+				PE100001000000000000001 /* PDFPreserveExperimentalMode.swift */,
+				AC05EE39C6DE4195A1EF551B /* CompressionFormat.swift */,
+				F5D3DAE858994431BC84C13F /* BinkyPreferences.swift */,
+				CP100001000000000000001 /* CompressionPreset.swift */,
+				SR100001000000000000001 /* SessionRecord.swift */,
+				MT100001000000000000001 /* MediaType.swift */,
+				KS100001000000000000001 /* CustomShortcut.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		32ED8DD8E46E4623979A137D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				56D9DE1C999B470FBB27E454 /* DropZoneView.swift */,
+				OES100001000000000000001 /* OrganizerEmptyStateView.swift */,
+				5B63EBD7088E4C9BAB7A45DC /* ResultsRowView.swift */,
+				CCS100001000000000000001 /* CompressionConfirmationSheet.swift */,
+				SSR100001000000000000001 /* SummaryStatRow.swift */,
+				D1032BF7B7A74FAF99A74DB7 /* AntyMascotView.swift */,
+				BB100001000000000000001 /* SidebarView.swift */,
+				SC100001000000000000001 /* SettingsChrome.swift */,
+				UB100001000000000000001 /* UpdateBanner.swift */,
+				RB100001000000000000001 /* ReviewPromptBanner.swift */,
+				IPS10001000000000000001 /* ImagePreviewSheet.swift */,
+				HS100001000000000000001 /* HistorySheet.swift */,
+				BC100001000000000000001 /* BatchCompletionSummarySheet.swift */,
+				CRD100001000000000000001 /* CompressionResultDetailSheets.swift */,
+				HW100001000000000000001 /* HelpWindow.swift */,
+				SH100001000000000000001 /* ShortcutRecorderField.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		SV100001000000000000001 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				UC100001000000000000001 /* UpdateChecker.swift */,
+				OH100001000000000000001 /* OriginalsHandler.swift */,
+				CU100001000000000000001 /* CompressionUndo.swift */,
+				UD100001000000000000001 /* URLDownloader.swift */,
+				LL100001000000000000001 /* LaunchAtLoginManager.swift */,
+				CC100001000000000000001 /* ContentClassifier.swift */,
+				ICFR1000010000000000001 /* ImageCompressionFormatResolver.swift */,
+				CI100001000000000000001 /* ClipboardImporter.swift */,
+				FW100001000000000000001 /* FolderWatcher.swift */,
+				DST10009900000000000001 /* DownloadSortServices.swift */,
+				PC100001000000000000001 /* PDFCompressor.swift */,
+				VC100001000000000000001 /* VideoCompressor.swift */,
+				PQ100001000000000000001 /* PDFSmartQuality.swift */,
+				DS100001000000000000001 /* PDFDocumentSampler.swift */,
+				OC100001000000000000001 /* PDFOCRService.swift */,
+				PH100001000000000000001 /* PDFPreserveHeuristics.swift */,
+				VQ100001000000000000001 /* VideoSmartQuality.swift */,
+				VCC1001000000000000001 /* VideoContentClassifier.swift */,
+				WR100001000000000000001 /* WatchRegistry.swift */,
+				GH100001000000000000001 /* GlobalHotkeyManager.swift */,
+				DR100001000000000000001 /* DiagnosticsReporter.swift */,
+				CT100001000000000000001 /* CompressionTiming.swift */,
+				PM100001000000000000001 /* PDFCompressionMetrics.swift */,
+				PI100001000000000000001 /* PDFImageDownsampler.swift */,
+				FC100001000000000000001 /* FinderCommentsCopier.swift */,
+				OP100001000000000000001 /* OutputPathUniqueness.swift */,
+				SP100001000000000000001 /* SavingsPerspective.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		EX100001000000000000001 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				AG100001000000000000001 /* View+AdaptiveGlass.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		3337D9E5CCB647BAA20571DE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				06FD4F8D9AC8412C83F517C6 /* Binky.app */,
+				XTPRD00000000000000001 /* BinkyTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		INTGRP001000000000000001 /* Intents */ = {
+			isa = PBXGroup;
+			children = (
+				SRTINT100001000000000001 /* SortFilesWithBinkyIntent.swift */,
+				ASH10001000000000000001 /* BinkyAppShortcuts.swift */,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
+		4E72C0A5F2794B39AD3A51DF /* Binky */ = {
+			isa = PBXGroup;
+			children = (
+				1983E259BC5A494A9D936B63 /* BinkyApp.swift */,
+				DD000002000000000000002 /* AppDelegate.swift */,
+				96F9AD6A1BD04233828DC140 /* ContentView.swift */,
+				ORGVM10000100000000000001 /* OrganizerViewModel.swift */,
+				ORGMAIN100001000000000001 /* OrganizerMainView.swift */,
+				5BEB16B6B1534C999F261F79 /* CompressionService.swift */,
+				89ED8C350A5D404EA5F1CCF6 /* PreferencesView.swift */,
+				4FE17DC818E44D3F88D6F88A /* Strings.swift */,
+				LCATREF0000000000000001 /* Localizable.xcstrings */,
+				ICATREF0000000000000001 /* InfoPlist.xcstrings */,
+				0E8A023749E745F7BB24F03D /* Models */,
+				32ED8DD8E46E4623979A137D /* Views */,
+				SV100001000000000000001 /* Services */,
+				EX100001000000000000001 /* Extensions */,
+				INTGRP001000000000000001 /* Intents */,
+				9C5E5DA78AAF4A25B1599477 /* Resources */,
+				74EE7205601D464484113FEB /* Assets.xcassets */,
+				F68BBF685BAD4911BEC725DB /* Binky.entitlements */,
+				DD000001000000000000001 /* Info.plist */,
+				E71A34AFC5CA41FDACAEE19D /* Preview Content/Preview Assets.xcassets */,
+			);
+			path = Binky;
+			sourceTree = "<group>";
+		};
+		9C5E5DA78AAF4A25B1599477 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				E168EFE304164DA3B71EFE4F /* bin */,
+				LB100001000000000000001 /* lib */,
+				HMVGRP00000000000000001 /* Help.md */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		AABBCCDD00000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				4E72C0A5F2794B39AD3A51DF /* Binky */,
+				XTGRP00000000000000001 /* BinkyTests */,
+				AI100001000000000000001 /* AppIcon.icon */,
+				3337D9E5CCB647BAA20571DE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		XTGRP00000000000000001 /* BinkyTests */ = {
+			isa = PBXGroup;
+			children = (
+				XTREF00000000000000001 /* PDFScanDetectionTests.swift */,
+				XTREF00000000000000002 /* DownloadSortClassificationTests.swift */,
+			);
+			path = BinkyTests;
+			sourceTree = "<group>";
+		};
+		E168EFE304164DA3B71EFE4F /* bin */ = {
+			isa = PBXGroup;
+			children = (
+				5CBDB8972F9041F600E7E9C0 /* avifenc */,
+				5CBDB8992F9041F600E7E9C0 /* cwebp */,
+				5CBDB89A2F9041F600E7E9C0 /* oxipng */,
+				QP100001000000000000001 /* qpdf */,
+				5BC7D00FC2B14EF09CB7F833 /* README.md */,
+			);
+			path = bin;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1224039F8B5340EE9F91589E /* Binky */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 90BA7AAE78454AE280292FF6 /* Build configuration list for PBXNativeTarget "Binky" */;
+			buildPhases = (
+				998A23993F5848F1B732DC47 /* Sources */,
+				E21DF18078534E6AAFC3CD56 /* Frameworks */,
+				E3643529CC4842C6B993EE52 /* Resources */,
+				RS000001000000000000001 /* Re-sign bundled binaries */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Binky;
+			productName = Binky;
+			productReference = 06FD4F8D9AC8412C83F517C6 /* Binky.app */;
+			productType = "com.apple.product-type.application";
+		};
+		XTGT00000000000000001 /* BinkyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = XTCL00000000000000001 /* Build configuration list for PBXNativeTarget "BinkyTests" */;
+			buildPhases = (
+				XTSS00000000000000001 /* Sources */,
+				XTFR00000000000000001 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				XTTD00000000000000001 /* PBXTargetDependency */,
+			);
+			name = BinkyTests;
+			productName = BinkyTests;
+			productReference = XTPRD00000000000000001 /* BinkyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXContainerItemProxy section */
+		XTCP00000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 30998CF249484469BEA4BC05 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1224039F8B5340EE9F91589E /* Binky */;
+			remoteInfo = Binky;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		XTTD00000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1224039F8B5340EE9F91589E /* Binky */;
+			targetProxy = XTCP00000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXProject section */
+		30998CF249484469BEA4BC05 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					1224039F8B5340EE9F91589E = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = 51BCE0C4C2684CF69AC58556 /* Build configuration list for PBXProject "Binky" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				de,
+				es,
+				fr,
+				it,
+				ja,
+				ko,
+				nl,
+				"pt-BR",
+				ru,
+				tr,
+				"zh-Hans",
+				"zh-Hant",
+			);
+			mainGroup = AABBCCDD00000000000000001;
+			productRefGroup = 3337D9E5CCB647BAA20571DE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1224039F8B5340EE9F91589E /* Binky */,
+				XTGT00000000000000001 /* BinkyTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E3643529CC4842C6B993EE52 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AI000001000000000000001 /* AppIcon.icon in Resources */,
+				AA000012000000000000012 /* Assets.xcassets in Resources */,
+				AA000013000000000000013 /* Preview Content/Preview Assets.xcassets in Resources */,
+				5CBDB89C2F9041F600E7E9C0 /* avifenc in Resources */,
+				5CBDB89D2F9041F600E7E9C0 /* oxipng in Resources */,
+				5CBDB89E2F9041F600E7E9C0 /* cwebp in Resources */,
+				QP000001000000000000001 /* qpdf in Resources */,
+				LB000001000000000000001 /* lib in Resources */,
+				HM000001000000000000001 /* Help.md in Resources */,
+				LCAT00000100000000000001 /* Localizable.xcstrings in Resources */,
+				ICAT00000100000000000001 /* InfoPlist.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		998A23993F5848F1B732DC47 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000001000000000000001 /* BinkyApp.swift in Sources */,
+				DD000003000000000000003 /* AppDelegate.swift in Sources */,
+				AA000002000000000000002 /* ContentView.swift in Sources */,
+				ORGVM00000100000000000001 /* OrganizerViewModel.swift in Sources */,
+				ORGMAIN001000000000000001 /* OrganizerMainView.swift in Sources */,
+				OES000001000000000000001 /* OrganizerEmptyStateView.swift in Sources */,
+				SRTINT001000000000000001 /* SortFilesWithBinkyIntent.swift in Sources */,
+				AA000003000000000000003 /* CompressionService.swift in Sources */,
+				AA000004000000000000004 /* PreferencesView.swift in Sources */,
+				AA000005000000000000005 /* Strings.swift in Sources */,
+				AA000006000000000000006 /* ImageItem.swift in Sources */,
+				PE000001000000000000001 /* PDFPreserveExperimentalMode.swift in Sources */,
+				AA000007000000000000007 /* CompressionFormat.swift in Sources */,
+				AA000008000000000000008 /* BinkyPreferences.swift in Sources */,
+				AA000009000000000000009 /* DropZoneView.swift in Sources */,
+				AA000010000000000000010 /* ResultsRowView.swift in Sources */,
+				CCS000001000000000000001 /* CompressionConfirmationSheet.swift in Sources */,
+				SSR000001000000000000001 /* SummaryStatRow.swift in Sources */,
+				AA000011000000000000011 /* AntyMascotView.swift in Sources */,
+				BB000001000000000000001 /* SidebarView.swift in Sources */,
+				SC000001000000000000001 /* SettingsChrome.swift in Sources */,
+				UC000001000000000000001 /* UpdateChecker.swift in Sources */,
+				UB000001000000000000001 /* UpdateBanner.swift in Sources */,
+				RB000001000000000000001 /* ReviewPromptBanner.swift in Sources */,
+				CC000001000000000000001 /* ContentClassifier.swift in Sources */,
+				ICFR0000010000000000001 /* ImageCompressionFormatResolver.swift in Sources */,
+				AG000001000000000000001 /* View+AdaptiveGlass.swift in Sources */,
+				CI000001000000000000001 /* ClipboardImporter.swift in Sources */,
+				OH000001000000000000001 /* OriginalsHandler.swift in Sources */,
+				CU000001000000000000001 /* CompressionUndo.swift in Sources */,
+				UD000001000000000000001 /* URLDownloader.swift in Sources */,
+				LL000001000000000000001 /* LaunchAtLoginManager.swift in Sources */,
+				FW000001000000000000001 /* FolderWatcher.swift in Sources */,
+				DST00009900000000000001 /* DownloadSortServices.swift in Sources */,
+				IPS00001000000000000001 /* ImagePreviewSheet.swift in Sources */,
+				HS000001000000000000001 /* HistorySheet.swift in Sources */,
+				BC000001000000000000001 /* BatchCompletionSummarySheet.swift in Sources */,
+				CRD000001000000000000001 /* CompressionResultDetailSheets.swift in Sources */,
+				CP000001000000000000001 /* CompressionPreset.swift in Sources */,
+				SR000001000000000000001 /* SessionRecord.swift in Sources */,
+				ASH00001000000000000001 /* BinkyAppShortcuts.swift in Sources */,
+				MT000001000000000000001 /* MediaType.swift in Sources */,
+				PC000001000000000000001 /* PDFCompressor.swift in Sources */,
+				VC000001000000000000001 /* VideoCompressor.swift in Sources */,
+				PQ000001000000000000001 /* PDFSmartQuality.swift in Sources */,
+				DS000001000000000000001 /* PDFDocumentSampler.swift in Sources */,
+				OC000001000000000000001 /* PDFOCRService.swift in Sources */,
+				PH000001000000000000001 /* PDFPreserveHeuristics.swift in Sources */,
+				VQ000001000000000000001 /* VideoSmartQuality.swift in Sources */,
+				VCC0001000000000000001 /* VideoContentClassifier.swift in Sources */,
+				WR000001000000000000001 /* WatchRegistry.swift in Sources */,
+				HW000001000000000000001 /* HelpWindow.swift in Sources */,
+				KS000001000000000000001 /* CustomShortcut.swift in Sources */,
+				SH000001000000000000001 /* ShortcutRecorderField.swift in Sources */,
+				GH000001000000000000001 /* GlobalHotkeyManager.swift in Sources */,
+				DR000001000000000000001 /* DiagnosticsReporter.swift in Sources */,
+				CT000001000000000000001 /* CompressionTiming.swift in Sources */,
+				PM000001000000000000001 /* PDFCompressionMetrics.swift in Sources */,
+				PI000001000000000000001 /* PDFImageDownsampler.swift in Sources */,
+				FC000001000000000000001 /* FinderCommentsCopier.swift in Sources */,
+				OP000001000000000000001 /* OutputPathUniqueness.swift in Sources */,
+				SP000001000000000000001 /* SavingsPerspective.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		XTSS00000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				XTBLD00000000000000001 /* PDFScanDetectionTests.swift in Sources */,
+				XTBLD00000000000000002 /* DownloadSortClassificationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		RS000001000000000000001 /* Re-sign bundled binaries */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = ();
+			inputFileListPaths = ();
+			inputPaths = ();
+			name = "Re-sign bundled binaries";
+			outputFileListPaths = ();
+			outputPaths = ();
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Re-sign all bundled CLI binaries and dylibs with ad-hoc signatures.\n# Required because install_name_tool invalidates Homebrew-supplied signatures.\nRESOURCES=\"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\nfor f in \"$RESOURCES/avifenc\" \"$RESOURCES/cwebp\" \"$RESOURCES/oxipng\" \"$RESOURCES/qpdf\" \"$RESOURCES\"/lib/*.dylib; do\n  [ -f \"$f\" ] && codesign -s - --force \"$f\"\ndone\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		2590EFF6992F4F13862BEF4F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		2C52EABD73124FF2B654EABD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		2CAA52676FD140AF9F910BFB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = Binky/Binky.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2.7.12;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Binky/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Binky;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 2.7.12;
+				PRODUCT_BUNDLE_IDENTIFIER = com.binky.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "";
+			};
+			name = Debug;
+		};
+		35FB812A91A24C2DBCA72A70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = Binky/Binky.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2.7.12;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Binky/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Binky;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 2.7.12;
+				PRODUCT_BUNDLE_IDENTIFIER = com.binky.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "";
+			};
+			name = Release;
+		};
+		XTBCFGD000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.binky.app.BinkyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Binky.app/Contents/MacOS/Binky";
+			};
+			name = Debug;
+		};
+		XTBCFGR000000000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.binky.app.BinkyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Binky.app/Contents/MacOS/Binky";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		51BCE0C4C2684CF69AC58556 /* Build configuration list for PBXProject "Binky" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2C52EABD73124FF2B654EABD /* Debug */,
+				2590EFF6992F4F13862BEF4F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		90BA7AAE78454AE280292FF6 /* Build configuration list for PBXNativeTarget "Binky" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2CAA52676FD140AF9F910BFB /* Debug */,
+				35FB812A91A24C2DBCA72A70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		XTCL00000000000000001 /* Build configuration list for PBXNativeTarget "BinkyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				XTBCFGD000000000000001 /* Debug */,
+				XTBCFGR000000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 30998CF249484469BEA4BC05 /* Project object */;
+}

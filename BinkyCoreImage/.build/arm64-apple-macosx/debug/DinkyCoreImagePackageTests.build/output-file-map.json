@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/primary.swiftdeps"
+  },
+  "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.derived/runner.swift": {
+    "dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/runner.d",
+    "object": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/runner.swiftdeps",
+    "diagnostics": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/runner.dia"
+  }
+}

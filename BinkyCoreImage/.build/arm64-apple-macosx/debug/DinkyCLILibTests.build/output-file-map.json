@@ -1,0 +1,26 @@
+{
+  "": {
+    "swift-dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/primary.swiftdeps"
+  },
+  "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/ArgumentParserTests.swift": {
+    "dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/ArgumentParserTests.d",
+    "object": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/ArgumentParserTests.swift.o",
+    "swiftmodule": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/ArgumentParserTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/ArgumentParserTests.swiftdeps",
+    "diagnostics": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/ArgumentParserTests.dia"
+  },
+  "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/CompressionPipelineSmokeTests.swift": {
+    "dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/CompressionPipelineSmokeTests.d",
+    "object": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/CompressionPipelineSmokeTests.swift.o",
+    "swiftmodule": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/CompressionPipelineSmokeTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/CompressionPipelineSmokeTests.swiftdeps",
+    "diagnostics": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/CompressionPipelineSmokeTests.dia"
+  },
+  "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/JSONContractTests.swift": {
+    "dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/JSONContractTests.d",
+    "object": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/JSONContractTests.swift.o",
+    "swiftmodule": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/JSONContractTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/JSONContractTests.swiftdeps",
+    "diagnostics": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/JSONContractTests.dia"
+  }
+}

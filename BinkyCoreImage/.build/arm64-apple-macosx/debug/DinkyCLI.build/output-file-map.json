@@ -1,0 +1,33 @@
+{
+  "": {
+    "swift-dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/primary.swiftdeps"
+  },
+  "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLI/CLIJSONModels.swift": {
+    "dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/CLIJSONModels.d",
+    "object": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/CLIJSONModels.swift.o",
+    "swiftmodule": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/CLIJSONModels~partial.swiftmodule",
+    "swift-dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/CLIJSONModels.swiftdeps",
+    "diagnostics": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/CLIJSONModels.dia"
+  },
+  "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLI/DinkyCLIMain.swift": {
+    "dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyCLIMain.d",
+    "object": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyCLIMain.swift.o",
+    "swiftmodule": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyCLIMain~partial.swiftmodule",
+    "swift-dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyCLIMain.swiftdeps",
+    "diagnostics": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyCLIMain.dia"
+  },
+  "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLI/DinkyCompressCommand.swift": {
+    "dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyCompressCommand.d",
+    "object": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyCompressCommand.swift.o",
+    "swiftmodule": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyCompressCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyCompressCommand.swiftdeps",
+    "diagnostics": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyCompressCommand.dia"
+  },
+  "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLI/DinkyServeCommand.swift": {
+    "dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyServeCommand.d",
+    "object": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyServeCommand.swift.o",
+    "swiftmodule": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyServeCommand~partial.swiftmodule",
+    "swift-dependencies": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyServeCommand.swiftdeps",
+    "diagnostics": "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLI.build/DinkyServeCommand.dia"
+  }
+}

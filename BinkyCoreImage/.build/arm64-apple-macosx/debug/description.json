@@ -1,0 +1,1355 @@
+{
+  "builtTestProducts" : [
+    {
+      "binaryPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.xctest/Contents/MacOS/DinkyCoreImagePackageTests",
+      "packagePath" : "/Users/heyderekj/dinky/DinkyCoreImage",
+      "productName" : "DinkyCoreImagePackageTests"
+    }
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.DinkyCLIApp-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLIApp.build/sources",
+      "importPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLIApp/DinkyCLIMain.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCLILib.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLIApp.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "DinkyCLIApp",
+      "moduleOutputPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCLIApp.swiftmodule",
+      "objects" : [
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLIApp.build/DinkyCLIMain.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx15.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j8",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "DinkyCLIApp_main",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dinkycoreimage"
+      ],
+      "outputFileMapPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLIApp.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLIApp.build/DinkyCLIMain.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCLIApp.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLIApp/DinkyCLIMain.swift"
+      ],
+      "tempsPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLIApp.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.DinkyCLILib-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/sources",
+      "importPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/CLIJSONModels.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCLIHelp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressArgParser.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressCommand.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressOptions.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyServeCommand.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCoreImage.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "DinkyCLILib",
+      "moduleOutputPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCLILib.swiftmodule",
+      "objects" : [
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/CLIJSONModels.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCLIHelp.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressArgParser.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressCommand.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressOptions.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyServeCommand.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx15.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j8",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/include/DinkyCLILib-Swift.h",
+        "-swift-version",
+        "6",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dinkycoreimage"
+      ],
+      "outputFileMapPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/CLIJSONModels.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCLIHelp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressArgParser.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressCommand.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressOptions.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyServeCommand.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCLILib.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/CLIJSONModels.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCLIHelp.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressArgParser.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressCommand.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressOptions.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyServeCommand.swift"
+      ],
+      "tempsPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.DinkyCLILibTests-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/sources",
+      "importPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/ArgumentParserTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/CompressionPipelineSmokeTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/JSONContractTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCLILib.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCoreImage.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "DinkyCLILibTests",
+      "moduleOutputPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCLILibTests.swiftmodule",
+      "objects" : [
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/ArgumentParserTests.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/CompressionPipelineSmokeTests.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/JSONContractTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx15.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j8",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-swift-version",
+        "6",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dinkycoreimage"
+      ],
+      "outputFileMapPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/ArgumentParserTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/CompressionPipelineSmokeTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/JSONContractTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCLILibTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/ArgumentParserTests.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/CompressionPipelineSmokeTests.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/JSONContractTests.swift"
+      ],
+      "tempsPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.DinkyCoreImage-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/sources",
+      "importPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/CompressionFormat.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/CompressionGoals.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/ContentClassifier.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyEncoderPath.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompression.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompressionError.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompressionResult.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/OriginalsHandler.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/OutputPathUniqueness.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/SharedEnums.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "DinkyCoreImage",
+      "moduleOutputPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCoreImage.swiftmodule",
+      "objects" : [
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/CompressionFormat.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/CompressionGoals.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/ContentClassifier.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyEncoderPath.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompression.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompressionError.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompressionResult.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/OriginalsHandler.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/OutputPathUniqueness.swift.o",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/SharedEnums.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx15.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j8",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/include/DinkyCoreImage-Swift.h",
+        "-swift-version",
+        "6",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dinkycoreimage"
+      ],
+      "outputFileMapPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/CompressionFormat.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/CompressionGoals.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/ContentClassifier.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyEncoderPath.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompression.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompressionError.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompressionResult.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/OriginalsHandler.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/OutputPathUniqueness.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/SharedEnums.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCoreImage.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/CompressionFormat.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/CompressionGoals.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/ContentClassifier.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyEncoderPath.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompression.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompressionError.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompressionResult.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/OriginalsHandler.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/OutputPathUniqueness.swift",
+        "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/SharedEnums.swift"
+      ],
+      "tempsPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.DinkyCoreImagePackageTests-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/sources",
+      "importPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.derived/runner.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCLILibTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "DinkyCoreImagePackageTests",
+      "moduleOutputPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCoreImagePackageTests.swiftmodule",
+      "objects" : [
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/runner.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx15.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j8",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/include/DinkyCoreImagePackageTests-Swift.h",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dinkycoreimage"
+      ],
+      "outputFileMapPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules/DinkyCoreImagePackageTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.derived/runner.swift"
+      ],
+      "tempsPath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "DinkyCLIApp" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "DinkyCLIApp",
+      "-package-name",
+      "dinkycoreimage",
+      "-c",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLIApp/DinkyCLIMain.swift",
+      "-I",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx15.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j8",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "DinkyCLIApp_main",
+      "-parse-as-library",
+      "-swift-version",
+      "6",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dinkycoreimage",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "DinkyCLILib" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "DinkyCLILib",
+      "-package-name",
+      "dinkycoreimage",
+      "-c",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/CLIJSONModels.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCLIHelp.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressArgParser.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressCommand.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressOptions.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyServeCommand.swift",
+      "-I",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx15.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j8",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/include/DinkyCLILib-Swift.h",
+      "-swift-version",
+      "6",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dinkycoreimage",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "DinkyCLILibTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "DinkyCLILibTests",
+      "-package-name",
+      "dinkycoreimage",
+      "-c",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/ArgumentParserTests.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/CompressionPipelineSmokeTests.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/JSONContractTests.swift",
+      "-I",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx15.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j8",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-swift-version",
+      "6",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dinkycoreimage",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "DinkyCoreImage" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "DinkyCoreImage",
+      "-package-name",
+      "dinkycoreimage",
+      "-c",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/CompressionFormat.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/CompressionGoals.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/ContentClassifier.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyEncoderPath.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompression.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompressionError.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompressionResult.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/OriginalsHandler.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/OutputPathUniqueness.swift",
+      "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/SharedEnums.swift",
+      "-I",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx15.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j8",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/include/DinkyCoreImage-Swift.h",
+      "-swift-version",
+      "6",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dinkycoreimage",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "DinkyCoreImagePackageTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "DinkyCoreImagePackageTests",
+      "-package-name",
+      "dinkycoreimage",
+      "-c",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.derived/runner.swift",
+      "-I",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx15.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j8",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/include/DinkyCoreImagePackageTests-Swift.h",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dinkycoreimage",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "DinkyCLIApp" : [
+      "DinkyCLILib",
+      "DinkyCoreImage"
+    ],
+    "DinkyCLILib" : [
+      "DinkyCoreImage"
+    ],
+    "DinkyCLILibTests" : [
+      "DinkyCLILib",
+      "DinkyCoreImage"
+    ],
+    "DinkyCoreImage" : [
+
+    ],
+    "DinkyCoreImagePackageTests" : [
+      "DinkyCLILibTests",
+      "DinkyCLILib",
+      "DinkyCoreImage"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+    "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.derived/runner.swift" : {
+      "inputs" : [
+
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.derived/runner.swift"
+        }
+      ]
+    }
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLIApp.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLIApp/DinkyCLIMain.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLIApp.build/sources"
+    },
+    "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/CLIJSONModels.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCLIHelp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressArgParser.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressCommand.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyCompressOptions.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCLILib/DinkyServeCommand.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/sources"
+    },
+    "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/ArgumentParserTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/CompressionPipelineSmokeTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Tests/DinkyCLILibTests/JSONContractTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/sources"
+    },
+    "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/CompressionFormat.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/CompressionGoals.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/ContentClassifier.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyEncoderPath.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompression.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompressionError.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/DinkyImageCompressionResult.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/OriginalsHandler.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/OutputPathUniqueness.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/Sources/DinkyCoreImage/SharedEnums.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/sources"
+    },
+    "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.derived/runner.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/sources"
+    },
+    "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/CLIJSONModels.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCLIHelp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressArgParser.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressCommand.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressOptions.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyServeCommand.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/ArgumentParserTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/CompressionPipelineSmokeTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILibTests.build/JSONContractTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/CompressionFormat.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/CompressionGoals.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/ContentClassifier.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyEncoderPath.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompression.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompressionError.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompressionResult.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/OriginalsHandler.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/OutputPathUniqueness.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/SharedEnums.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.build/runner.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImagePackageTests.product/Objects.LinkFileList"
+    },
+    "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/dinky-entitlement.plist" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<entitlement-plist>"
+        },
+        {
+          "kind" : "virtual",
+          "name" : "<com.apple.security.get-task-allow>"
+        }
+      ],
+      "outputFilePath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/dinky-entitlement.plist"
+    },
+    "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/dinky.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLIApp.build/DinkyCLIMain.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/CLIJSONModels.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCLIHelp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressArgParser.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressCommand.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyCompressOptions.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCLILib.build/DinkyServeCommand.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/CompressionFormat.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/CompressionGoals.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/ContentClassifier.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyEncoderPath.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompression.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompressionError.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/DinkyImageCompressionResult.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/OriginalsHandler.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/OutputPathUniqueness.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/SharedEnums.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/dinky.product/Objects.LinkFileList"
+    },
+    "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}

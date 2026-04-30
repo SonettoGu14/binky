@@ -1,0 +1,37 @@
+[build]
+  publish = "site"
+
+[[edge_functions]]
+  function = "markdown-home"
+  path = "/"
+
+# RFC 8288 / discovery — homepage points agents at machine-readable resources
+[[headers]]
+  for = "/"
+  [headers.values]
+    Link = "</.well-known/api-catalog>; rel=\"api-catalog\", </llms.txt>; rel=\"describedby\", </openapi.yaml>; rel=\"service-desc\", </homepage.md>; rel=\"alternate\"; type=\"text/markdown\""
+
+[[headers]]
+  for = "/.well-known/api-catalog"
+  [headers.values]
+    Content-Type = "application/linkset+json; charset=utf-8"
+
+[[headers]]
+  for = "/.well-known/agent-skills/index.json"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+
+[[headers]]
+  for = "/openapi.yaml"
+  [headers.values]
+    Content-Type = "application/yaml; charset=utf-8"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"

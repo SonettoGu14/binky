@@ -1,0 +1,16 @@
+.DS_Store
+*.xcuserstate
+xcuserdata/
+*.xcworkspace/xcshareddata/
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.dmg
+
+# Release archives — host on GitHub Releases, not in the repo
+Dinky-*.zip
+
+# Local Netlify folder
+.netlify

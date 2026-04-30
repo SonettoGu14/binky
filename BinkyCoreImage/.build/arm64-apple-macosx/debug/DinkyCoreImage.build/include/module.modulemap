@@ -1,0 +1,3 @@
+module DinkyCoreImage {
+    header "/Users/heyderekj/dinky/DinkyCoreImage/.build/arm64-apple-macosx/debug/DinkyCoreImage.build/include/DinkyCoreImage-Swift.h"
+}

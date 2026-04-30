@@ -1,0 +1,8 @@
+openapi: 3.1.0
+info:
+  title: Dinky
+  version: "0.0.0"
+  description: |
+    Dinky is a native macOS desktop application. There is no public HTTP API on dinkyfiles.com.
+    This document exists only for machine-readable discovery (RFC 9727 service-desc).
+paths: {}

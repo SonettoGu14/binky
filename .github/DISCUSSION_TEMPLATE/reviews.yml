@@ -1,0 +1,43 @@
+title: "[Review] "
+labels:
+  - review
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking a minute. Quotes from this category may be featured on binkyfiles.com — only with your explicit permission below.
+  - type: dropdown
+    id: rating
+    attributes:
+      label: Rating
+      options:
+        - "5 — love it"
+        - "4 — really good"
+        - "3 — it's fine"
+        - "2 — has issues"
+        - "1 — not for me"
+    validations:
+      required: true
+  - type: textarea
+    id: quote
+    attributes:
+      label: What you'd tell a friend about Binky
+      placeholder: "A sentence or two is perfect."
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Name to display (optional)
+  - type: input
+    id: link
+    attributes:
+      label: Site, X handle, or LinkedIn (optional)
+      placeholder: "https://…  or  @yourhandle"
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Permission
+      options:
+        - label: "I'm okay with Derek quoting this on binkyfiles.com (with attribution above)."
+          required: true

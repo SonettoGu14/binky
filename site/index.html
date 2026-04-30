@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dinky makes files smaller.</title>
+  <meta name="description" content="A macOS app making images, videos, and PDFs smaller. Automatic codec conversion. Free and open source." />
+
+  <link rel="canonical" href="https://dinkyfiles.com" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="apple-touch-icon" href="app-icon.webp" />
+
+  <meta property="og:title" content="Dinky makes files smaller." />
+  <meta property="og:description" content="A macOS app making images, videos, and PDFs smaller. Automatic codec conversion. Free and open source." />
+  <meta property="og:image" content="https://dinkyfiles.com/screenshots/og-image.png" />
+  <meta property="og:url" content="https://dinkyfiles.com" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Dinky" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Dinky makes files smaller." />
+  <meta name="twitter:description" content="A macOS app making images, videos, and PDFs smaller. Automatic codec conversion. Free and open source." />
+  <meta name="twitter:image" content="https://dinkyfiles.com/screenshots/og-image.png" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Dinky",
+    "operatingSystem": "macOS",
+    "applicationCategory": "UtilitiesApplication",
+    "description": "A macOS app that shrinks images, videos, and PDFs. Converts still images to WebP, AVIF, HEIC, or lossless PNG; smaller MP4 video; PDF flatten or preserve with optional scan OCR. Presets, watch folders, URL drop. Drag, drop, get smaller files back. Free, open source, local.",
+    "url": "https://dinkyfiles.com",
+    "downloadUrl": "https://github.com/heyderekj/dinky/releases/download/v2.7.12/Dinky-2.7.12.dmg",
+    "softwareVersion": "2.7.12",
+    "fileSize": "33 MB",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Derek Castelli", "url": "https://heyderekj.com" },
+    "contactPoint": { "@type": "ContactPoint", "contactType": "customer support", "email": "help@dinkyfiles.com" }
+  }
+  </script>
+
+  <!-- Fathom - beautiful, simple website analytics -->
+  <script src="https://cdn.usefathom.com/script.js" data-site="KGNDSOKI" defer></script>
+  <!-- / Fathom -->
+
+  <style>
+    /*
+      Color system: OKLCH with identical sRGB fallbacks (second declaration wins when
+      `oklch()` is supported). Easier to tune L/C/H consistently; neutrals share ~286° hue.
+    */
+    :root {
+      /* sRGB fallbacks for browsers without `oklch()` */
+      --bg: #fff;
+      --text: #1c1c1e;
+      --text-secondary: #6b6b70;
+      --brand: #2563eb;
+      --brand-hover: #1d4ed8;
+      --divider: #eaeaea;
+      --button-secondary-hover: #f1f1f3;
+      --modal-bg: #fff;
+      --surface: #f1f1f3;
+      --surface-hover: #e4e4e6;
+      --shadow-xs: rgba(0, 0, 0, 0.08);
+      --shadow-md: rgba(0, 0, 0, 0.18);
+      --shadow-overlay: rgba(0, 0, 0, 0.4);
+      --code-bg: #1c1c1e;
+      --faq-row-even: rgba(0, 0, 0, 0.03);
+      --row-hover: rgba(37, 99, 235, 0.05);
+      --cmp-cross: #d1d1d6;
+      --cmp-dim: #aeaeb2;
+      --text-on-brand: #fff;
+      --code-text: #e5e5ea;
+      --success: #30d158;
+      /* Muted label on code blocks (same hex in light & dark for contrast on --code-bg) */
+      --code-muted: #aeaeb2;
+      /* OKLCH */
+      --bg: oklch(1 0 0);
+      --text: oklch(0.2273 0.0038 286.09);
+      --text-secondary: oklch(0.5295 0.0077 286.13);
+      --brand: oklch(0.546 0.238 264.1);
+      --brand-hover: oklch(0.492 0.232 264.2);
+      --divider: oklch(0.937 0 0);
+      --button-secondary-hover: oklch(0.9587 0.0027 286.35);
+      --modal-bg: oklch(1 0 0);
+      --surface: oklch(0.9587 0.0027 286.35);
+      --surface-hover: oklch(0.9194 0.0027 286.35);
+      --shadow-xs: oklch(0 0 0 / 0.08);
+      --shadow-md: oklch(0 0 0 / 0.18);
+      --shadow-overlay: oklch(0 0 0 / 0.4);
+      --code-bg: oklch(0.2273 0.0038 286.09);
+      --faq-row-even: oklch(0 0 0 / 0.03);
+      --row-hover: oklch(0.546 0.238 264.1 / 0.05);
+      --cmp-cross: oklch(0.8622 0.0068 286.26);
+      --cmp-dim: oklch(0.752 0.0057 286.26);
+      --text-on-brand: oklch(1 0 0);
+      --code-text: oklch(0.9233 0.0067 286.27);
+      --success: oklch(0.7556 0.2082 146.98);
+      --code-muted: oklch(0.752 0.0057 286.26);
+      /* Match comparison row gutter and write-ups block offset above */
+      --cmp-row-gap: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* Brighter blue on dark bg = higher WCAG contrast vs page bg (links + eyebrow); bg is midpoint #000 ↔ #1c1c1e */
+        --bg: #0e0e0f;
+        --text: #f5f5f7;
+        --text-secondary: #98989d;
+        --brand: #60a5fa;
+        --brand-hover: #93c5fd;
+        --divider: #38383a;
+        --button-secondary-hover: #2c2c2e;
+        --modal-bg: #2c2c2e;
+        --surface: #3a3a3c;
+        --surface-hover: #48484a;
+        --shadow-xs: rgba(0, 0, 0, 0.4);
+        --shadow-md: rgba(0, 0, 0, 0.5);
+        --shadow-overlay: rgba(0, 0, 0, 0.6);
+        --code-bg: #2c2c2e;
+        --faq-row-even: rgba(255, 255, 255, 0.04);
+        --row-hover: rgba(96, 165, 250, 0.09);
+        --cmp-cross: #48484a;
+        --cmp-dim: #636366;
+        /* OKLCH */
+        --bg: oklch(0.1137 0.0019 286.09);
+        --text: oklch(0.9707 0.0027 286.35);
+        --text-secondary: oklch(0.6812 0.0073 286.21);
+        --brand: oklch(0.707 0.21 258.5);
+        --brand-hover: oklch(0.79 0.165 255.7);
+        --divider: oklch(0.3414 0.0034 286.22);
+        --button-secondary-hover: oklch(0.2939 0.0036 286.18);
+        --modal-bg: oklch(0.2939 0.0036 286.18);
+        --surface: oklch(0.3492 0.0034 286.22);
+        --surface-hover: oklch(0.4024 0.0033 286.25);
+        --shadow-xs: oklch(0 0 0 / 0.4);
+        --shadow-md: oklch(0 0 0 / 0.5);
+        --shadow-overlay: oklch(0 0 0 / 0.6);
+        --code-bg: oklch(0.2939 0.0036 286.18);
+        --faq-row-even: oklch(1 0 0 / 0.04);
+        --row-hover: oklch(0.707 0.21 258.5 / 0.09);
+        --cmp-cross: oklch(0.4024 0.0033 286.25);
+        --cmp-dim: oklch(0.5007 0.0047 286.23);
+        /* Segmented control “pill” on dark gray track — distinct from page bg */
+        --segmented-tab-active: #5a5a5c;
+        --segmented-tab-active: oklch(0.4683 0.0032 286.28);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 24px 40px;
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 560px;
+      width: 100%;
+      overflow: visible;
+    }
+
+    /* Outer wrap: room for shadow + rotation. Inner stage: filter + wiggle on one element so
+       iOS Safari does not promote separate layers (filtered img vs transformed parent), which
+       showed as one or two opaque rectangles behind the icon. */
+    .app-icon-wrap {
+      margin-bottom: 12px;
+      padding: 20px 22px;
+    }
+
+    .app-icon-stage {
+      display: inline-block;
+      line-height: 0;
+      transform-origin: 50% 85%;
+      filter:
+        drop-shadow(0 1px 1px var(--shadow-xs))
+        drop-shadow(0 10px 20px var(--shadow-md));
+      /* Safari compositing: pre-promote layer so filter+transform animation
+         doesn't create an opaque backing store mid-animation */
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+
+    .app-icon-stage.is-wiggling {
+      animation: app-icon-wiggle 1.1s ease-out 1 both;
+    }
+
+    .app-icon {
+      display: block;
+      width: 96px;
+      height: 96px;
+    }
+
+    @keyframes app-icon-wiggle {
+      0%   { transform: rotate(0deg); }
+      15%  { transform: rotate(-9deg); }
+      30%  { transform: rotate(7deg); }
+      45%  { transform: rotate(-5deg); }
+      60%  { transform: rotate(3deg); }
+      75%  { transform: rotate(-2deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .app-icon-stage.is-wiggling { animation: none; }
+    }
+
+    /* GitHub hover star burst — count grows gently with stargazers (sqrt curve, capped) */
+    .gh-star {
+      position: fixed;
+      pointer-events: none;
+      color: var(--brand);
+      text-shadow:
+        0 0 6px color-mix(in srgb, var(--brand) 55%, transparent),
+        0 0 14px color-mix(in srgb, var(--brand) 35%, transparent);
+      transform: translate(-50%, -50%) scale(0.4);
+      z-index: 200;
+      line-height: 1;
+      animation: gh-star-fly var(--dur, 1600ms) cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+      will-change: transform, opacity;
+    }
+    @keyframes gh-star-fly {
+      0%   { transform: translate(-50%, -50%) scale(0.3) rotate(0deg); opacity: 0; }
+      18%  { opacity: 1; }
+      100% {
+        transform:
+          translate(calc(-50% + var(--dx)), calc(-50% + var(--dy)))
+          scale(1) rotate(var(--rot));
+        opacity: 0;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .gh-star { display: none; }
+    }
+
+    /* Sync the in-button star + count with the burst color */
+    .btn-secondary .gh-star-anchor,
+    .btn-secondary #gh-stars-count {
+      transition: color 180ms ease, text-shadow 180ms ease;
+    }
+    .btn-secondary.is-bursting .gh-star-anchor,
+    .btn-secondary.is-bursting #gh-stars-count {
+      color: var(--brand);
+      text-shadow: 0 0 6px color-mix(in srgb, var(--brand) 45%, transparent);
+    }
+
+    h1 {
+      font-size: 56px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: var(--brand);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .tagline {
+      font-size: 17px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .description {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 28px;
+      max-width: 400px;
+      text-wrap: pretty;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.15s ease, transform 0.1s ease;
+      border: 1px solid transparent;
+      line-height: 1.4;
+    }
+
+    .btn:has(> svg) {
+      padding-left: 11px;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: var(--text-on-brand);
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-hover);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--divider);
+    }
+
+    .btn-secondary:hover {
+      background: var(--button-secondary-hover);
+    }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .version {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 8px auto 0;
+      max-width: 320px;
+      line-height: 1.5;
+    }
+
+    .screenshots {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      max-width: 960px;
+      margin-top: 32px;
+      padding: 0 8px;
+    }
+
+    .screenshots img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px var(--shadow-xs);
+      display: block;
+    }
+
+    .ss-row {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 16px;
+      /* Stretch so the screenshot column matches the text card height */
+      align-items: stretch;
+    }
+
+    .ss-row.is-rev {
+      grid-template-columns: 2fr 3fr;
+    }
+
+    .ss-row > img {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      align-self: stretch;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    /* Multi-feature rows: narrower max-width so the square screenshot isn't enormous */
+    .ss-row:not(:has(.ss-card.is-hero)) {
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+    }
+
+    .ss-shot {
+      align-self: center;
+    }
+
+    /* Square screenshot: don't stretch to match the text card — keeps 1:1 assets uncropped */
+    .ss-shot img {
+      width: 100%;
+      aspect-ratio: 1;
+      height: auto;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    .ss-card {
+      background: var(--faq-row-even);
+      border: 1px solid var(--divider);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+      align-self: stretch;
+    }
+
+    .ss-card.is-hero {
+      gap: 12px;
+    }
+
+    .ss-card-features {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .ss-card-features.is-2col {
+      grid-template-columns: 1fr 1fr;
+      gap: 24px 28px;
+    }
+
+    .ss-card-feature .feature-icon {
+      width: 20px;
+      height: 20px;
+      margin-bottom: 6px;
+    }
+
+    .ss-card-feature h3 {
+      margin: 0 0 4px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .ss-card-feature p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .ss-card-hero-title {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .ss-card-hero-text {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+
+    .ss-card.is-hero .ss-card-hero-text + .ss-card-hero-text {
+      margin-top: 10px;
+    }
+
+    .ss-card-hero-text a {
+      color: var(--brand);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
+
+    .ss-card-hero-text a:hover {
+      color: var(--brand-hover);
+    }
+
+    .ss-card-hero-text code {
+      font-size: 0.92em;
+      padding: 0.12em 0.35em;
+      border-radius: 4px;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .ss-hero-stat {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-top: 4px;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .ss-hero-stat-from {
+      color: var(--text-secondary);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+    }
+
+    .ss-hero-stat-arrow {
+      color: var(--text-secondary);
+      font-size: 18px;
+    }
+
+    .ss-hero-stat-to {
+      color: var(--brand);
+    }
+
+    .ss-hero-stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      opacity: 0.7;
+    }
+
+    .ss-hero-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--brand);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: -8px;
+    }
+    .ss-hero-eyebrow-icon {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      color: inherit;
+    }
+
+    .meta-note {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: min(34em, 100%);
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0 8px;
+      line-height: 1.45;
+      text-wrap: pretty;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px 40px;
+      width: 100%;
+      max-width: 900px;
+      margin-top: 40px;
+      padding: 0 8px;
+    }
+
+    .feature-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--brand);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .feature h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+
+    .feature p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .feature p + p {
+      margin-top: 10px;
+    }
+
+    .install-fallback {
+      display: block;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+    .install-fallback a {
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
+    .install-fallback a:hover { color: var(--text); }
+    /* Opened from hero “how to install” or MCP — no “download didn’t start” line */
+    #install-modal.install-modal--help .install-fallback {
+      display: none;
+    }
+    .install-step-stack {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .install-step-stack p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .install-callout {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 20px;
+      padding: 12px 14px;
+      background: var(--row-hover);
+      border-radius: 10px;
+    }
+
+    .install-callout-icon {
+      width: 18px;
+      height: 18px;
+      color: var(--brand);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .install-callout p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .install-callout p strong {
+      color: var(--text);
+    }
+
+    .install-modal-tabstrip {
+      margin: 0 0 18px;
+    }
+    .install-modal-tabstrip .cmp-segmented {
+      max-width: none;
+      width: 100%;
+    }
+    .install-homebrew-note {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .install-homebrew-note a {
+      color: var(--brand);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
+    .install-homebrew-note a:hover {
+      color: var(--text);
+    }
+    .install-code-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .install-homebrew-foot {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin-top: 4px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--shadow-overlay);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    /* Lock page scroll while any modal is open */
+    html.modal-scroll-locked {
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+    .modal {
+      background: var(--modal-bg);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 520px;
+      width: 100%;
+      max-height: min(90vh, 720px);
+      overflow-y: auto;
+      box-shadow: 0 24px 64px var(--shadow-md);
+      position: relative;
+    }
+    .modal h2 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: var(--surface);
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 16px;
+      line-height: 1;
+    }
+    .modal-close:hover { background: var(--surface-hover); color: var(--text); }
+    .install-steps {
+      list-style: none;
+      counter-reset: steps;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .install-steps li {
+      counter-increment: steps;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .install-steps li::before {
+      content: counter(steps);
+      min-width: 22px;
+      height: 22px;
+      background: var(--brand);
+      color: var(--text-on-brand);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .install-steps li span {
+      flex: 1;
+      min-width: 0;
+    }
+    .install-steps li kbd {
+      font-family: inherit;
+      font-size: 13px;
+      background: var(--surface);
+      border-radius: 4px;
+      padding: 1px 5px;
+      white-space: nowrap;
+    }
+    .code-block {
+      background: var(--code-bg);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .code-block code {
+      font-family: "SF Mono", "Fira Mono", "Menlo", monospace;
+      font-size: 12.5px;
+      color: var(--code-text);
+      word-break: break-all;
+    }
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.12);
+      background: oklch(1 0 0 / 0.12);
+      border: none;
+      border-radius: 6px;
+      color: var(--code-muted);
+      cursor: pointer;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-family: inherit;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      background: oklch(1 0 0 / 0.2);
+      color: var(--text-on-brand);
+    }
+    .copy-btn.copied { color: var(--success); }
+
+    /* FAQ */
+    .faq {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 80px;
+    }
+    .faq > h2 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 48px;
+      row-gap: 0;
+      padding: 0 8px;
+    }
+    .faq-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 24px 0;
+      border-top: 1px solid var(--divider);
+    }
+    .faq-item:nth-child(-n+2) {
+      border-top: none;
+      padding-top: 0;
+    }
+    .faq-q {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      line-height: 1.4;
+    }
+    .faq-a {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    /* Same link treatment as footer — secondary + underline; hover to primary text */
+    footer a,
+    .faq-a a,
+    .cmp-text-card a {
+      color: var(--text-secondary);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
+    footer a:hover,
+    .faq-a a:hover,
+    .cmp-text-card a:hover {
+      color: var(--text);
+    }
+    .faq-inline-link {
+      display: inline;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font: inherit;
+      color: var(--text-secondary);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
+    .faq-inline-link:hover {
+      color: var(--text);
+    }
+    .faq-inline-link.version-install-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      vertical-align: -0.2em;
+    }
+    .faq-inline-link.version-install-link svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .gatekeeper-lead,
+    .install-modal-sublead {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin: 0 0 14px;
+    }
+
+    .install-modal-lead {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text);
+      margin: 0 0 16px;
+    }
+
+    @media (max-width: 700px) {
+      .faq-grid { grid-template-columns: 1fr; }
+      .faq-item:nth-child(-n+2) { border-top: 1px solid var(--divider); padding-top: 24px; }
+      .faq-item:first-child { border-top: none; padding-top: 0; }
+    }
+
+    /* Comparison */
+    .comparison {
+      width: 100%;
+      max-width: 960px;
+      margin-top: 80px;
+    }
+    .cmp-row {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: var(--cmp-row-gap);
+      align-items: stretch;
+    }
+    .cmp-text-card {
+      background: var(--faq-row-even);
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 14px;
+    }
+    .cmp-title {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .cmp-desc {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .cmp-footnote {
+      margin: 0;
+      margin-top: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .cmp-writeups {
+      width: 100%;
+      max-width: 960px;
+      margin: var(--cmp-row-gap) auto 0;
+    }
+    .cmp-writeups-specialists {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 28px 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--divider);
+    }
+    .cmp-writeups-specialists-intro {
+      flex: 1 1 220px;
+      max-width: min(26rem, 100%);
+      min-width: min(100%, 11rem);
+    }
+    .cmp-writeups-specialists .cmp-writeups-grid {
+      flex: 2 1 400px;
+      min-width: min(100%, 280px);
+    }
+    .cmp-writeups-specialists-title {
+      margin: 0 0 10px;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .cmp-writeups-specialists-lead {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .cmp-writeups-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px 32px;
+      align-items: start;
+    }
+    .cmp-writeups-cat {
+      margin: 0 0 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .cmp-writeups-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .cmp-writeups-list li + li {
+      margin-top: 6px;
+    }
+    .cmp-writeups-list a {
+      color: var(--text-secondary);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
+    .cmp-writeups-list a:hover {
+      color: var(--text);
+    }
+
+    .cmp-writeups-suite {
+      margin: 0 0 28px;
+    }
+    .cmp-writeups-suite-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .cmp-writeups-suite-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--bg);
+      border: 1px solid var(--divider);
+      border-radius: 12px;
+      padding: 18px 20px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .cmp-writeups-suite-card:hover {
+      border-color: var(--brand);
+      box-shadow: 0 4px 20px var(--shadow-xs);
+    }
+    .cmp-writeups-suite-card-kicker {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--brand);
+      margin-bottom: 6px;
+    }
+    .cmp-writeups-suite-card-name {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .cmp-writeups-suite-card-desc {
+      margin: 0 0 12px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .cmp-writeups-suite-card-cta {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--brand);
+    }
+
+    .comparison-card {
+      background: var(--faq-row-even);
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      overflow: hidden;
+      padding-top: 12px;
+    }
+    .cmp-mobile-tabs {
+      display: flex;
+      padding: 0 14px 20px;
+      justify-content: center;
+    }
+    .cmp-segmented {
+      display: inline-flex;
+      padding: 3px;
+      background: var(--surface);
+      border-radius: 9px;
+      gap: 2px;
+      width: 100%;
+      max-width: 320px;
+    }
+    .cmp-tab {
+      flex: 1 1 0;
+      padding: 7px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .cmp-tab:hover { color: var(--text); }
+    .cmp-tab.is-active {
+      background: var(--segmented-tab-active, var(--bg));
+      color: var(--text);
+      box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.08),
+        0 0 0 0.5px rgba(0, 0, 0, 0.04);
+      box-shadow:
+        0 1px 2px oklch(0 0 0 / 0.08),
+        0 0 0 0.5px oklch(0 0 0 / 0.04);
+    }
+    @media (prefers-color-scheme: dark) {
+      .cmp-tab.is-active {
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 1px 2px oklch(0 0 0 / 0.3);
+      }
+    }
+    .comparison-scroll {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .comparison-table {
+      width: 100%;
+      min-width: 0;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .comparison-table[data-active-cat="image"] th[data-cat="video"],
+    .comparison-table[data-active-cat="image"] th[data-cat="pdf"],
+    .comparison-table[data-active-cat="image"] td[data-col="video"],
+    .comparison-table[data-active-cat="image"] td[data-col="pdf"],
+    .comparison-table[data-active-cat="video"] th[data-cat="image"],
+    .comparison-table[data-active-cat="video"] th[data-cat="pdf"],
+    .comparison-table[data-active-cat="video"] td[data-col="image"],
+    .comparison-table[data-active-cat="video"] td[data-col="pdf"],
+    .comparison-table[data-active-cat="pdf"] th[data-cat="image"],
+    .comparison-table[data-active-cat="pdf"] th[data-cat="video"],
+    .comparison-table[data-active-cat="pdf"] td[data-col="image"],
+    .comparison-table[data-active-cat="pdf"] td[data-col="video"] { display: none; }
+    .comparison-table thead th {
+      padding: 0 16px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-align: center;
+      border-bottom: 1px solid var(--divider);
+      white-space: nowrap;
+    }
+    .comparison-table thead th:first-child {
+      text-align: left;
+      padding-left: 24px;
+    }
+    .comparison-table thead th:last-child,
+    .comparison-table tbody td:last-child { padding-right: 24px; }
+    .comparison-table thead .th-dinky,
+    .comparison-table thead .th-cycle { width: 170px; }
+    .comparison-table thead .th-dinky { padding-bottom: 10px; vertical-align: top; }
+    .th-dinky-name {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--brand);
+      letter-spacing: -0.01em;
+      line-height: 22px;
+    }
+    .comparison-table thead .th-cycle { padding-bottom: 10px; vertical-align: top; }
+    .th-cat {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+      opacity: 0.7;
+    }
+    .th-cycle-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+    .th-tool {
+      display: inline-block;
+      min-width: 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      line-height: 22px;
+      white-space: nowrap;
+      transition: opacity 0.18s ease;
+    }
+    .th-tool.fading { opacity: 0; }
+    .th-cycle-btn {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid var(--divider);
+      background: transparent;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .th-cycle-btn:hover {
+      background: var(--button-secondary-hover);
+      color: var(--text);
+      border-color: var(--text-secondary);
+    }
+    .th-cycle-btn svg { width: 10px; height: 10px; }
+    .comparison-table tbody td {
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--divider);
+      transition: background 0.15s ease;
+    }
+    .comparison-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .comparison-table tbody tr:hover td {
+      background: var(--row-hover);
+    }
+    .comparison-table tbody tr:hover .cmp-label {
+      color: var(--brand);
+    }
+    .comparison-table tbody tr:hover .cmp-icon {
+      color: var(--brand);
+    }
+
+    .cmp-label-cell {
+      text-align: left !important;
+      padding-left: 24px !important;
+    }
+    .cmp-label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      transition: color 0.15s ease;
+    }
+    .cmp-icon {
+      width: 15px;
+      height: 15px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      overflow: visible;
+      transition: color 0.15s ease;
+    }
+    .cmp-check {
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+      color: var(--brand);
+    }
+    .cmp-cross { color: var(--cmp-cross); }
+    .cmp-dim {
+      color: var(--cmp-dim);
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .cmp-row { grid-template-columns: 1fr; }
+      .cmp-text-card { padding: 24px; }
+      .cmp-writeups-specialists {
+        flex-direction: column;
+        gap: 24px;
+      }
+      .cmp-writeups-specialists-intro {
+        flex: none;
+        max-width: 42rem;
+      }
+      .cmp-writeups-specialists .cmp-writeups-grid {
+        flex: none;
+        width: 100%;
+        min-width: 0;
+      }
+      .cmp-writeups-grid { grid-template-columns: 1fr; gap: 20px; }
+      .cmp-writeups-suite-cards { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .comparison-card { border-radius: 12px; padding-top: 8px; }
+      .comparison-table thead .th-dinky { width: 56px; }
+      .comparison-table thead .th-cycle { width: 130px; }
+      .comparison-table thead th:first-child,
+      .cmp-label-cell { padding-left: 12px !important; }
+      .comparison-table thead th:last-child,
+      .comparison-table tbody td:last-child { padding-right: 12px; }
+      .comparison-table th,
+      .comparison-table td { padding: 10px 4px; font-size: 12px; white-space: normal; }
+      .comparison-table .cmp-label { font-size: 12px; gap: 7px; }
+      .comparison-table .cmp-icon { width: 14px; height: 14px; }
+      .th-cycle-row { gap: 4px; flex-wrap: nowrap; }
+      .th-cycle-btn { width: 16px; height: 16px; flex-shrink: 0; }
+      .th-cycle-btn svg { width: 9px; height: 9px; }
+      .th-tool { font-size: 12px; min-width: 0; white-space: nowrap; }
+      .th-cat { font-size: 10px; }
+    }
+
+    .reviews { width: 100%; max-width: 960px; margin-top: 56px; }
+    .reviews-head { text-align: center; margin-bottom: 24px; }
+    .reviews-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .reviews-sub { font-size: 14px; color: var(--text-secondary); }
+    .reviews-sub a { color: var(--text-secondary); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+    .reviews-sub a:hover { color: var(--text); }
+    .reviews-grid { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 0 8px; }
+    .review-card { background: var(--faq-row-even); border: 1px solid var(--divider); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+    .review-stars { color: var(--brand); font-size: 14px; letter-spacing: 2px; line-height: 1; }
+    .review-stars .dim { color: var(--cmp-cross); }
+    .review-quote { font-size: 14px; line-height: 1.55; color: var(--text); }
+    .review-author { display: flex; align-items: center; gap: 10px; margin-top: auto; }
+    .review-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--surface); flex-shrink: 0; }
+    .review-name { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+    .review-handle { font-size: 12px; color: var(--text-secondary); }
+    .review-handle a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+    .review-handle a:hover { color: var(--text); }
+    .review-source { font-size: 11px; color: var(--text-secondary); margin-left: auto; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+    .review-source:hover { color: var(--text); }
+    @media (max-width: 700px) {
+      .reviews-grid { grid-template-columns: 1fr; }
+    }
+
+    footer {
+      margin-top: 80px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    @media (max-width: 700px) {
+      .features {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px 24px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 32px 20px 32px;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+
+      .tagline {
+        font-size: 16px;
+      }
+
+      .app-icon-wrap {
+        margin-bottom: 10px;
+        padding: 16px 18px;
+      }
+
+      .app-icon {
+        width: 72px;
+        height: 72px;
+      }
+
+      .screenshots {
+        margin-top: 32px;
+      }
+
+      .ss-row,
+      .ss-row.is-rev {
+        grid-template-columns: 1fr;
+      }
+
+      /* Keep screenshot above copy when rows stack (is-rev markup is card-then-image) */
+      .ss-row.is-rev > img {
+        order: -1;
+      }
+
+      .ss-card {
+        padding: 24px;
+        gap: 20px;
+      }
+
+      .ss-card-features.is-2col {
+        grid-template-columns: 1fr;
+      }
+
+      .features {
+        margin-top: 56px;
+      }
+
+      footer {
+        margin-top: 56px;
+      }
+    }
+  </style>
+  <script>
+    function initDinkyWebMcp() {
+      var mc = typeof navigator !== 'undefined' ? navigator.modelContext : null;
+      if (!mc || typeof mc.registerTool !== 'function') return;
+
+      var ac = new AbortController();
+      var signal = ac.signal;
+      var toolOpts = { signal: signal };
+
+      mc.registerTool({
+        name: 'dinky_scroll_to_faq',
+        description: 'Scroll to the FAQ section on this page.',
+        category: 'navigation',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        execute: function () {
+          var el = document.getElementById('faq');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return Promise.resolve({ ok: true });
+        }
+      }, toolOpts);
+
+      mc.registerTool({
+        name: 'dinky_open_install_modal',
+        description: 'Open the “How to install” modal (Download & install vs Homebrew tabs, Gatekeeper / quarantine).',
+        category: 'install',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        execute: function () {
+          var modal = document.getElementById('install-modal');
+          if (modal) {
+            modal.classList.add('install-modal--help', 'open');
+          }
+          return Promise.resolve({ ok: true });
+        }
+      }, toolOpts);
+
+      mc.registerTool({
+        name: 'dinky_copy_quarantine_command',
+        description: 'Copy the Terminal command to remove the Gatekeeper quarantine flag from Dinky.app.',
+        category: 'clipboard',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        execute: function () {
+          var cmd = document.getElementById('xattr-cmd');
+          var text = cmd ? cmd.textContent : 'xattr -dr com.apple.quarantine /Applications/Dinky.app';
+          return navigator.clipboard.writeText(text).then(function () { return { ok: true, copied: text }; });
+        }
+      }, toolOpts);
+
+      mc.registerTool({
+        name: 'dinky_open_latest_release',
+        description: 'Open the latest Dinky release page on GitHub.',
+        category: 'releases',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        execute: function () {
+          window.open('https://github.com/heyderekj/dinky/releases/latest', '_blank', 'noopener,noreferrer');
+          return Promise.resolve({ ok: true });
+        }
+      }, toolOpts);
+
+      window.addEventListener('pagehide', function () { ac.abort(); }, { once: true });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initDinkyWebMcp);
+    } else {
+      initDinkyWebMcp();
+    }
+  </script>
+</head>
+<body>
+  <section class="hero">
+    <div class="app-icon-wrap">
+      <div class="app-icon-stage">
+        <img src="app-icon.webp" alt="Dinky app icon" class="app-icon" />
+      </div>
+    </div>
+    <h1>Dinky</h1>
+    <p class="tagline">Dinky makes files smaller.</p>
+    <p class="description">
+      A macOS app making images, videos, and PDFs smaller. Automatic codec conversion. Free and open source.
+    </p>
+
+    <div class="buttons">
+      <a class="btn btn-primary" href="https://github.com/heyderekj/dinky/releases/download/v2.7.12/Dinky-2.7.12.dmg" onclick="fathom.trackEvent('Download macOS'); var im=document.getElementById('install-modal'); im.classList.remove('install-modal--help'); im.classList.add('open')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true">
+          <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+        </svg>
+        Download for macOS
+      </a>
+      <a class="btn btn-secondary" href="https://github.com/heyderekj/dinky">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        GitHub<span id="gh-stars"> · <span class="gh-star-anchor" aria-hidden="true">★</span><span id="gh-stars-count"></span></span>
+      </a>
+    </div>
+    <p class="version">33 MB · v2.7.12 · Requires macOS 15 Sequoia · <button type="button" class="faq-inline-link version-install-link" onclick="if(typeof fathom!=='undefined')fathom.trackEvent('install_modal_from_version'); document.getElementById('install-modal').classList.add('install-modal--help','open')" aria-haspopup="dialog" aria-controls="install-modal"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>How to Install</button></p>
+  </section>
+
+  <!-- Install modal -->
+  <div class="modal-overlay" id="install-modal" onclick="if(event.target===this)this.classList.remove('open','install-modal--help')">
+    <div class="modal">
+      <button class="modal-close" onclick="document.getElementById('install-modal').classList.remove('open','install-modal--help')" aria-label="Close">✕</button>
+      <h2>How to install Dinky</h2>
+      <p class="install-modal-lead">Pick the path that fits you — both put Dinky in Applications.</p>
+      <div class="install-modal-tabstrip">
+        <div class="cmp-segmented" role="tablist" aria-label="Install method">
+          <button type="button" class="cmp-tab is-active" role="tab" aria-selected="true" aria-controls="install-panel-dmg" id="install-tab-dmg" data-install-tab="dmg">Download &amp; install</button>
+          <button type="button" class="cmp-tab" role="tab" aria-selected="false" aria-controls="install-panel-brew" id="install-tab-brew" data-install-tab="brew">Homebrew</button>
+        </div>
+      </div>
+      <div id="install-panel-dmg" role="tabpanel" aria-labelledby="install-tab-dmg" data-install-panel="dmg">
+        <p class="install-modal-sublead">macOS will say Dinky can't be opened — that's Gatekeeper, not a virus. Both steps take less than a minute.</p>
+        <ol class="install-steps">
+          <li>
+            <span>
+              Open the <strong>installer</strong> from your Downloads, then drag <strong>Dinky</strong> into your <strong>Applications</strong> folder.
+              <span class="install-fallback">Download didn't start? <a href="https://github.com/heyderekj/dinky/releases/download/v2.7.12/Dinky-2.7.12.dmg" onclick="fathom.trackEvent('Download macOS')">Download again</a>.</span>
+            </span>
+          </li>
+          <li>
+            <div class="install-step-stack">
+              <p>Open <strong>Terminal</strong> and paste this command:</p>
+              <div class="code-block">
+                <code id="xattr-cmd">xattr -dr com.apple.quarantine /Applications/Dinky.app</code>
+                <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </div>
+      <div id="install-panel-brew" role="tabpanel" aria-labelledby="install-tab-brew" data-install-panel="brew" hidden>
+        <p class="install-homebrew-note">Requires <a href="https://brew.sh" target="_blank" rel="noopener noreferrer">Homebrew</a>. In Terminal, run once to add this repo as a tap, then install the app:</p>
+        <div class="install-code-stack">
+          <div class="code-block">
+            <code>brew tap heyderekj/dinky https://github.com/heyderekj/dinky</code>
+            <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
+          </div>
+          <div class="code-block">
+            <code>brew install --cask dinky</code>
+            <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
+          </div>
+        </div>
+        <p class="install-homebrew-foot"><strong>Upgrading Dinky:</strong> in Terminal, run <code style="font-size: 12px; background: var(--surface); padding: 2px 6px; border-radius: 4px;">brew update &amp;&amp; brew upgrade --cask dinky</code> when you want a newer release. <strong>If macOS blocks the first launch,</strong> switch to the <strong>Download &amp; install</strong> tab and run the Terminal command in step 2.</p>
+      </div>
+      <div class="install-callout">
+        <!-- arrow-path (same icon as Easy updating feature) -->
+        <svg class="install-callout-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M4.755 10.059a7.5 7.5 0 0 1 12.548-3.364l1.903 1.903h-3.183a.75.75 0 1 0 0 1.5h4.992a.75.75 0 0 0 .75-.75V4.356a.75.75 0 0 0-1.5 0v3.18l-1.9-1.9A9 9 0 0 0 3.306 9.67a.75.75 0 1 0 1.45.388Zm15.408 3.352a.75.75 0 0 0-.919.53 7.5 7.5 0 0 1-12.548 3.364l-1.902-1.903h3.183a.75.75 0 0 0 0-1.5H2.984a.75.75 0 0 0-.75.75v4.992a.75.75 0 0 0 1.5 0v-3.18l1.9 1.9a9 9 0 0 0 15.059-4.035.75.75 0 0 0-.53-.918Z" clip-rule="evenodd"/>
+        </svg>
+        <p><strong>Easy updating</strong> — once you're set up, one click checks for new releases whenever they become available.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gatekeeper help (no download — for users who already installed) -->
+  <div class="modal-overlay" id="gatekeeper-modal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal">
+      <button class="modal-close" onclick="document.getElementById('gatekeeper-modal').classList.remove('open')" aria-label="Close">✕</button>
+      <h2>macOS blocked Dinky</h2>
+      <p class="gatekeeper-lead">Because Dinky isn't from the App Store, macOS quarantines it on first run. Paste this into Terminal to remove the flag:</p>
+      <div class="code-block">
+        <code id="xattr-cmd-gk">xattr -dr com.apple.quarantine /Applications/Dinky.app</code>
+        <button class="copy-btn" onclick="copyCmd(this)">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="screenshots">
+    <!-- Row A: Drop zone screenshot + card (image left) -->
+    <div class="ss-row">
+      <img src="screenshots/screenshot-drop-active.webp" alt="Dinky drop zone with a file being dragged in — Release to compress" />
+      <div class="ss-card">
+        <div class="ss-card-features">
+          <div class="ss-card-feature">
+            <!-- arrow-down-tray -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd"/>
+            </svg>
+            <h3>Drag and drop</h3>
+            <p>Drop images, videos, or PDFs on the window, the Dock icon, or use the file picker. No fussing.</p>
+          </div>
+          <div class="ss-card-feature">
+            <!-- clipboard-document -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd"/>
+              <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375Zm9.586 4.594a.75.75 0 0 0-1.172-.938l-2.476 3.096-.908-.907a.75.75 0 0 0-1.06 1.06l1.5 1.5a.75.75 0 0 0 1.116-.062l3-3.75Z" clip-rule="evenodd"/>
+            </svg>
+            <h3>Clipboard compress</h3>
+            <p>Copy an image anywhere — screenshot, Figma export, browser grab — and hit ⌘⇧V. Works system-wide, even when Dinky isn't focused.</p>
+          </div>
+          <div class="ss-card-feature">
+            <!-- rectangle-stack -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M5.566 4.657A4.505 4.505 0 0 1 6.75 4.5h10.5c.41 0 .806.055 1.183.157A3 3 0 0 0 15.75 3h-7.5a3 3 0 0 0-2.684 1.657ZM2.25 12a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3v-6ZM5.25 7.5c-.41 0-.806.055-1.184.157A3 3 0 0 1 6.75 6h10.5a3 3 0 0 1 2.683 1.657A4.505 4.505 0 0 0 18.75 7.5H5.25Z"/>
+            </svg>
+            <h3>Images, videos, and PDFs</h3>
+            <p>One app for all three — JPG, PNG, WebP, AVIF, HEIC, PDF, MP4, MOV, and more. Drop anything; Dinky picks the right pipeline.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row B: Sidebar presets + format picker (card left, image right) -->
+    <div class="ss-row is-rev">
+      <div class="ss-card">
+        <div class="ss-card-features">
+          <div class="ss-card-feature">
+            <!-- adjustments-horizontal -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18.75 12.75h1.5a.75.75 0 0 0 0-1.5h-1.5a.75.75 0 0 0 0 1.5ZM12 6a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 12 6ZM12 18a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 12 18ZM3.75 6.75h1.5a.75.75 0 1 0 0-1.5h-1.5a.75.75 0 0 0 0 1.5ZM5.25 18.75h-1.5a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 0 1.5ZM3 12a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 3 12ZM9 3.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM12.75 12a2.25 2.25 0 1 1 4.5 0 2.25 2.25 0 0 1-4.5 0ZM9 15.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z"/>
+            </svg>
+            <h3>Compression presets</h3>
+            <p>Save your favorite settings as a named preset and apply them in one click.</p>
+          </div>
+          <div class="ss-card-feature">
+            <!-- arrows-right-left -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M15.97 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 1 1-1.06-1.06l3.22-3.22H7.5a.75.75 0 0 1 0-1.5h11.69l-3.22-3.22a.75.75 0 0 1 0-1.06Zm-7.94 9a.75.75 0 0 1 0 1.06l-3.22 3.22H16.5a.75.75 0 0 1 0 1.5H4.81l3.22 3.22a.75.75 0 1 1-1.06 1.06l-4.5-4.5a.75.75 0 0 1 0-1.06l4.5-4.5a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/>
+            </svg>
+            <h3>Format conversion</h3>
+            <p>Images: WebP, AVIF, lossless PNG, or HEIC — oxipng for PNG fidelity. Video: H.264/HEVC export. PDF: flatten, preserve, target size; optional Vision OCR on scan-like pages before encoding.</p>
+          </div>
+          <div class="ss-card-feature">
+            <!-- sparkles -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M9 4.5a.75.75 0 0 1 .721.544l.813 2.846a3.75 3.75 0 0 0 2.576 2.576l2.846.813a.75.75 0 0 1 0 1.442l-2.846.813a3.75 3.75 0 0 0-2.576 2.576l-.813 2.846a.75.75 0 0 1-1.442 0l-.813-2.846a3.75 3.75 0 0 0-2.576-2.576l-2.846-.813a.75.75 0 0 1 0-1.442l2.846-.813A3.75 3.75 0 0 0 7.466 7.89l.813-2.846A.75.75 0 0 1 9 4.5ZM18 1.5a.75.75 0 0 1 .728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 0 1 0 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 0 1-1.456 0l-.258-1.036a2.625 2.625 0 0 0-1.91-1.91l-1.036-.258a.75.75 0 0 1 0-1.456l1.036-.258a2.625 2.625 0 0 0 1.91-1.91l.258-1.036A.75.75 0 0 1 18 1.5ZM16.5 15a.75.75 0 0 1 .712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 0 1 0 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 0 1-1.422 0l-.395-1.183a1.5 1.5 0 0 0-.948-.948l-1.183-.395a.75.75 0 0 1 0-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0 1 16.5 15Z" clip-rule="evenodd"/>
+            </svg>
+            <h3>Smart quality</h3>
+            <p>Auto-detects photo vs. graphic (UI, illustration, logo, screenshot) and picks quality accordingly. Or force Photo, Graphic, or Mixed per preset.</p>
+          </div>
+        </div>
+      </div>
+      <img src="screenshots/screenshot-sidebar-presets.webp?v=20260420-full" alt="Dinky sidebar with presets, type tabs, and format picker" />
+    </div>
+
+    <!-- Watch folder hero (image left) -->
+    <div class="ss-row">
+      <img src="screenshots/screenshot-watch-folder.webp" alt="Dinky watch folder settings: global watch and per-preset watch folders" />
+      <div class="ss-card is-hero">
+        <div class="ss-hero-eyebrow">
+          <!-- eye (Heroicons 24 solid) -->
+          <svg class="ss-hero-eyebrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+            <path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clip-rule="evenodd" />
+          </svg>
+          Watch Folders
+        </div>
+        <h3 class="ss-card-hero-title">Compress while you work</h3>
+        <p class="ss-card-hero-text">Pick a folder for Dinky to mind. New files that land there get shrunk on the way in — one global watcher, or one per preset.</p>
+        <p class="ss-card-hero-text">For example, watch a Dropbox-synced folder such as <code>~/Dropbox/Inbox</code> so saves and downloads compress as they appear on disk. <a href="#faq-watch-folder">Cloud folders &amp; details in the FAQ →</a></p>
+      </div>
+    </div>
+
+    <!-- Row C: Preset summary (card left, image right) -->
+    <div class="ss-row is-rev">
+      <div class="ss-card">
+        <div class="ss-card-features">
+          <div class="ss-card-feature">
+            <!-- folder-arrow-down -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M19.5 21a3 3 0 0 0 3-3v-4.5a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3V18a3 3 0 0 0 3 3h15ZM1.5 10.146V6a3 3 0 0 1 3-3h5.379a2.25 2.25 0 0 1 1.59.659l2.122 2.121c.14.141.331.22.53.22H19.5a3 3 0 0 1 3 3v1.146A4.483 4.483 0 0 0 19.5 9h-15a4.483 4.483 0 0 0-3 1.146Z"/>
+              <path fill-rule="evenodd" d="M12 12.75a.75.75 0 0 1 .75.75v3.69l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72v-3.69a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd"/>
+            </svg>
+            <h3>Smart destination</h3>
+            <p>Save next to the original, pick a custom folder, and decide what happens to originals: keep them, move to the Trash, or tuck them into a Backup folder — set per preset or globally.</p>
+          </div>
+          <div class="ss-card-feature">
+            <!-- arrows-pointing-out -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M15 3.75a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0V5.56l-3.97 3.97a.75.75 0 1 1-1.06-1.06l3.97-3.97h-2.69a.75.75 0 0 1-.75-.75Zm-12 0A.75.75 0 0 1 3.75 3h4.5a.75.75 0 0 1 0 1.5H5.56l3.97 3.97a.75.75 0 0 1-1.06 1.06L4.5 5.56v2.69a.75.75 0 0 1-1.5 0v-4.5Zm11.47 11.78a.75.75 0 1 1 1.06-1.06l3.97 3.97v-2.69a.75.75 0 0 1 1.5 0v4.5a.75.75 0 0 1-.75.75h-4.5a.75.75 0 0 1 0-1.5h2.69l-3.97-3.97Zm-4.94-1.06a.75.75 0 0 1 0 1.06L5.56 19.5h2.69a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 1 1.5 0v2.69l3.97-3.97a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/>
+            </svg>
+            <h3>Max width</h3>
+            <p>Resize on the way out with common web presets or a custom value.</p>
+          </div>
+          <div class="ss-card-feature">
+            <!-- document-arrow-down -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875Zm5.845 17.03a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06l-1.72 1.72V12a.75.75 0 0 0-1.5 0v4.19l-1.72-1.72a.75.75 0 0 0-1.06 1.06l3 3Z" clip-rule="evenodd"/>
+              <path d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z"/>
+            </svg>
+            <h3>Max file size</h3>
+            <p>Binary-searches the quality level to hit an exact KB or MB target.</p>
+          </div>
+        </div>
+      </div>
+      <img src="screenshots/screenshot-preset-selected.webp" alt="Dinky Websites preset selected with settings summary" />
+    </div>
+
+    <!-- Row D: Results list with right-click format menu (image left) -->
+    <div class="ss-row">
+      <img src="screenshots/screenshot-results.webp?v=20260420-balance" alt="Dinky results list with batch processing and right-click format menu" />
+      <div class="ss-card">
+        <div class="ss-card-features">
+          <div class="ss-card-feature">
+            <!-- square-3-stack-3d -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M11.644 1.59a.75.75 0 0 1 .712 0l9.75 5.25a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l9.75-5.25Z"/>
+              <path d="m3.265 10.602 7.668 4.129a2.25 2.25 0 0 0 2.134 0l7.668-4.13 1.37.739a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l1.372-.738Z"/>
+              <path d="m10.933 19.231-7.668-4.13-1.372.739a.75.75 0 0 0 0 1.32l9.75 5.25a.75.75 0 0 0 .712 0l9.75-5.25a.75.75 0 0 0 0-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 0 1-2.134-.001Z"/>
+            </svg>
+            <h3>Batch compression</h3>
+            <p>Multiple files compress concurrently with live results as they finish.</p>
+          </div>
+          <div class="ss-card-feature">
+            <!-- rocket-launch -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M9.315 7.584C12.195 3.883 16.695 1.5 21.75 1.5a.75.75 0 0 1 .75.75c0 5.056-2.383 9.555-6.084 12.436A6.75 6.75 0 0 1 9.75 22.5a.75.75 0 0 1-.75-.75v-4.131A15.838 15.838 0 0 1 6.382 15H2.25a.75.75 0 0 1-.75-.75 6.75 6.75 0 0 1 7.815-6.666ZM15 6.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" clip-rule="evenodd"/>
+              <path d="M5.26 17.242a.75.75 0 1 0-.897-1.203 5.243 5.243 0 0 0-2.05 5.022.75.75 0 0 0 .625.627 5.243 5.243 0 0 0 5.022-2.051.75.75 0 1 0-1.202-.897 3.744 3.744 0 0 1-3.008 1.51c0-1.23.592-2.323 1.51-3.008Z"/>
+            </svg>
+            <h3>Performance</h3>
+            <p>Pick batch speed: Fast is one at a time, Faster runs a few jobs together, and Fastest opens the taps — up to eight at once when your Mac is game.</p>
+          </div>
+          <div class="ss-card-feature">
+            <!-- cursor-arrow-rays -->
+            <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M12 1.5a.75.75 0 0 1 .75.75V4.5a.75.75 0 0 1-1.5 0V2.25A.75.75 0 0 1 12 1.5ZM5.636 4.136a.75.75 0 0 1 1.06 0l1.592 1.591a.75.75 0 0 1-1.061 1.06l-1.591-1.59a.75.75 0 0 1 0-1.061Zm12.728 0a.75.75 0 0 1 0 1.06l-1.591 1.592a.75.75 0 0 1-1.06-1.061l1.59-1.591a.75.75 0 0 1 1.061 0Zm-6.816 4.496a.75.75 0 0 1 .82.311l5.228 7.917a.75.75 0 0 1-.777 1.148l-2.097-.43 1.045 3.9a.75.75 0 0 1-1.45.388l-1.044-3.899-1.601 1.42a.75.75 0 0 1-1.247-.606l.569-9.47a.75.75 0 0 1 .554-.68ZM3 10.5a.75.75 0 0 1 .75-.75H6a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 10.5Zm14.25 0a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5H18a.75.75 0 0 1-.75-.75Zm-8.962 3.712a.75.75 0 0 1 0 1.061l-1.591 1.591a.75.75 0 1 1-1.061-1.06l1.591-1.592a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/>
+            </svg>
+            <h3>Manual mode</h3>
+            <p>Drop files without compressing. Right-click any item to pick a format and fire when you're ready.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Closer: Before & after preview (card left, image right) -->
+    <div class="ss-row is-rev">
+      <div class="ss-card is-hero">
+        <h3 class="ss-card-hero-title">Before &amp; after preview</h3>
+        <p class="ss-card-hero-text">Slider or side-by-side. Compare the original and the compressed version, then keep it or back out — nothing lands on disk until you say so.</p>
+        <div class="ss-hero-stat">
+          <span class="ss-hero-stat-from">3.82 MB</span>
+          <span class="ss-hero-stat-arrow">→</span>
+          <span class="ss-hero-stat-to">0.07 MB</span>
+        </div>
+        <div class="ss-hero-stat-label">54× smaller in this preview</div>
+      </div>
+      <img src="screenshots/screenshot-before-after.webp" alt="Dinky before and after slider preview" />
+    </div>
+  </section>
+  <p class="meta-note">Every screenshot on this page was compressed with Dinky. Obviously.</p>
+
+  <section class="features" id="features">
+
+    <!-- Row 1: ways to get files in -->
+
+        <div class="feature">
+      <!-- bolt -->
+      <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 0 1 .359.852L12.982 9.75h7.268a.75.75 0 0 1 .548 1.262l-10.5 11.25a.75.75 0 0 1-1.272-.71l1.992-7.302H3.75a.75.75 0 0 1-.548-1.262l10.5-11.25a.75.75 0 0 1 .913-.143Z" clip-rule="evenodd"/>
+      </svg>
+      <h3>Quick Actions</h3>
+      <p>Compress straight from Finder’s right-click menu, no app launch needed.</p>
+    </div>
+
+        <div class="feature">
+      <!-- link -->
+      <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M19.902 4.098a3.75 3.75 0 0 0-5.304 0l-4.5 4.5a3.75 3.75 0 0 0 1.035 6.037.75.75 0 0 1-.646 1.353 5.25 5.25 0 0 1-1.449-8.45l4.5-4.5a5.25 5.25 0 1 1 7.424 7.424l-1.757 1.757a.75.75 0 1 1-1.06-1.06l1.757-1.757a3.75 3.75 0 0 0 0-5.304Zm-7.389 4.267a.75.75 0 0 1 1-.353 5.25 5.25 0 0 1 1.449 8.45l-4.5 4.5a5.25 5.25 0 1 1-7.424-7.424l1.757-1.757a.75.75 0 1 1 1.06 1.06l-1.757 1.757a3.75 3.75 0 1 0 5.304 5.304l4.5-4.5a3.75 3.75 0 0 0-1.035-6.037.75.75 0 0 1-.354-1Z" clip-rule="evenodd"/>
+      </svg>
+      <h3>Compress from a URL</h3>
+      <p>Drop or paste a direct image, video, or PDF link. Dinky downloads it, compresses, and cleans up the temp copy. Up to 500 MB.</p>
+    </div>
+
+        <div class="feature">
+      <!-- arrow-uturn-down -->
+      <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M15 3.75C12.1005 3.75 9.75 6.10051 9.75 9L9.75 19.1893L14.4697 14.4697C14.7626 14.1768 15.2374 14.1768 15.5303 14.4697C15.8232 14.7626 15.8232 15.2374 15.5303 15.5303L9.53033 21.5303C9.38968 21.671 9.19891 21.75 9 21.75C8.80109 21.75 8.61032 21.671 8.46967 21.5303L2.46967 15.5303C2.17678 15.2374 2.17678 14.7626 2.46967 14.4697C2.76256 14.1768 3.23744 14.1768 3.53033 14.4697L8.25 19.1893V9C8.25 5.27208 11.2721 2.25 15 2.25C18.7279 2.25 21.75 5.27208 21.75 9V12C21.75 12.4142 21.4142 12.75 21 12.75C20.5858 12.75 20.25 12.4142 20.25 12V9C20.25 6.10051 17.8995 3.75 15 3.75Z" clip-rule="evenodd"/>
+      </svg>
+      <h3>Automate with Shortcuts</h3>
+      <p>Drop Dinky’s Compress Images action into any Apple Shortcut and pass the smaller files to the next step.</p>
+    </div>
+
+    <!-- Row 2: control and privacy -->
+
+        <div class="feature">
+      <!-- command-line -->
+      <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M2.25 5.25a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V5.25Zm3.97.97a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1 0 1.06l-2.25 2.25a.75.75 0 0 1-1.06-1.06l1.72-1.72-1.72-1.72a.75.75 0 0 1 0-1.06Zm4.28 4.28a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z" clip-rule="evenodd"/>
+      </svg>
+      <h3>Custom shortcuts</h3>
+      <p>Rebind Open Files, Clipboard Compress, Compress Now, Clear, and Delete in Settings → Shortcuts.</p>
+    </div>
+
+        <div class="feature">
+      <!-- eye-slash -->
+      <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z"/>
+        <path d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z"/>
+        <path d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z"/>
+      </svg>
+      <h3>Strip metadata</h3>
+      <p>Scrubs EXIF, GPS, and camera data on the way out. Smaller files, nothing personal left behind.</p>
+    </div>
+
+        <div class="feature">
+      <!-- lock-closed -->
+      <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M12 1.5C9.10051 1.5 6.75 3.85051 6.75 6.75V9.75C5.09315 9.75 3.75 11.0931 3.75 12.75V19.5C3.75 21.1569 5.09315 22.5 6.75 22.5H17.25C18.9069 22.5 20.25 21.1569 20.25 19.5V12.75C20.25 11.0931 18.9069 9.75 17.25 9.75V6.75C17.25 3.85051 14.8995 1.5 12 1.5ZM15.75 9.75V6.75C15.75 4.67893 14.0711 3 12 3C9.92893 3 8.25 4.67893 8.25 6.75V9.75H15.75Z" clip-rule="evenodd"/>
+      </svg>
+      <h3>On your Mac only</h3>
+      <p>No sign-in and no upload step — files stay on disk unless you choose a cloud folder yourself.</p>
+    </div>
+
+    <!-- Row 3: workflow and utility -->
+
+        <div class="feature">
+      <!-- clock -->
+      <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M12 2.25C6.61522 2.25 2.25 6.61522 2.25 12C2.25 17.3848 6.61522 21.75 12 21.75C17.3848 21.75 21.75 17.3848 21.75 12C21.75 6.61522 17.3848 2.25 12 2.25ZM12.75 6C12.75 5.58579 12.4142 5.25 12 5.25C11.5858 5.25 11.25 5.58579 11.25 6V12C11.25 12.4142 11.5858 12.75 12 12.75H16.5C16.9142 12.75 17.25 12.4142 17.25 12C17.25 11.5858 16.9142 11.25 16.5 11.25H12.75V6Z" clip-rule="evenodd"/>
+      </svg>
+      <h3>Session history</h3>
+      <p>Open History to see what you compressed — paths, formats, and before/after sizes, all in one place.</p>
+    </div>
+
+        <div class="feature">
+      <!-- language -->
+      <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M9 2.25a.75.75 0 0 1 .75.75v1.506a49.384 49.384 0 0 1 5.343.371.75.75 0 1 1-.186 1.489c-.66-.083-1.323-.151-1.99-.206a18.67 18.67 0 0 1-2.97 6.323c.317.384.65.753.998 1.107a.75.75 0 1 1-1.07 1.052A18.902 18.902 0 0 1 9 13.687a18.823 18.823 0 0 1-5.656 4.482.75.75 0 1 1-.688-1.333 17.323 17.323 0 0 0 5.396-4.353A18.72 18.72 0 0 1 5.89 8.598a.75.75 0 0 1 1.388-.568A17.21 17.21 0 0 0 9 11.224a17.17 17.17 0 0 0 2.391-5.165 48.038 48.038 0 0 0-8.298.307.75.75 0 0 1-.186-1.489 49.159 49.159 0 0 1 5.343-.371V3A.75.75 0 0 1 9 2.25ZM15.75 9a.75.75 0 0 1 .68.433l5.25 11.25a.75.75 0 1 1-1.36.634l-1.198-2.567h-6.744l-1.198 2.567a.75.75 0 0 1-1.36-.634l5.25-11.25A.75.75 0 0 1 15.75 9Zm-2.672 8.25h5.344l-2.672-5.726-2.672 5.726Z" clip-rule="evenodd"/>
+      </svg>
+      <h3>Supports 13 languages</h3>
+      <p>Functional UI follows your Mac into English, Spanish, French, Italian, German, Japanese, Korean, Dutch, Portuguese, Russian, Turkish, Simplified, and Traditional Chinese.</p>
+    </div>
+
+        <div class="feature">
+      <!-- power -->
+      <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v9a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.382 5.968a.75.75 0 0 1-.139 1.05 7.5 7.5 0 1 0 9.514 0 .75.75 0 1 1 .91-1.192A9 9 0 1 1 6.332 5.83a.75.75 0 0 1 1.05.139Z" clip-rule="evenodd"/>
+      </svg>
+      <h3>Launch at login</h3>
+      <p>Opt in once and Dinky's ready the moment you log in — handy alongside Watch Folders for set-and-forget compression.</p>
+    </div>
+
+  </section>
+
+  <section class="comparison" id="comparison">
+    <div class="cmp-row">
+      <div class="cmp-text-card">
+        <h2 class="cmp-title">Dinky in size* only</h2>
+        <p class="cmp-desc">Most image tools don't do PDFs. Most PDF tools don't do video. Dinky covers all three — includes optional scan OCR before PDF compression — free, open source, and tiny.</p>
+        <p class="cmp-footnote">*We don't want you to give up quality for a smaller footprint — Dinky stays light without cutting corners on how your images, video, and PDFs look.</p>
+      </div>
+      <div class="comparison-card">
+    <div class="cmp-mobile-tabs">
+      <div class="cmp-segmented" role="tablist" aria-label="Compare Dinky against">
+        <button class="cmp-tab is-active" type="button" role="tab" aria-selected="true" data-cat="image">Image</button>
+        <button class="cmp-tab" type="button" role="tab" aria-selected="false" data-cat="video">Video</button>
+        <button class="cmp-tab" type="button" role="tab" aria-selected="false" data-cat="pdf">PDF</button>
+      </div>
+    </div>
+    <div class="comparison-scroll">
+      <table class="comparison-table" data-active-cat="image">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col" class="th-dinky">
+              <div class="th-cat" aria-hidden="true">&nbsp;</div>
+              <div class="th-dinky-name">Dinky</div>
+            </th>
+            <th scope="col" class="th-cycle" data-cat="image">
+              <div class="th-cat">Image</div>
+              <div class="th-cycle-row">
+                <button class="th-cycle-btn" type="button" data-dir="-1" aria-label="Previous image tool"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 12l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z" clip-rule="evenodd"/></svg></button>
+                <span class="th-tool" data-slot="image">ImageOptim</span>
+                <button class="th-cycle-btn" type="button" data-dir="1" aria-label="Next image tool"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 4.53a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd"/></svg></button>
+              </div>
+            </th>
+            <th scope="col" class="th-cycle" data-cat="video">
+              <div class="th-cat">Video</div>
+              <div class="th-cycle-row">
+                <button class="th-cycle-btn" type="button" data-dir="-1" aria-label="Previous video tool"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 12l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z" clip-rule="evenodd"/></svg></button>
+                <span class="th-tool" data-slot="video">HandBrake</span>
+                <button class="th-cycle-btn" type="button" data-dir="1" aria-label="Next video tool"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 4.53a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd"/></svg></button>
+              </div>
+            </th>
+            <th scope="col" class="th-cycle" data-cat="pdf">
+              <div class="th-cat">PDF</div>
+              <div class="th-cycle-row">
+                <button class="th-cycle-btn" type="button" data-dir="-1" aria-label="Previous PDF tool"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 12l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z" clip-rule="evenodd"/></svg></button>
+                <span class="th-tool" data-slot="pdf">Preview</span>
+                <button class="th-cycle-btn" type="button" data-dir="1" aria-label="Next PDF tool"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 4.53a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd"/></svg></button>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cmp-label-cell"><div class="cmp-label">
+              <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.25 2.25a3 3 0 0 0-3 3v4.318a3 3 0 0 0 .879 2.121l9.58 9.581c.92.92 2.39 1.186 3.548.428a18.849 18.849 0 0 0 5.441-5.44c.758-1.16.492-2.629-.428-3.548l-9.58-9.581a3 3 0 0 0-2.122-.879H5.25ZM6.375 7.5a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" clip-rule="evenodd"/></svg>
+              Price
+            </div></td>
+            <td class="cmp-dinky">Free</td>
+            <td data-col="image" data-row="price"></td>
+            <td data-col="video" data-row="price"></td>
+            <td data-col="pdf" data-row="price"></td>
+          </tr>
+          <tr>
+            <td class="cmp-label-cell"><div class="cmp-label">
+              <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M2.25 5.25a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3V15a3 3 0 0 1-3 3h-3v.257c0 .597.237 1.17.659 1.591l.621.622a.75.75 0 0 1-.53 1.28h-9a.75.75 0 0 1-.53-1.28l.621-.622a2.25 2.25 0 0 0 .659-1.59V18h-3a3 3 0 0 1-3-3V5.25Zm1.5 0v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5Z" clip-rule="evenodd"/></svg>
+              macOS native
+            </div></td>
+            <td class="cmp-dinky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+            <td data-col="image" data-row="mac"></td>
+            <td data-col="video" data-row="mac"></td>
+            <td data-col="pdf" data-row="mac"></td>
+          </tr>
+          <tr>
+            <td class="cmp-label-cell"><div class="cmp-label">
+              <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.644 1.59a.75.75 0 0 1 .712 0l9.75 5.25a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l9.75-5.25Z"/><path d="m3.265 10.602 7.668 4.129a2.25 2.25 0 0 0 2.134 0l7.668-4.13 1.37.739a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l1.372-.738Z"/><path d="m10.933 19.231-7.668-4.13-1.372.739a.75.75 0 0 0 0 1.32l9.75 5.25a.75.75 0 0 0 .712 0l9.75-5.25a.75.75 0 0 0 0-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 0 1-2.134-.001Z"/></svg>
+              Batch processing
+            </div></td>
+            <td class="cmp-dinky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+            <td data-col="image" data-row="batch"></td>
+            <td data-col="video" data-row="batch"></td>
+            <td data-col="pdf" data-row="batch"></td>
+          </tr>
+          <tr>
+            <td class="cmp-label-cell"><div class="cmp-label">
+              <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M6.32 2.577a49.255 49.255 0 0 1 11.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 0 1-1.085.67L12 18.089l-7.165 3.583A.75.75 0 0 1 3.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93Z" clip-rule="evenodd"/></svg>
+              Presets
+            </div></td>
+            <td class="cmp-dinky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+            <td data-col="image" data-row="presets"></td>
+            <td data-col="video" data-row="presets"></td>
+            <td data-col="pdf" data-row="presets"></td>
+          </tr>
+          <tr>
+            <td class="cmp-label-cell"><div class="cmp-label">
+              <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clip-rule="evenodd"/></svg>
+              Watch folder
+            </div></td>
+            <td class="cmp-dinky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+            <td data-col="image" data-row="watch"></td>
+            <td data-col="video" data-row="watch"></td>
+            <td data-col="pdf" data-row="watch"></td>
+          </tr>
+          <tr>
+            <td class="cmp-label-cell"><div class="cmp-label">
+              <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z"/><path d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z"/><path d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z"/></svg>
+              Strip metadata
+            </div></td>
+            <td class="cmp-dinky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+            <td data-col="image" data-row="strip"></td>
+            <td data-col="video" data-row="strip"></td>
+            <td data-col="pdf" data-row="strip"></td>
+          </tr>
+          <tr>
+            <td class="cmp-label-cell"><div class="cmp-label">
+              <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 0 1 .359.852L12.982 9.75h7.268a.75.75 0 0 1 .548 1.262l-10.5 11.25a.75.75 0 0 1-1.272-.71l1.992-7.302H3.818a.75.75 0 0 1-.548-1.262l10.5-11.25a.75.75 0 0 1 .845-.143Z" clip-rule="evenodd"/></svg>
+              Outputs optimized format
+            </div></td>
+            <td class="cmp-dinky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+            <td data-col="image" data-row="transcode"></td>
+            <td data-col="video" data-row="transcode"></td>
+            <td data-col="pdf" data-row="transcode"></td>
+          </tr>
+          <tr>
+            <td class="cmp-label-cell"><div class="cmp-label">
+              <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z" clip-rule="evenodd"/></svg>
+              Files stay on device
+            </div></td>
+            <td class="cmp-dinky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+            <td data-col="image" data-row="local"></td>
+            <td data-col="video" data-row="local"></td>
+            <td data-col="pdf" data-row="local"></td>
+          </tr>
+          <tr>
+            <td class="cmp-label-cell"><div class="cmp-label">
+              <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v.75c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875v-.75C22.5 3.839 21.66 3 20.625 3H3.375Z"/><path fill-rule="evenodd" d="m3.087 9 .54 9.176A3 3 0 0 0 6.62 21h10.757a3 3 0 0 0 2.995-2.824L20.913 9H3.087Zm6.163 3.75A.75.75 0 0 1 10 12h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd"/></svg>
+              App size
+            </div></td>
+            <td class="cmp-dinky">33 MB</td>
+            <td data-col="image" data-row="size"></td>
+            <td data-col="video" data-row="size"></td>
+            <td data-col="pdf" data-row="size"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cmp-writeups" aria-label="Compare Dinky with other apps">
+    <div class="cmp-writeups-suite">
+      <div class="cmp-writeups-suite-cards">
+        <a class="cmp-writeups-suite-card" href="/compare/clop/">
+          <span class="cmp-writeups-suite-card-kicker">Dinky vs Clop</span>
+          <span class="cmp-writeups-suite-card-name">Clop</span>
+          <p class="cmp-writeups-suite-card-desc">Menu-bar and clipboard–first, with freemium Pro automation. See how that stacks up against a free MIT drop zone with watch folders included and heavier PDF tooling.</p>
+          <span class="cmp-writeups-suite-card-cta">Full comparison →</span>
+        </a>
+        <a class="cmp-writeups-suite-card" href="/compare/picmal/">
+          <span class="cmp-writeups-suite-card-kicker">Dinky vs Picmal</span>
+          <span class="cmp-writeups-suite-card-name">Picmal</span>
+          <p class="cmp-writeups-suite-card-desc">Paid Mac suite for images, video, PDFs, and audio in a larger install. Compare when open source, zero license cost, and a ~33 MB footprint matter more than an all-in-one paid bundle.</p>
+          <span class="cmp-writeups-suite-card-cta">Full comparison →</span>
+        </a>
+      </div>
+    </div>
+    <div class="cmp-writeups-specialists">
+      <div class="cmp-writeups-specialists-intro">
+        <h2 class="cmp-writeups-specialists-title" id="cmp-writeups-specialists-heading">How Dinky stacks up</h2>
+        <p class="cmp-writeups-specialists-lead">Each page is Dinky vs one other app—images, video, or PDFs.</p>
+      </div>
+      <div class="cmp-writeups-grid">
+        <div class="cmp-writeups-col">
+          <h3 class="cmp-writeups-cat">Images</h3>
+          <ul class="cmp-writeups-list">
+            <li><a href="/compare/imageoptim/">ImageOptim</a></li>
+            <li><a href="/compare/optimage/">Optimage</a></li>
+            <li><a href="/compare/preview/">Preview</a></li>
+            <li><a href="/compare/squoosh/">Squoosh</a></li>
+            <li><a href="/compare/tinypng/">TinyPNG</a></li>
+          </ul>
+        </div>
+        <div class="cmp-writeups-col">
+          <h3 class="cmp-writeups-cat">Video</h3>
+          <ul class="cmp-writeups-list">
+            <li><a href="/compare/compressor/">Compressor</a></li>
+            <li><a href="/compare/ffmpeg/">FFmpeg</a></li>
+            <li><a href="/compare/handbrake/">HandBrake</a></li>
+            <li><a href="/compare/permute/">Permute</a></li>
+            <li><a href="/compare/quicktime/">QuickTime</a></li>
+          </ul>
+        </div>
+        <div class="cmp-writeups-col">
+          <h3 class="cmp-writeups-cat">PDF</h3>
+          <ul class="cmp-writeups-list">
+            <li><a href="/compare/adobe-acrobat/">Acrobat</a></li>
+            <li><a href="/compare/preview/">Preview</a></li>
+            <li><a href="/compare/pdf-squeezer/">PDF Squeezer</a></li>
+            <li><a href="/compare/smallpdf/">Smallpdf</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="reviews" id="reviews" hidden>
+    <div class="reviews-head">
+      <h2 class="reviews-title">Folks who shrunk things with Dinky</h2>
+      <p class="reviews-sub">Real quotes from <a href="https://github.com/heyderekj/dinky/discussions/categories/reviews" target="_blank" rel="noopener">GitHub Discussions</a>. Want to share your take? <a href="https://github.com/heyderekj/dinky/discussions/new?category=reviews" target="_blank" rel="noopener">Leave a review</a>.</p>
+    </div>
+    <ul class="reviews-grid" id="reviews-grid"></ul>
+  </section>
+
+  <section class="faq" id="faq">
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h3 class="faq-q">macOS says Dinky can't be opened — what do I do?</h3>
+        <p class="faq-a">That's Gatekeeper — macOS blocks first launch for apps outside the App Store and Apple Developer Program. <button type="button" class="faq-inline-link" onclick="document.getElementById('gatekeeper-modal').classList.add('open')">How to fix it →</button></p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">Only Mac?</h3>
+        <p class="faq-a">Yes. It’s SwiftUI + macOS frameworks; a Windows or Linux port would be a different app.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">What macOS version does it require?</h3>
+        <p class="faq-a">macOS 15 Sequoia or later. On macOS 26 Tahoe you get the full liquid glass UI; on Sequoia it falls back to the frosted material look.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">Is it actually free?</h3>
+        <p class="faq-a">Yes. Free to download, free to use, <a href="https://github.com/heyderekj/dinky" target="_blank">open source on GitHub</a> under MIT. No trial, no watermarks, no "pro" tier.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">Does Dinky send my files anywhere?</h3>
+        <p class="faq-a">Nope. Everything runs locally on your Mac. Your files never leave your machine — no servers, no accounts, no uploads.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">What happens to my originals?</h3>
+        <p class="faq-a">In Settings → Originals, choose Keep, Move to Trash, or a backup folder. Default is Keep.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">What input formats does Dinky support?</h3>
+        <p class="faq-a">Images: JPG, PNG, WebP, AVIF, HEIC/HEIF, TIFF, BMP → WebP, AVIF, lossless PNG, or HEIC. Video: MP4/MOV → MP4 (H.264 or HEVC). PDFs: flatten, preserve, target size; scan-like PDFs can get OCR for search first.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">What are presets?</h3>
+        <p class="faq-a">Saved settings (format, quality, destination, etc.) — one click from the sidebar. Create them in Settings → Presets.</p>
+      </div>
+
+      <div class="faq-item" id="faq-watch-folder">
+        <h3 class="faq-q">Can Dinky compress files automatically?</h3>
+        <p class="faq-a">Yes, with Watch Folder. Any supported file saved or moved into a watched folder is picked up and compressed — handy for Figma, Lightroom, or screenshot exports. You can watch a path inside Dropbox, Google Drive, iCloud Drive, or any other cloud folder that syncs to your Mac; Dinky reacts once the file is fully on disk (the sync app has to finish downloading first).</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">Can Dinky compress something from a URL?</h3>
+        <p class="faq-a">Yes. Drag a direct media link (<code>https://…/photo.jpg</code>, etc.) onto the window, or copy it and hit ⌘⇧V (Clipboard Compress). Direct file URLs only — not web pages.</p>
+      </div>
+
+      <div class="faq-item" id="faq-cloud-destination">
+        <h3 class="faq-q">Can I share a URL’s compressed version straight to Dropbox or Google Drive?</h3>
+        <p class="faq-a">Not directly. Set a preset’s destination to a cloud-synced folder (e.g. <code>~/Dropbox/Compressed/</code>) so outputs sync automatically. The same idea applies to Watch Folder: pick a watched path under your Dropbox (or Drive) folder for inputs, or a synced subfolder as the destination so compressed files upload with everything else.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">What if Dinky can’t hit my target file size?</h3>
+        <p class="faq-a">Dinky walks quality down as far as your preset allows to stay under the cap. If the file is still larger than your target at minimum quality, you’ve hit the practical floor for that source at its current pixel dimensions — Dinky returns the smallest output it could produce, not a magically smaller one.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">What changed in 2.0?</h3>
+        <p class="faq-a">The 1.x line (from 1.0) was images only. 2.0 added videos and PDFs alongside images. Older 1.x DMGs and ZIPs stay on <a href="https://github.com/heyderekj/dinky/releases" target="_blank">GitHub Releases</a> for archival use.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">Who made this and why?</h3>
+        <p class="faq-a"><a href="https://heyderekj.com" target="_blank">Derek Castelli</a> is a freelance web designer in Figma and Webflow. He made Dinky after Optimage crashed mid-project.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <footer>
+    © Testament Made, LLC · <a href="mailto:help@dinkyfiles.com">help@dinkyfiles.com</a>
+  </footer>
+
+  <script>
+    (function () {
+      const stage = document.querySelector('.app-icon-stage');
+      if (!stage) return;
+      let armed = false;
+
+      function wiggle() {
+        stage.classList.remove('is-wiggling');
+        // Force reflow so re-adding the class restarts the animation
+        void stage.offsetWidth;
+        stage.classList.add('is-wiggling');
+      }
+
+      function clearWiggle() { stage.classList.remove('is-wiggling'); }
+      stage.addEventListener('animationend', clearWiggle);
+      stage.addEventListener('animationcancel', clearWiggle);
+
+      function trigger(initial) {
+        if (initial) {
+          setTimeout(wiggle, 300);
+        } else {
+          wiggle();
+        }
+      }
+
+      // First load
+      trigger(true);
+
+      // Re-trigger when the user scrolls back near the very top.
+      // Arm only after the user has scrolled away, so the initial position doesn't keep firing.
+      window.addEventListener('scroll', function () {
+        const y = window.scrollY || window.pageYOffset || 0;
+        if (y > 200) {
+          armed = true;
+        } else if (armed && y < 20) {
+          armed = false;
+          trigger(false);
+        }
+      }, { passive: true });
+    })();
+
+    function copyCmd(btn) {
+      const code = btn.closest('.code-block').querySelector('code');
+      const text = code.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    (function initInstallModalTabs() {
+      const modal = document.getElementById('install-modal');
+      if (!modal) return;
+      const tabs = modal.querySelectorAll('[data-install-tab]');
+      const panels = modal.querySelectorAll('[data-install-panel]');
+      if (!tabs.length || !panels.length) return;
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const id = tab.getAttribute('data-install-tab');
+          tabs.forEach(t => {
+            const on = t === tab;
+            t.classList.toggle('is-active', on);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+          });
+          panels.forEach(p => {
+            const on = p.getAttribute('data-install-panel') === id;
+            p.hidden = !on;
+          });
+          if (typeof fathom !== 'undefined') fathom.trackEvent('install_modal_tab_' + id);
+        });
+      });
+    })();
+
+    (function initModalScrollLock() {
+      function sync() {
+        const locked = !!document.querySelector('.modal-overlay.open');
+        document.documentElement.classList.toggle('modal-scroll-locked', locked);
+      }
+      document.querySelectorAll('.modal-overlay').forEach(function (el) {
+        new MutationObserver(sync).observe(el, { attributes: true, attributeFilter: ['class'] });
+      });
+      sync();
+    })();
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        document.getElementById('install-modal').classList.remove('open', 'install-modal--help');
+        document.getElementById('gatekeeper-modal').classList.remove('open');
+      }
+    });
+
+
+    (function () {
+      const CHECK = '<svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg>';
+      const CROSS = '<span class="cmp-cross">—</span>';
+      const tools = {
+        image: [
+          { name: 'ImageOptim',  data: { price: 'Free',     mac: CHECK, batch: CHECK,     presets: CROSS, watch: CROSS, strip: CHECK, local: CHECK, size: '17 MB',   transcode: CROSS } },
+          { name: 'Squoosh',     data: { price: 'Free',     mac: 'Web', batch: CROSS,     presets: CROSS, watch: CROSS, strip: CHECK, local: CHECK, size: 'Web',    transcode: CHECK } },
+          { name: 'TinyPNG',     data: { price: 'Freemium', mac: 'Web', batch: 'Limited', presets: CROSS, watch: CROSS, strip: CHECK, local: CROSS, size: 'Web',    transcode: CHECK } },
+          { name: 'Optimage',    data: { price: 'Freemium', mac: CHECK, batch: CHECK,     presets: CROSS, watch: CROSS, strip: CHECK, local: CHECK, size: '62 MB',   transcode: CHECK } },
+          { name: 'Preview', data: { price: 'Free', mac: CHECK, batch: CROSS, presets: CROSS, watch: CROSS, strip: CROSS, local: CHECK, size: 'Built-in', transcode: CROSS } },
+          { name: 'Clop',        data: { price: 'Freemium', mac: CHECK, batch: CHECK,     presets: CHECK, watch: 'Pro', strip: CHECK, local: CHECK, size: '~90 MB',  transcode: CHECK } },
+          { name: 'Picmal',      data: { price: 'Paid',     mac: CHECK, batch: CHECK,     presets: CHECK, watch: CROSS, strip: CHECK, local: CHECK, size: '330 MB',  transcode: CHECK } },
+          { name: 'JPEGmini',    data: { price: '$60+',     mac: CHECK, batch: CHECK,     presets: CHECK, watch: CROSS, strip: CROSS, local: CHECK, size: '~50 MB',  transcode: CROSS } }
+        ],
+        pdf: [
+          { name: 'Preview',       data: { price: 'Free',     mac: CHECK, batch: CROSS,     presets: CROSS, watch: CROSS, strip: CROSS, local: CHECK, size: 'Built-in', transcode: CROSS } },
+          { name: 'Adobe Acrobat', data: { price: '$$',       mac: CHECK, batch: 'Limited', presets: CHECK, watch: CROSS, strip: CHECK, local: CHECK, size: '500+ MB', transcode: CROSS } },
+          { name: 'PDF Squeezer',  data: { price: 'Paid',     mac: CHECK, batch: CHECK,     presets: CHECK, watch: CHECK, strip: CHECK, local: CHECK, size: '20 MB',   transcode: CROSS } },
+          { name: 'Smallpdf',      data: { price: 'Freemium', mac: 'Web', batch: 'Limited', presets: CROSS, watch: CROSS, strip: CROSS, local: CROSS, size: 'Web',    transcode: CROSS } },
+          { name: 'Clop',          data: { price: 'Freemium', mac: CHECK, batch: CHECK,     presets: CHECK, watch: 'Pro', strip: CHECK, local: CHECK, size: '~90 MB',  transcode: CROSS } },
+          { name: 'Picmal',        data: { price: 'Paid',     mac: CHECK, batch: CHECK,     presets: CHECK, watch: CROSS, strip: CHECK, local: CHECK, size: '330 MB',  transcode: CROSS } }
+        ],
+        video: [
+          { name: 'HandBrake',  data: { price: 'Free',     mac: CHECK, batch: CHECK, presets: CHECK,    watch: CHECK, strip: CHECK, local: CHECK, size: '46 MB',   transcode: 'Manual' } },
+          { name: 'Permute',    data: { price: 'Paid',     mac: CHECK, batch: CHECK, presets: CHECK,    watch: CROSS, strip: CHECK, local: CHECK, size: '60 MB',   transcode: CHECK } },
+          { name: 'FFmpeg',     data: { price: 'Free',     mac: 'CLI', batch: CHECK, presets: 'Manual', watch: CROSS, strip: CHECK, local: CHECK, size: '80 MB',   transcode: CROSS } },
+          { name: 'Compressor', data: { price: '$$',       mac: CHECK, batch: CHECK, presets: CHECK,    watch: CHECK, strip: CHECK, local: CHECK, size: '500+ MB', transcode: CHECK } },
+          { name: 'Clop',       data: { price: 'Freemium', mac: CHECK, batch: CHECK, presets: CHECK,    watch: 'Pro', strip: CHECK, local: CHECK, size: '~90 MB',  transcode: CHECK } },
+          { name: 'Picmal',     data: { price: 'Paid',     mac: CHECK, batch: CHECK, presets: CHECK,    watch: CROSS, strip: CHECK, local: CHECK, size: '330 MB',  transcode: CHECK } },
+          { name: 'QuickTime', data: { price: 'Free', mac: CHECK, batch: CROSS, presets: CROSS, watch: CROSS, strip: CROSS, local: CHECK, size: 'Built-in', transcode: 'Limited' } }
+        ]
+      };
+      const idx = { image: 0, pdf: 0, video: 0 };
+
+      function paint(cat) {
+        const tool = tools[cat][idx[cat]];
+        document.querySelectorAll('.th-tool[data-slot="' + cat + '"]').forEach(el => { el.textContent = tool.name; });
+        document.querySelectorAll('td[data-col="' + cat + '"]').forEach(td => {
+          const row = td.getAttribute('data-row');
+          const v = tool.data[row];
+          td.innerHTML = (v == null) ? CROSS : v;
+        });
+      }
+
+      ['image', 'video', 'pdf'].forEach(paint);
+
+      document.querySelectorAll('.th-cycle').forEach(th => {
+        const cat = th.getAttribute('data-cat');
+        th.querySelectorAll('.th-cycle-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const dir = parseInt(btn.getAttribute('data-dir'), 10) || 1;
+            const len = tools[cat].length;
+            idx[cat] = ((idx[cat] + dir) % len + len) % len;
+            const slot = th.querySelector('.th-tool');
+            if (slot) {
+              slot.classList.add('fading');
+              setTimeout(() => { paint(cat); slot.classList.remove('fading'); }, 120);
+            } else {
+              paint(cat);
+            }
+          });
+        });
+      });
+
+      const table = document.querySelector('.comparison-table');
+      document.querySelectorAll('.comparison .cmp-segmented .cmp-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const cat = tab.getAttribute('data-cat');
+          if (table) table.setAttribute('data-active-cat', cat);
+          document.querySelectorAll('.comparison .cmp-segmented .cmp-tab').forEach(t => {
+            const active = t === tab;
+            t.classList.toggle('is-active', active);
+            t.setAttribute('aria-selected', active ? 'true' : 'false');
+          });
+        });
+      });
+    })();
+
+    let __ghStarCount = 12; // fallback before fetch resolves
+    fetch('https://api.github.com/repos/heyderekj/dinky')
+      .then(r => r.json())
+      .then(d => {
+        if (typeof d.stargazers_count === 'number') {
+          __ghStarCount = d.stargazers_count;
+          document.getElementById('gh-stars-count').textContent = ' ' + d.stargazers_count.toLocaleString();
+        }
+      })
+      .catch(() => {});
+
+    (function () {
+      const ghBtn = document.querySelector('a.btn-secondary[href*="github.com/heyderekj/dinky"]');
+      if (!ghBtn) return;
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) return;
+
+      // Decoupled from the real stargazer count: a sqrt curve so the burst grows
+      // slowly with popularity (e.g. 10★ → ~11, 100★ → ~21, 1k★ → ~26) and never
+      // gets dense enough to feel like confetti spam.
+      function emitCount() {
+        const n = Math.max(0, __ghStarCount | 0);
+        return Math.max(6, Math.min(Math.round(6 + Math.sqrt(n) * 1.5), 26));
+      }
+
+      let bursting = false;
+
+      // Map total particle count (6–26) to a 0..1 "energy" value used to speed
+      // things up as the burst grows: more stars = quicker fly-out + tighter stagger.
+      function energyFor(total) {
+        return Math.max(0, Math.min(1, (total - 6) / 20));
+      }
+
+      function spawnStar(cx, cy, energy) {
+        const star = document.createElement('span');
+        star.className = 'gh-star';
+        star.textContent = '★';
+
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 70 + Math.random() * 130;
+        const dx = Math.cos(angle) * dist;
+        const dy = Math.sin(angle) * dist - 30; // slight upward bias = more "celebratory"
+        const rot = (Math.random() - 0.5) * 720;
+        const size = 10 + Math.random() * 16;
+        // Lerp duration from leisurely (≈1300–2000ms) at low counts to easy
+        // (≈900–1400ms) at the cap — overall slower so stars drift gracefully.
+        const durMin = 1300 - 400 * energy;
+        const durJitter = 700 - 300 * energy;
+        const dur = durMin + Math.random() * durJitter;
+
+        star.style.left = cx + 'px';
+        star.style.top = cy + 'px';
+        star.style.fontSize = size + 'px';
+        star.style.setProperty('--dx', dx.toFixed(1) + 'px');
+        star.style.setProperty('--dy', dy.toFixed(1) + 'px');
+        star.style.setProperty('--rot', rot.toFixed(0) + 'deg');
+        star.style.setProperty('--dur', Math.round(dur) + 'ms');
+
+        document.body.appendChild(star);
+        star.addEventListener('animationend', () => star.remove(), { once: true });
+      }
+
+      function burst() {
+        if (bursting) return;
+        bursting = true;
+        ghBtn.classList.add('is-bursting');
+
+        const anchor = ghBtn.querySelector('.gh-star-anchor');
+        const rect = (anchor || ghBtn).getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+
+        const total = emitCount();
+        const energy = energyFor(total);
+        // Tighten the stream as the burst grows — 30ms at low counts, 12ms at the cap.
+        const stagger = Math.round(30 - 18 * energy);
+        for (let i = 0; i < total; i++) {
+          setTimeout(() => spawnStar(cx, cy, energy), i * stagger);
+        }
+        // Clear the button color when the burst is mostly through, not after the
+        // last lingering particle. The 180ms CSS transition softens the trail-off.
+        const colorFor = total * stagger + 350;
+        setTimeout(() => { ghBtn.classList.remove('is-bursting'); }, colorFor);
+        // Keep the re-trigger debounce a touch longer so a quick re-hover doesn't pile bursts.
+        setTimeout(() => { bursting = false; }, total * stagger + 900);
+      }
+
+      ghBtn.addEventListener('mouseenter', burst);
+      ghBtn.addEventListener('focus', burst);
+    })();
+
+    (function () {
+      var section = document.getElementById('reviews');
+      var grid = document.getElementById('reviews-grid');
+      if (!section || !grid) return;
+
+      function esc(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+        });
+      }
+
+      fetch('data/testimonials.json', { cache: 'no-cache' })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (items) {
+          if (!Array.isArray(items) || items.length === 0) return;
+          grid.innerHTML = items.map(function (it) {
+            var r = Math.max(0, Math.min(5, (it.rating | 0)));
+            var starStr = '★★★★★';
+            var stars = starStr.split('').map(function (ch, i) {
+              return i < r ? '<span>' + ch + '</span>' : '<span class="dim">' + ch + '</span>';
+            }).join('');
+            var name = esc(it.name || it.githubUser || 'Anonymous');
+            var avatar = it.githubUser
+              ? '<img class="review-avatar" src="https://github.com/' + esc(it.githubUser) + '.png?size=96" alt="" loading="lazy" width="32" height="32">'
+              : '<span class="review-avatar"></span>';
+            var handleHtml = '';
+            if (it.handle) {
+              var url = it.handleURL || (it.handle.charAt(0) === '@' ? '' : 'https://' + it.handle);
+              handleHtml = url
+                ? '<div class="review-handle"><a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(it.handle) + '</a></div>'
+                : '<div class="review-handle">' + esc(it.handle) + '</div>';
+            }
+            var src = it.sourceURL ? '<a class="review-source" href="' + esc(it.sourceURL) + '" target="_blank" rel="noopener">via GitHub</a>' : '';
+            return '<li class="review-card">' +
+              '<div class="review-stars" aria-label="' + r + ' out of 5 stars">' + stars + '</div>' +
+              '<p class="review-quote">' + esc(it.quote || '') + '</p>' +
+              '<div class="review-author">' +
+              avatar +
+              '<div><div class="review-name">' + name + '</div>' + handleHtml + '</div>' +
+              src +
+              '</div></li>';
+          }).join('');
+          section.hidden = false;
+        })
+        .catch(function () {});
+    })();
+  </script>
+</body>
+</html>
