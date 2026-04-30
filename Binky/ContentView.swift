@@ -17,6 +17,22 @@ struct ContentView: View {
         OrganizerMainView(vm: vm)
             .environmentObject(prefs)
             .environmentObject(updater)
+            .onAppear {
+                BinkyMenuBarController.shared.refresh()
+            }
+            .onChange(of: prefs.showMenuBarIcon) { _, _ in
+                BinkyMenuBarController.shared.refresh()
+            }
+            .onChange(of: prefs.menuBarOnlyMode) { _, newVal in
+                BinkyActivationPolicy.apply(menuBarOnly: newVal)
+                BinkyMenuBarController.shared.refresh()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .binkyFolderWatchPauseChanged)) { _ in
+                let v = UserDefaults.standard.bool(forKey: "folderWatch.paused")
+                if prefs.folderWatchPaused != v {
+                    prefs.folderWatchPaused = v
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .binkyOpenPanel)) { _ in
                 openSortableFilesPanel()
             }

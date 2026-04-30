@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: Dinky
+  title: Binky
   version: "0.0.0"
   description: |
-    Dinky is a native macOS desktop application. There is no public HTTP API on dinkyfiles.com.
+    Binky is a native macOS desktop application for organizing Downloads. There is no public HTTP API on binkyfiles.com.
     This document exists only for machine-readable discovery (RFC 9727 service-desc).
 paths: {}

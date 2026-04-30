@@ -10,6 +10,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         DiagnosticsReporter.shared.startMonitoring()
         UNUserNotificationCenter.current().delegate = self
         GlobalHotkeyManager.shared.syncFromDefaults()
+        NewTagExpiryService.shared.start()
+        UserDefaults.standard.register(defaults: [
+            "ui.showMenuBarIcon": true,
+            "ui.menuBarOnlyMode": false,
+        ])
+        BinkyActivationPolicy.normalizeMenuBarDefaultsAtLaunch()
+        BinkyActivationPolicy.apply(menuBarOnly: UserDefaults.standard.bool(forKey: "ui.menuBarOnlyMode"))
+        BinkyMenuBarController.shared.refresh()
         globalPasteHotkeyObserver = NotificationCenter.default.addObserver(
             forName: .binkyGlobalPasteHotkeyChanged,
             object: nil,
@@ -21,6 +29,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         DiagnosticsReporter.shared.clearSentinel()
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

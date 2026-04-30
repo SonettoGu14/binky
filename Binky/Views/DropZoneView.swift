@@ -97,14 +97,14 @@ struct DropZoneView: View {
             case .compress:
                 return String(localized: "Activate to open the file picker. You can also paste when the clipboard has a compressible item.", comment: "VoiceOver hint for main drop zone when idle.")
             case .organizeInbox:
-                return String(localized: "Activate to open the file picker. You can also paste when the clipboard has a file to sort from your inbox.", comment: "VoiceOver hint for organizer drop zone when idle.")
+                return String(localized: "Activate to open the file picker. You can also paste when the clipboard has a file to sort from your watch folder.", comment: "VoiceOver hint for organizer drop zone when idle.")
             }
         case .hovering:
             switch workflow {
             case .compress:
                 return String(localized: "Release the dragged items to add them to the queue.", comment: "VoiceOver hint for drop zone while dragging.")
             case .organizeInbox:
-                return String(localized: "Release the dragged items to sort files from your inbox.", comment: "VoiceOver hint for organizer drop zone while dragging.")
+                return String(localized: "Release the dragged items to sort files from your watch folder.", comment: "VoiceOver hint for organizer drop zone while dragging.")
             }
         case .processing:
             switch workflow {
@@ -144,7 +144,7 @@ struct DropZoneView: View {
                 Image(systemName: "arrow.down")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(.white)
-                    .symbolEffect(.bounce, options: .repeating.speed(0.65))
+                    .repeatingBounceSymbolEffect()
             }
             .onAppear {
                 withAnimation(.easeInOut(duration: 1.3).repeatForever(autoreverses: true)) {
@@ -156,7 +156,7 @@ struct DropZoneView: View {
             Image(systemName: "arrow.triangle.2.circlepath")
                 .font(.system(size: 52, weight: .ultraLight))
                 .foregroundStyle(Color.accentColor)
-                .symbolEffect(.rotate, options: .repeating)
+                .symbolRotationRepeatingEffect()
 
         case .done:
             ZStack {
@@ -243,6 +243,17 @@ struct DropZoneView: View {
         sparkleScale = 0; sparkleOpacity = 1
         withAnimation(.spring(response: 0.45, dampingFraction: 0.55)) { sparkleScale = 1 }
         withAnimation(.easeOut(duration: 0.55).delay(0.3))             { sparkleOpacity = 0 }
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func repeatingBounceSymbolEffect() -> some View {
+        if #available(macOS 15, *) {
+            self.symbolEffect(.bounce, options: .repeating.speed(0.65))
+        } else {
+            self
+        }
     }
 }
 

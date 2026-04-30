@@ -31,16 +31,11 @@ struct BinkyApp: App {
                 .handlesExternalEvents(preferring: Set(["*"]), allowing: Set(["*"]))
                 .background(.ultraThinMaterial)        // frosted glass fill
                 .background(TransparentWindow())       // makes NSWindow itself see-through
-                .toolbarBackgroundVisibility(.visible, for: .windowToolbar)
+                .adaptiveVisibleWindowToolbarBackground()
         }
         .windowStyle(.titleBar)
         .windowResizability(.contentMinSize)
         .defaultSize(width: 440, height: 440)
-        .defaultWindowPlacement { _, context in
-            let display = context.defaultDisplay
-            let center  = CGPoint(x: display.visibleRect.midX, y: display.visibleRect.midY)
-            return WindowPlacement(center)
-        }
         .commands {
             CommandGroup(after: .newItem) {
                 BinkyShortcutCommands(prefs: root.prefs)

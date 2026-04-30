@@ -27,6 +27,8 @@ extension Notification.Name {
     static let binkyGlobalPasteHotkeyChanged = Notification.Name("binkyGlobalPasteHotkeyChanged")
     /// Posted before quit so SwiftUI can dismiss sheets; used with `applicationShouldTerminate` / `terminateLater`.
     static let binkyPrepareQuit = Notification.Name("binkyPrepareQuit")
+    /// Menu bar toggled **Pause watching** — syncs `UserDefaults` → SwiftUI preferences.
+    static let binkyFolderWatchPauseChanged = Notification.Name("binkyFolderWatchPauseChanged")
 }
 
 enum S {
@@ -46,18 +48,18 @@ enum S {
     /// Organizer main window — empty activity area; cycles with each idle animation loop (or a timer when reduced motion is on).
     static func organizerEmptyTagline(loop: Int) -> String {
         let lines: [String] = [
-            String(localized: "That's a Binky problem now.", comment: "Organizer empty state: rotating playful tagline."),
-            String(localized: "Binky knows where it goes.", comment: "Organizer empty state: rotating playful tagline."),
-            String(localized: "Sorted. Routed. Binky'd.", comment: "Organizer empty state: rotating playful tagline."),
-            String(localized: "Inbox chaos? Binky's on it.", comment: "Organizer empty state: rotating playful tagline."),
-            String(localized: "Binky tidies. You thrive.", comment: "Organizer empty state: rotating playful tagline."),
-            String(localized: "Give it to Binky.", comment: "Organizer empty state: rotating playful tagline."),
+            String(localized: "Fussy inbox. Meet Binky.", comment: "Organizer empty state: rotating playful tagline."),
+            String(localized: "Downloads acting up? Pop in a Binky.", comment: "Organizer empty state: rotating playful tagline."),
+            String(localized: "Quiets the mess right down.", comment: "Organizer empty state: rotating playful tagline."),
+            String(localized: "Files were screaming. Binky helped.", comment: "Organizer empty state: rotating playful tagline."),
+            String(localized: "The pacifier for your Downloads.", comment: "Organizer empty state: rotating playful tagline."),
+            String(localized: "Sh. Binky's handling it.", comment: "Organizer empty state: rotating playful tagline."),
         ]
         return lines[loop % lines.count]
     }
 
     /// Organizer inbox hint (shown under drop zone).
-    static let organizerDropHint = String(localized: "Only files inside your watched inbox can be sorted from here.", comment: "Organizer drop zone footnote.")
+    static let organizerDropHint = String(localized: "Only files inside your watch folder can be sorted from here.", comment: "Organizer drop zone footnote.")
 
     static let dropHover     = "Let go."
 

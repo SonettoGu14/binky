@@ -45,7 +45,7 @@ struct OrganizerEmptyStateView: View {
                     .animation(.easeInOut(duration: 0.35), value: loopIndex)
             }
 
-            Text(String(localized: "Turn on Watch to tidy new downloads, or run Sort Now. You can also drop files from your inbox here.", comment: "Organizer empty activity hint."))
+            Text(String(localized: "Turn on Watch to tidy new downloads, or run Sort Now. You can also drop files from your watch folder here.", comment: "Organizer empty activity hint."))
                 .font(.subheadline)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)

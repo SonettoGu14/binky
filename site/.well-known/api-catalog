@@ -1,20 +1,20 @@
 {
-  "description": "Static marketing site for the Dinky macOS app. No public HTTP API, OAuth/OIDC, or protected resource — see https://dinkyfiles.com/llms.txt (Agent integration) and https://dinkyfiles.com/openapi.yaml.",
+  "description": "Static marketing site for the Binky macOS app. No public HTTP API, OAuth/OIDC, or protected resource — see https://binkyfiles.com/llms.txt (Agent integration) and https://binkyfiles.com/openapi.yaml.",
   "linkset": [
     {
-      "anchor": "https://dinkyfiles.com/",
+      "anchor": "https://binkyfiles.com/",
       "item": [
         {
-          "href": "https://dinkyfiles.com/openapi.yaml",
+          "href": "https://binkyfiles.com/openapi.yaml",
           "rel": "service-desc",
           "type": "application/vnd.oai.openapi;version=3.1"
         },
         {
-          "href": "https://github.com/heyderekj/dinky",
+          "href": "https://github.com/heyderekj/binky",
           "rel": "service-doc"
         },
         {
-          "href": "https://dinkyfiles.com/llms.txt",
+          "href": "https://binkyfiles.com/llms.txt",
           "rel": "describedby"
         }
       ]

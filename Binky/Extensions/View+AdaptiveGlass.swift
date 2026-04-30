@@ -15,4 +15,36 @@ extension View {
             self.background(.ultraThinMaterial, in: shape)
         }
     }
+
+    /// Forces the toolbar background visible. Uses the modern API on macOS 15+,
+    /// falls back to `.toolbarBackground(.visible, for: .windowToolbar)` on macOS 14.
+    @ViewBuilder
+    func adaptiveVisibleWindowToolbarBackground() -> some View {
+        if #available(macOS 15, *) {
+            self.toolbarBackgroundVisibility(.visible, for: .windowToolbar)
+        } else {
+            self.toolbarBackground(.visible, for: .windowToolbar)
+        }
+    }
+
+    /// Repeating rotate for SF Symbols (`SymbolEffect.rotate` is macOS 15+).
+    @ViewBuilder
+    func symbolRotationRepeatingEffect() -> some View {
+        if #available(macOS 15, *) {
+            self.symbolEffect(.rotate, options: .repeating)
+        } else {
+            self.modifier(LegacySymbolRotationModifier())
+        }
+    }
+}
+
+/// Spin for Sonoma: `TimelineView` + `rotationEffect` (no `SymbolEffect.rotate`).
+private struct LegacySymbolRotationModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
+            let t = context.date.timeIntervalSinceReferenceDate
+            let degrees = (t * 400).truncatingRemainder(dividingBy: 360)
+            content.rotationEffect(.degrees(degrees))
+        }
+    }
 }

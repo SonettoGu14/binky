@@ -11,7 +11,7 @@ struct SortFilesWithBinkyIntent: AppIntent {
 
     static var description = IntentDescription(
         LocalizedStringResource(
-            "Sorts files with Binky using your Downloads inbox routing rules.",
+            "Sorts files with Binky using your watch folder routing rules.",
             comment: "Shortcuts: intent description."
         )
     )
@@ -20,7 +20,7 @@ struct SortFilesWithBinkyIntent: AppIntent {
 
     @Parameter(
         title: LocalizedStringResource("Files", comment: "Shortcuts: files parameter."),
-        description: LocalizedStringResource("Files to sort into your inbox buckets.", comment: "")
+        description: LocalizedStringResource("Files to sort into your watch folder buckets.", comment: "")
     )
     var files: [IntentFile]
 

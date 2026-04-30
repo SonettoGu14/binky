@@ -275,23 +275,35 @@ enum VideoCompressor {
         return false
     }
 
-    /// Runs `export` concurrently with `states(updateInterval:)` for progress updates.
+    /// Runs `export` concurrently with `states(updateInterval:)` for progress updates on macOS 15+;
+    /// falls back to polling `session.progress` on macOS 14.
     private static func exportWithProgress(
         session: AVAssetExportSession,
         outputURL: URL,
         progressHandler: (@Sendable (Float) -> Void)?
     ) async throws {
         if let progressHandler {
-            let monitor = Task {
-                for await state in session.states(updateInterval: 0.1) {
-                    guard !Task.isCancelled else { break }
-                    switch state {
-                    case .pending, .waiting:
-                        break
-                    case .exporting(let progress):
-                        progressHandler(Float(progress.fractionCompleted))
-                    @unknown default:
-                        break
+            let monitor: Task<Void, Never>
+            if #available(macOS 15, *) {
+                monitor = Task {
+                    for await state in session.states(updateInterval: 0.1) {
+                        if Task.isCancelled { break }
+                        switch state {
+                        case .pending, .waiting:
+                            break
+                        case .exporting(let progress):
+                            progressHandler(Float(progress.fractionCompleted))
+                        @unknown default:
+                            break
+                        }
+                    }
+                }
+            } else {
+                monitor = Task {
+                    while !Task.isCancelled {
+                        try? await Task.sleep(nanoseconds: 100_000_000)
+                        let p = session.progress
+                        if p > 0 { progressHandler(p) }
                     }
                 }
             }

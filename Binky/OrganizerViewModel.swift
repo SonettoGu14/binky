@@ -82,4 +82,9 @@ final class OrganizerViewModel: ObservableObject {
         guard outcome.hasWork else { return }
         deliverCompletedSort(outcome, prefs: prefs)
     }
+
+    /// Dry-run rows for files at the top level of the inbox (Output tab “Preview” uses the same engine).
+    func inboxPreviewEntries(prefs: BinkyPreferences) -> [SortPreviewEntry] {
+        DownloadsSortOrchestrator.shared.previewInbox(prefs: prefs)
+    }
 }

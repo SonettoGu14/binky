@@ -80,6 +80,38 @@ final class BinkyPreferences: ObservableObject {
     init() {
         Self.migrateConcurrentTasksToTiersIfNeeded()
         Self.migrateMoveOriginalsToOriginalsActionIfNeeded()
+        seedDefaultProfileIfNeeded()
+        ensureActiveProfileIsValid()
+    }
+
+    /// On first run, every user gets a `Default` profile so the organizer always has at least one
+    /// profile to route through (mirrors how Dinky always shipped a default preset).
+    /// Runs exactly once — the seed flag persists so deleting/renaming Default later doesn't recreate it.
+    private func seedDefaultProfileIfNeeded() {
+        let seedKey = "binky.profiles.didSeedDefault"
+        let d = UserDefaults.standard
+        guard !d.bool(forKey: seedKey) else { return }
+        if savedPresets.isEmpty {
+            let defaultProfile = CompressionPreset(
+                name: String(localized: "Default", comment: "Built-in default organizer profile name."),
+                from: self,
+                format: defaultFormat
+            )
+            savedPresets = [defaultProfile]
+            if activePresetID.isEmpty {
+                activePresetID = defaultProfile.id.uuidString
+            }
+        }
+        d.set(true, forKey: seedKey)
+    }
+
+    /// If `activePresetID` doesn't resolve to a saved profile (e.g. fresh install, deleted profile),
+    /// fall back to the first available profile so organizer surfaces always show a real selection.
+    private func ensureActiveProfileIsValid() {
+        guard !savedPresets.isEmpty else { return }
+        if activePresetID.isEmpty || !savedPresets.contains(where: { $0.id.uuidString == activePresetID }) {
+            activePresetID = savedPresets.first!.id.uuidString
+        }
     }
 
     /// Migrates legacy `moveOriginalsToTrash` Bool to `originalsAction` once.
@@ -176,6 +208,12 @@ final class BinkyPreferences: ObservableObject {
     /// Failed/skipped rows are kept so the user can act on them.
     @AppStorage("autoClearWhenDone")    var autoClearWhenDone: Bool = false
     @AppStorage("reduceMotion")         var reduceMotion: Bool = false
+
+    /// Shows Binky in the menu bar (Sort Now, pause watching, Settings).
+    @AppStorage("ui.showMenuBarIcon") var showMenuBarIcon: Bool = true
+    /// Hides Dock icon and runs as accessory app; sorting still happens in the background.
+    @AppStorage("ui.menuBarOnlyMode") var menuBarOnlyMode: Bool = false
+
     @AppStorage("folderWatchEnabled")   var folderWatchEnabled: Bool = true
     @AppStorage("watchedFolderPath")    var watchedFolderPath: String = ""
     @AppStorage("watchedFolderBookmark") var watchedFolderBookmark: Data = Data()
@@ -365,6 +403,69 @@ final class BinkyPreferences: ObservableObject {
     @AppStorage("sort.assignFinderTags") var assignFinderTagsOnSortEnabled: Bool = false /// When enabled, merges semantic tags onto moved items in Finder.
     /// When true, prepend the “New” tag along with semantic category tags.
     @AppStorage("sort.appendNewSemanticTag") var sortAppendNewSemanticTagEnabled: Bool = true
+
+    // MARK: Inbox routing (custom rules + exclusions)
+
+    @AppStorage("sort.customRulesEnabled") var sortCustomRulesEnabled: Bool = false
+
+    @AppStorage("sort.routingRulesJSON") private var sortRoutingRulesJSONStorage: Data = Data()
+
+    private var cachedSortRoutingRules: [InboxSortRule]?
+    /// Ordered rules — first match wins when **Custom routing** is on.
+    var sortRoutingRules: [InboxSortRule] {
+        get {
+            if let cachedSortRoutingRules { return cachedSortRoutingRules }
+            let v = (try? JSONDecoder().decode([InboxSortRule].self, from: sortRoutingRulesJSONStorage)) ?? []
+            cachedSortRoutingRules = v
+            return v
+        }
+        set {
+            objectWillChange.send()
+            cachedSortRoutingRules = newValue
+            sortRoutingRulesJSONStorage = (try? JSONEncoder().encode(newValue)) ?? Data()
+        }
+    }
+
+    /// Comma-separated extensions without dots (e.g. `iso,dmg`).
+    @AppStorage("sort.excludeExtensionsCSV") var sortExcludeExtensionsCSV: String = ""
+
+    @AppStorage("sort.excludeNameFragmentsJSON") private var sortExcludeNameFragmentsJSONStorage: Data = Data()
+
+    private var cachedExcludeNameFragments: [String]?
+    /// Filenames containing any of these substrings (case-insensitive) are never sorted.
+    var sortExcludeNameFragments: [String] {
+        get {
+            if let cachedExcludeNameFragments { return cachedExcludeNameFragments }
+            let v = (try? JSONDecoder().decode([String].self, from: sortExcludeNameFragmentsJSONStorage)) ?? []
+            cachedExcludeNameFragments = v
+            return v
+        }
+        set {
+            objectWillChange.send()
+            cachedExcludeNameFragments = newValue
+            sortExcludeNameFragmentsJSONStorage = (try? JSONEncoder().encode(newValue)) ?? Data()
+        }
+    }
+
+    @AppStorage("folderWatch.paused") var folderWatchPaused: Bool = false
+
+    func sortExcludeExtensionsNormalized() -> Set<String> {
+        sortExcludeExtensionsCSV
+            .split(separator: ",")
+            .map { chunk in
+                String(chunk).trimmingCharacters(in: .whitespacesAndNewlines)
+                    .lowercased()
+                    .replacingOccurrences(of: ".", with: "")
+            }
+            .filter { !$0.isEmpty }
+            .reduce(into: Set<String>()) { $0.insert($1) }
+    }
+
+    func sortExcludeNameFragmentsNormalized() -> [String] {
+        sortExcludeNameFragments
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+    }
 
     // MARK: Keyboard shortcuts (customizable menu commands)
 

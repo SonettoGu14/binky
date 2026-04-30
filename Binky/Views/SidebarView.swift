@@ -252,7 +252,7 @@ struct SidebarView: View {
                 settingsShortcutRow(title: "Presets", systemImage: "slider.horizontal.3") {
                     openPreferences(.profiles)
                 }
-                settingsShortcutRow(title: "Watch folders", systemImage: "eye") {
+                settingsShortcutRow(title: "Watch Folder", systemImage: "eye") {
                     openPreferences(.watch)
                 }
                 settingsShortcutRow(title: "All settings", systemImage: "gearshape") {

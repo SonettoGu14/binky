@@ -38,6 +38,15 @@ struct CompressionPreset: Codable, Identifiable {
     var contentTypeHintRaw: String
     /// Which media types this preset targets: `all`, a single token, or comma-separated `image` / `video` / `pdf`.
     var presetMediaScopeRaw: String
+    // Organizer (per-profile): Finder tags + routing overlay
+    /// Always merged onto sorted files when global “Assign Finder tags” is on.
+    var customFinderTags: [String]
+    /// When non-empty, replaces global custom routing rules for files from this profile’s watch pipeline.
+    var inboxSortRules: [InboxSortRule]
+    /// Days until the automatic `"New"` tag is stripped (`0` = never).
+    var newTagExpiryDays: Int
+    /// Shortcuts app shortcut name; empty = none.
+    var postSortShortcutName: String
     // PDF / Video (same keys as BinkyPreferences)
     var pdfOutputModeRaw: String
     var pdfQualityRaw: String
@@ -89,6 +98,10 @@ struct CompressionPreset: Codable, Identifiable {
         self.presetCustomFolderBookmark = Data()
         self.contentTypeHintRaw = prefs.contentTypeHintRaw
         self.presetMediaScopeRaw = PresetMediaScope.all.rawValue
+        self.customFinderTags = []
+        self.inboxSortRules = []
+        self.newTagExpiryDays = 0
+        self.postSortShortcutName = ""
         self.pdfOutputModeRaw = prefs.pdfOutputModeRaw
         self.pdfQualityRaw = prefs.pdfQualityRaw
         self.videoQualityRaw = prefs.videoQualityRaw
@@ -135,6 +148,10 @@ struct CompressionPreset: Codable, Identifiable {
         self.presetCustomFolderBookmark = source.presetCustomFolderBookmark
         self.contentTypeHintRaw = source.contentTypeHintRaw
         self.presetMediaScopeRaw = source.presetMediaScopeRaw
+        self.customFinderTags = source.customFinderTags
+        self.inboxSortRules = source.inboxSortRules
+        self.newTagExpiryDays = source.newTagExpiryDays
+        self.postSortShortcutName = source.postSortShortcutName
         self.pdfOutputModeRaw = source.pdfOutputModeRaw
         self.pdfQualityRaw = source.pdfQualityRaw
         self.videoQualityRaw = source.videoQualityRaw
@@ -207,6 +224,10 @@ struct CompressionPreset: Codable, Identifiable {
         } else {
             pdfOCRLanguages = BinkyPreferences.defaultPdfOCRLanguages
         }
+        customFinderTags = try c.decodeIfPresent([String].self, forKey: .customFinderTags) ?? []
+        inboxSortRules = try c.decodeIfPresent([InboxSortRule].self, forKey: .inboxSortRules) ?? []
+        newTagExpiryDays = try c.decodeIfPresent(Int.self, forKey: .newTagExpiryDays) ?? 0
+        postSortShortcutName = try c.decodeIfPresent(String.self, forKey: .postSortShortcutName) ?? ""
     }
 
     func apply(to prefs: BinkyPreferences, selectedFormat: inout CompressionFormat) {

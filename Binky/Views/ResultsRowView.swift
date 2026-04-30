@@ -465,7 +465,7 @@ struct ResultsRowView: View {
                                 .font(.system(size: 11, weight: .semibold))
                                 .symbolRenderingMode(.monochrome)
                                 .foregroundStyle(Self.progressBarTint.opacity(0.95))
-                                .symbolEffect(.rotate, options: .repeating)
+                                .symbolRotationRepeatingEffect()
                                 .accessibilityHidden(true)
                         }
                         ProgressView(value: progress, total: 1)
@@ -484,7 +484,7 @@ struct ResultsRowView: View {
                                 .font(.system(size: 11, weight: .semibold))
                                 .symbolRenderingMode(.monochrome)
                                 .foregroundStyle(Self.progressBarTint.opacity(0.95))
-                                .symbolEffect(.rotate, options: .repeating)
+                                .symbolRotationRepeatingEffect()
                                 .accessibilityHidden(true)
                         }
                         ProgressView()
@@ -518,7 +518,7 @@ struct ResultsRowView: View {
                                         .font(.system(size: 11, weight: .semibold))
                                         .symbolRenderingMode(.monochrome)
                                         .foregroundStyle(Self.progressBarTint.opacity(0.95))
-                                        .symbolEffect(.rotate, options: .repeating)
+                                        .symbolRotationRepeatingEffect()
                                         .accessibilityHidden(true)
                                 }
                                 ProgressView(value: p, total: 1)
@@ -548,7 +548,7 @@ struct ResultsRowView: View {
                                 .font(.system(size: 11, weight: .semibold))
                                 .symbolRenderingMode(.monochrome)
                                 .foregroundStyle(Self.progressBarTint.opacity(0.95))
-                                .symbolEffect(.rotate, options: .repeating)
+                                .symbolRotationRepeatingEffect()
                                 .accessibilityHidden(true)
                         }
                         ProgressView()

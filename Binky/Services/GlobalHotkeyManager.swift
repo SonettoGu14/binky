@@ -71,10 +71,16 @@ final class GlobalHotkeyManager {
 
     private func handleHotKeyPressed() {
         DispatchQueue.main.async {
-            NSApp.activate(ignoringOtherApps: true)
-            Self.bringMainWindowForward()
+            Self.activateMainWindow()
             NotificationCenter.default.post(name: .binkyPasteClipboard, object: nil)
         }
+    }
+
+    /// Opens the main organizer window (autosave name ``BinkyMainWindow``), or creates one if needed.
+    @MainActor
+    static func activateMainWindow() {
+        NSApp.activate(ignoringOtherApps: true)
+        bringMainWindowForward()
     }
 
     private static func bringMainWindowForward() {

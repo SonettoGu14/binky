@@ -1,13 +1,13 @@
 /*
   Compare pages — subset of site/index.html tokens and components.
-  Color system: OKLCH with identical sRGB fallbacks.
+  Color system: OKLCH with identical sRGB fallbacks (Binky brand).
 */
 :root {
   --bg: #fff;
   --text: #1c1c1e;
   --text-secondary: #6b6b70;
-  --brand: #2563eb;
-  --brand-hover: #1d4ed8;
+  --brand: #e3366e;
+  --brand-hover: #c92e8f;
   --divider: #eaeaea;
   --button-secondary-hover: #f1f1f3;
   --surface: #f1f1f3;
@@ -18,8 +18,8 @@
   --bg: oklch(1 0 0);
   --text: oklch(0.2273 0.0038 286.09);
   --text-secondary: oklch(0.5295 0.0077 286.13);
-  --brand: oklch(0.546 0.238 264.1);
-  --brand-hover: oklch(0.492 0.232 264.2);
+  --brand: oklch(0.6129 0.2098 7.08);
+  --brand-hover: oklch(0.5747 0.2094 347.54);
   --divider: oklch(0.937 0 0);
   --button-secondary-hover: oklch(0.9587 0.0027 286.35);
   --surface: oklch(0.9587 0.0027 286.35);
@@ -34,8 +34,8 @@
     --bg: #0e0e0f;
     --text: #f5f5f7;
     --text-secondary: #98989d;
-    --brand: #60a5fa;
-    --brand-hover: #93c5fd;
+    --brand: #e3366e;
+    --brand-hover: #c92e8f;
     --divider: #38383a;
     --button-secondary-hover: #2c2c2e;
     --surface: #3a3a3c;
@@ -45,8 +45,8 @@
     --bg: oklch(0.1137 0.0019 286.09);
     --text: oklch(0.9707 0.0027 286.35);
     --text-secondary: oklch(0.6812 0.0073 286.21);
-    --brand: oklch(0.707 0.21 258.5);
-    --brand-hover: oklch(0.79 0.165 255.7);
+    --brand: oklch(0.6129 0.2098 7.08);
+    --brand-hover: oklch(0.5747 0.2094 347.54);
     --divider: oklch(0.3414 0.0034 286.22);
     --button-secondary-hover: oklch(0.2939 0.0036 286.18);
     --surface: oklch(0.3492 0.0034 286.22);
@@ -149,10 +149,6 @@ body {
   color: var(--text);
 }
 
-/*
-  Two-up “Choose …” blocks: grid gap reveals a hairline rule (reads like the reference)
-  instead of same-color border + white columns blending together.
-*/
 .compare-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -232,7 +228,7 @@ body {
   line-height: 1.5;
 }
 
-.compare-table .col-dinky {
+.compare-table .col-binky {
   color: var(--text);
   font-weight: 500;
 }
@@ -279,7 +275,6 @@ body {
   height: 14px;
 }
 
-/* End-of-page CTA (watch-folder style layout; image varies by compare) */
 .compare-cta {
   margin-top: 48px;
   padding-top: 36px;
@@ -419,6 +414,13 @@ body {
   color: var(--text);
 }
 
+.compare-related a.is-current {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: default;
+}
+
 footer {
   margin-top: 56px;
   font-size: 13px;
@@ -448,7 +450,6 @@ footer a:hover {
 
   .compare-split {
     grid-template-columns: 1fr;
-    /* gap: 1px already draws the horizontal rule between stacked panels */
   }
 
   .compare-split-col {

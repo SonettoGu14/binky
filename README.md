@@ -1,47 +1,82 @@
 # Binky
 
-**Binky Free keeps Downloads tidy.** A native macOS app that watches your inbox (defaults to `~/Downloads`), waits for files to finish downloading, then sorts them into sensible buckets — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc — with unknowns routed to **Review** so nothing sketchy silently disappears. Optional Finder tags; move/review summaries and session history with reveal / undo where possible.
+A native macOS app that calms a fussy Downloads folder. Binky watches your inbox (defaults to `~/Downloads`), waits for files to finish downloading, then routes them into clear buckets like Images, PDFs, Media, Documents, Archives, Apps, Screenshots, and Misc.
 
-**Binky Plus / Smart** (copy only in this repo) is the planned tier for automatic hands-off sorting — not implemented in v1.
+Unknown or sketchy extensions do not disappear silently: they land in **Review** first. Optional Finder tags, move summaries, and session history make it easy to verify what happened and undo where possible.
 
-- **Site & support:** [binkyfiles.com](https://binkyfiles.com)
-- **Repo:** [github.com/heyderekj/binky](https://github.com/heyderekj/binky)
+**Requires macOS 14 Sonoma or later** (Liquid Glass UI on macOS 26 Tahoe).
 
-## Features (v1 organizer)
+## Releases
 
-- **Sort Downloads Now** — primary action; stable-file gate, collision-safe moves
-- **Profiles & sorting rules** — destination behavior per profile; routing preview language in-app
-- **Watch inbox** — defaults on; falls back to `~/Downloads` when a bookmark is missing
-- **Finder Quick Action / Services** — “Sort with Binky” on selected files
-- **Shortcuts** — “Sort Files” App Intent hands paths to the running app
-- **Review bucket** — ambiguous / unknown extensions land here first
-- **History** — batch summaries using `SortBatchOutcome` payloads (moved / skipped / review counts)
-- **Launch at login** — optional (Login Items)
-- **Small native stack** — SwiftUI + AppKit; see `CLAUDE.md` for dependency rules
+**1.x** is organizer-first: sort now, watch continuously, review uncertain files, and keep a reliable history of move outcomes.
 
-Compression-era tooling may still ship in the bundle for compatibility; the **shipping UX is organizer-first**.
-
-## Install
-
-**Homebrew (custom tap in this repo):**
+**Homebrew:** add this repo as a tap once, then install the cask (see [Casks/README.md](Casks/README.md) for why it lives in-tree):
 
 ```bash
 brew tap heyderekj/binky https://github.com/heyderekj/binky
 brew install --cask binky
 ```
 
-See [Casks/README.md](Casks/README.md). Release automation refreshes `Casks/binky.rb` via `./release.sh`.
+You can also download `Binky-{version}.dmg` or `Binky-{version}.zip` from [GitHub Releases](https://github.com/heyderekj/binky/releases).
 
-**Manual:** Download **`Binky-{version}.dmg`** or **`Binky-{version}.zip`** from [GitHub Releases](https://github.com/heyderekj/binky/releases) and drag **`Binky.app`** to Applications.
+## About the developer
 
-## Development
+Hey! I'm [Derek Castelli](https://www.heyderekj.com), a full-time freelance web designer working primarily in Webflow and Figma. Binky came from a boring problem: Downloads gets noisy fast, and manually dragging files around all day is not the dream.
 
-Open **`Binky.xcodeproj`** in Xcode (scheme **Binky**). Run tests:
+## Features
+
+- **Sort Downloads Now** - one-click sort with stable-file checks and collision-safe moves
+- **Watch folder** - monitor Downloads continuously and route new files as they settle
+- **Profiles and rules** - define destination behavior per profile with predictable routing
+- **Review bucket** - unknown or ambiguous extensions get held for inspection first
+- **History and undo-friendly flow** - batch summaries with moved, skipped, and review counts
+- **Finder Quick Action and Services** - run "Sort with Binky" on selected files
+- **Apple Shortcuts support** - "Sort Files" App Intent can hand paths to Binky
+- **Finder tags (optional)** - apply tags during routing for quick visual scanning
+- **Launch at login** - keep it ready in the background when your Mac boots
+- **Native macOS stack** - SwiftUI + AppKit, no bundled web runtime
+
+## What others don't do
+
+- **Treat uncertainty safely** - questionable files go to **Review** instead of being buried in the wrong folder
+- **Sort with context, not just extension lists** - profiles and routing logic keep behavior consistent across different workflows
+- **Keep a readable paper trail** - clear per-batch outcomes so you can verify what moved and what did not
+- **Fit native Mac workflows** - Finder Services, Shortcuts, and login-item support out of the box
+- **Stay lightweight** - organizer-first UX on Apple frameworks with strict bundle-size discipline
+
+## Why it exists
+
+Downloads is where good naming conventions go to die. Binky exists to make that mess quiet again without adding another noisy "productivity system."
+
+Fussy inbox. Meet Binky.
+
+## How it works
+
+Binky is built in Swift and SwiftUI with AppKit integration for Mac-native behavior. The organizer pipeline waits for files to stabilize, classifies by routing rules, then moves them safely to target destinations with review safeguards.
+
+The app keeps session outcomes so you can see exactly what happened in each run. Optional compatibility code from earlier compression-focused iterations may remain in the bundle, but the shipping product and UX are organizer-led.
+
+## Built with
+
+- SwiftUI
+- AppKit
+- Foundation
+- UserNotifications
+- Xcode project + native macOS frameworks only
+
+## Install
+
+Download the latest release and drag `Binky.app` to Applications.
+
+Or install with Homebrew:
+
+```bash
+brew tap heyderekj/binky https://github.com/heyderekj/binky
+brew install --cask binky
+```
+
+For local development:
 
 ```bash
 xcodebuild -scheme Binky -configuration Debug test -destination 'platform=macOS'
 ```
-
-## About the developer
-
-Hey! I'm [Derek Castelli](https://www.heyderekj.com), a full-time freelance web designer (Webflow/Figma). Binky grew out of needing a **trust-first** Downloads workflow — sorting and visibility first, automation later.

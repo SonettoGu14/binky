@@ -108,3 +108,27 @@ struct WatchPipelineRegistry {
         return paths
     }
 }
+
+extension BinkyPreferences {
+
+    /// Inbox layout root and optional preset for sort/tag/rule customization for files routed through folder watch.
+    func sortContext(for fileURL: URL) -> (inboxRoot: URL, preset: CompressionPreset?) {
+        let reg = WatchPipelineRegistry(prefs: self)
+        switch reg.pipeline(for: fileURL) {
+        case .global:
+            return (downloadsSortRootDirectory(), nil)
+        case .preset(let id):
+            guard let preset = savedPresets.first(where: { $0.id == id }) else {
+                return (downloadsSortRootDirectory(), nil)
+            }
+            if preset.watchFolderModeRaw == "unique",
+               let path = WatchFolderPathResolver.resolvedWatchDirectoryPath(
+                    bookmark: preset.watchFolderBookmark,
+                    storedPath: preset.watchFolderPath
+               ) {
+                return (URL(fileURLWithPath: path).standardizedFileURL, preset)
+            }
+            return (downloadsSortRootDirectory(), preset)
+        }
+    }
+}
