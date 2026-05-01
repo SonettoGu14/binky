@@ -1,6 +1,6 @@
 # Binky
 
-**Tagline:** Quiets your Downloads.
+**Tagline:** Binky sorts your files.
 
 A native macOS app that watches your inbox (defaults to `~/Downloads`), waits for files to finish landing, then sorts them into sensible sorted folders — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc. Unknowns route to **Review** so nothing sketchy silently disappears. Optional Finder tags; history with reveal and undo where macOS allows.
 
