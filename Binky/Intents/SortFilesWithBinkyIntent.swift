@@ -20,7 +20,7 @@ struct SortFilesWithBinkyIntent: AppIntent {
 
     @Parameter(
         title: LocalizedStringResource("Files", comment: "Shortcuts: files parameter."),
-        description: LocalizedStringResource("Files to sort into your watch folder destinations.", comment: "")
+        description: LocalizedStringResource("Files to sort into your watch folder destination folders.", comment: "")
     )
     var files: [IntentFile]
 

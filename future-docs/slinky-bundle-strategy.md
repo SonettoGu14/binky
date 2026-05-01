@@ -77,7 +77,7 @@ Slinky targets steps 2-4.
 **Free**
 
 - Sort now + watch folder behavior
-- Starter destinations and review safety path
+- Starter destination folders and review safety path
 - Profiles/rules basics, history, undo-friendly outcomes
 - Finder Services/Quick Action and Shortcuts intent
 

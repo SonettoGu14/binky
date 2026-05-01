@@ -1,6 +1,6 @@
 # Binky
 
-> A native macOS app for Downloads: watch the inbox, wait for files to settle, sort into destinations, route unknowns to Review. Pacifier calm, pacifier blunt. Runs locally.
+> A native macOS app for Downloads: watch the inbox, wait for files to settle, sort into destination folders, route unknowns to Review. Pacifier calm, pacifier blunt. Runs locally.
 
 ## What it does
 
@@ -8,7 +8,7 @@
 - **Stable-file gate** — avoids grabbing half-downloaded noise
 - **Destinations** — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc
 - **Review** — trust-first staging for ambiguous files
-- **Profiles** — per-profile destinations and sorting rules
+- **Profiles** — per-profile destination folders and sorting rules
 - **Watch inbox** — optional; Downloads by default unless you aim elsewhere
 - **Finder Quick Action** — “Sort with Binky” without opening the app
 - **Shortcuts** — Sort Files intent for automation chains
@@ -17,7 +17,7 @@
 
 ## Rough comparison (not legal advice)
 
-- **vs Hazel** — Hazel is the Mac automation rules engine everywhere. Binky is Downloads-first organizer speak: watch, gate, destinations, Review.
+- **vs Hazel** — Hazel is the Mac automation rules engine everywhere. Binky is Downloads-first organizer speak: watch, gate, destination folders, Review.
 - **vs Spring Cleaner** — Spring Cleaner clears cruft on a schedule. Binky routes live arrivals into piles you configured.
 - **vs manual sorting** — Still free; your time isn't.
 

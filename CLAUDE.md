@@ -17,7 +17,7 @@ Binky still ships legacy compression engines from the Dinky era (image/video enc
 
 - macOS app, SwiftUI + AppKit; deployment target **macOS 14 Sonoma**; Liquid Glass (`.glassEffect()`) on **macOS 26 Tahoe** with `.ultraThinMaterial` fallback
 - Built by Derek Castelli — full-time freelance web designer (Webflow/Figma) at heyderekj.com
-- **v1 product:** Downloads inbox organizer (watch, classify, route, optional Finder tags, Review destination, history / undo moves).
+- **v1 product:** Downloads inbox organizer (watch, classify, route, optional Finder tags, Review folder, history / undo moves).
 - Legacy compression stack still present for backward compatibility paths; **UX is organizer-led**.
 - GitHub: https://github.com/heyderekj/binky · Site: https://binkyfiles.com
 

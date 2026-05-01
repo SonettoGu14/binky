@@ -91,7 +91,7 @@ struct SortBatchOutcome: Identifiable, Equatable, Codable, Sendable {
         })
     }
 
-    /// Review destination moves (confidence path).
+    /// Review folder moves (confidence path).
     var reviewQueuedCount: Int {
         entries.filter { $0.disposition == .moved && $0.category == .review }.count
     }
@@ -948,7 +948,7 @@ struct SortOutcomeSheet: View {
                 statChip(title: String(localized: "Moved", comment: "Sort audit"), value: outcome.movedCount, systemImage: "folder")
                 statChip(title: String(localized: "Kept", comment: "Sort audit"), value: outcome.keptCount, systemImage: "checkmark.circle")
                 statChip(title: String(localized: "Skipped", comment: "Sort audit"), value: outcome.skippedCount, systemImage: "minus.circle")
-                statChip(title: String(localized: "Review", comment: "Sort audit queue"), value: outcome.reviewQueuedCount, systemImage: "questionmark.circle")
+                statChip(title: String(localized: "Review folder", comment: "Sort audit queue"), value: outcome.reviewQueuedCount, systemImage: "questionmark.circle")
             }
 
             ForEach(Array(outcome.ancillaryWarnings.enumerated()), id: \.offset) { _, line in

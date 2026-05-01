@@ -487,7 +487,7 @@ struct OrganizerMainView: View {
                     sortPreviewRows = vm.inboxPreviewEntries(prefs: prefs)
                     showingSortPreview = true
                 } label: {
-                    Text(String(localized: "Preview…", comment: "Dry-run sort destinations."))
+                    Text(String(localized: "Preview…", comment: "Dry-run sort destination folders."))
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
@@ -539,7 +539,7 @@ struct OrganizerMainView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(.yellow)
             VStack(alignment: .leading, spacing: 2) {
-                Text(String(localized: "Pending review", comment: "Organizer banner when the Review destination has items."))
+                Text(String(localized: "Pending review", comment: "Organizer banner when the Review folder has items."))
                     .font(.subheadline.weight(.semibold))
                 Text(
                     String(localized: "\(reviewBannerCount) want a second look.", comment: "Organizer banner: files in Review needing attention; integer count interpolated.")
@@ -548,7 +548,7 @@ struct OrganizerMainView: View {
                 .foregroundStyle(.secondary)
             }
             Spacer(minLength: 0)
-            Button(String(localized: "Open Review in Finder", comment: "Reveal Review destination in Finder.")) {
+            Button(String(localized: "Open Review in Finder", comment: "Reveal Review folder in Finder.")) {
                 openReviewInFinder()
             }
             .buttonStyle(.bordered)
