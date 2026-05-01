@@ -11,6 +11,10 @@
   <link rel="stylesheet" href="/compare.css" />
   <link rel="stylesheet" href="/compare-hub.css" />
   <link rel="stylesheet" href="/site-tabs.css" />
+  <!-- Faster hop to sibling product site (dns + connection + idle document prefetch). -->
+  <link rel="dns-prefetch" href="https://dinkyfiles.com/" />
+  <link rel="preconnect" href="https://dinkyfiles.com/" crossorigin />
+  <link rel="prefetch" href="https://dinkyfiles.com/" as="document" />
 
   <meta property="og:title" content="Compare Binky — macOS Downloads organizer" />
   <meta property="og:description" content="Rough tradeoffs vs Hazel, Neatify, built-in Folder Actions, Refolder, and sorting in Finder by hand." />

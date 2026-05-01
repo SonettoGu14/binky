@@ -10,6 +10,7 @@
   for = "/"
   [headers.values]
     Link = "</.well-known/api-catalog>; rel=\"api-catalog\", </llms.txt>; rel=\"describedby\", </openapi.yaml>; rel=\"service-desc\", </homepage.md>; rel=\"alternate\"; type=\"text/markdown\""
+    Cache-Control = "public, max-age=120, stale-while-revalidate=86400"
 
 [[headers]]
   for = "/.well-known/api-catalog"
@@ -25,13 +26,47 @@
   for = "/openapi.yaml"
   [headers.values]
     Content-Type = "application/yaml; charset=utf-8"
+    Cache-Control = "public, max-age=300, stale-while-revalidate=3600"
 
 [[headers]]
   for = "/robots.txt"
   [headers.values]
     Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=600, stale-while-revalidate=86400"
 
 [[headers]]
   for = "/sitemap.xml"
   [headers.values]
     Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"
+
+# HTML hub + leaf compare pages — short max-age so updates land, stale-while-revalidate for perceived speed on back/forth.
+[[headers]]
+  for = "/compare/**"
+  [headers.values]
+    Cache-Control = "public, max-age=120, stale-while-revalidate=86400"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=864000"
+
+[[headers]]
+  for = "/screenshots/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=864000"
+
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=864000"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=864000"
+
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=864000"
