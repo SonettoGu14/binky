@@ -36,6 +36,24 @@ Hey! I'm [Derek Castelli](https://www.heyderekj.com), a full-time freelance web 
 - **Launch at login** - keep it ready in the background when your Mac boots
 - **Native macOS stack** - SwiftUI + AppKit, no bundled web runtime
 
+## Screenshots
+
+**Sorting dashboard**
+
+![Binky sorting dashboard](site/screenshots/sorting.png)
+
+**Profiles and routing**
+
+![Binky profiles and rules](site/screenshots/profiles.webp)
+
+**Sort breakdown**
+
+![Binky sorting breakdown](site/screenshots/sorting-breakdown.webp)
+
+**Review queue**
+
+![Binky review queue](site/screenshots/review.webp)
+
 ## What others don't do
 
 - **Treat uncertainty safely** - questionable files go to **Review** instead of being buried in the wrong folder
