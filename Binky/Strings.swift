@@ -29,6 +29,8 @@ extension Notification.Name {
     static let binkyFolderWatchPauseChanged = Notification.Name("binkyFolderWatchPauseChanged")
     /// Posted when sorting progress changes. `SortProgressTracker` includes values in `userInfo`.
     static let binkySortProgressChanged = Notification.Name("binkySortProgressChanged")
+    /// Thermal / LPM no longer blocks starting or continuing a held ingest batch.
+    static let binkyEnergyHoldReleased = Notification.Name("binkyEnergyHoldReleased")
 }
 
 enum S {

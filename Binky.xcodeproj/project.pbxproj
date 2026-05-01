@@ -21,6 +21,7 @@
 		CP000001000000000000001 /* CompressionPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = CP100001000000000000001 /* CompressionPreset.swift */; };
 		DD000003000000000000003 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD000002000000000000002 /* AppDelegate.swift */; };
 		DR000001000000000000001 /* DiagnosticsReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DR100001000000000000001 /* DiagnosticsReporter.swift */; };
+		ENRG20000100000000000001 /* EnergyConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = ENRG10000100000000000001 /* EnergyConditions.swift */; };
 		BAC00200000000000000001 /* BinkyActivationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC00100000000000000001 /* BinkyActivationPolicy.swift */; };
 		BMBC0020000000000000001 /* BinkyMenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BMBC0010000000000000001 /* BinkyMenuBarController.swift */; };
 		DST00009900000000000001 /* DownloadSortServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = DST10009900000000000001 /* DownloadSortServices.swift */; };
@@ -82,6 +83,7 @@
 		DD000001000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DD000002000000000000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DR100001000000000000001 /* DiagnosticsReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsReporter.swift; sourceTree = "<group>"; };
+		ENRG10000100000000000001 /* EnergyConditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyConditions.swift; sourceTree = "<group>"; };
 		DST10009900000000000001 /* DownloadSortServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSortServices.swift; sourceTree = "<group>"; };
 		DNKBRG1000010000000001 /* DinkyBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinkyBridge.swift; sourceTree = "<group>"; };
 		NTEXP102000000000000001 /* NewTagExpiry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTagExpiry.swift; sourceTree = "<group>"; };
@@ -277,6 +279,7 @@
 				WR100001000000000000001 /* WatchRegistry.swift */,
 				GH100001000000000000001 /* GlobalHotkeyManager.swift */,
 				DR100001000000000000001 /* DiagnosticsReporter.swift */,
+				ENRG10000100000000000001 /* EnergyConditions.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -436,6 +439,7 @@
 				SH000001000000000000001 /* ShortcutRecorderField.swift in Sources */,
 				GH000001000000000000001 /* GlobalHotkeyManager.swift in Sources */,
 				DR000001000000000000001 /* DiagnosticsReporter.swift in Sources */,
+				ENRG20000100000000000001 /* EnergyConditions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

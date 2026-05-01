@@ -28,6 +28,13 @@ enum SortProgressEvent: Sendable {
     case batchEnded
 }
 
+/// Energy / thermal hold while a sort is running (distinct from user Pause).
+enum SortEnergyHoldKind: Equatable {
+    case none
+    case thermal
+    case lowPower
+}
+
 /// One file currently passing through the sorter — shown on the sheet.
 struct ActiveSortItem: Identifiable, Equatable {
     let id: UUID
@@ -48,13 +55,22 @@ final class SortProgressTracker: ObservableObject {
     static let notificationSubtitleKey = "sortProgress.subtitle"
     static let notificationRunStateKey = "sortProgress.runState"
 
+    /// Matches energy throttle / inter-file sleep threshold in `EnergyConditions`.
+    static var bigSortEnergyCoalesceThreshold: Int { SortEnergy.bigBatchFileCount }
+
     @Published private(set) var isActive = false
     @Published private(set) var total: Int = 0
     @Published private(set) var completed: Int = 0
     @Published private(set) var currentItems: [ActiveSortItem] = []
     @Published private(set) var runState: SortRunState = .running
+    /// Full pause for thermal `.critical` or Low Power Mode while sorting.
+    @Published private(set) var energyHoldKind: SortEnergyHoldKind = .none
     /// Drives real-data bucket animation in `OrganizerEmptyStateView`; updated on each `fileStarted`.
     @Published private(set) var latestAnimationPulse: SortAnimationPulse?
+
+    /// Coalesce `binkySortProgressChanged` for large batches (MainActor).
+    private var coalesceProgressNotifications = false
+    private var coalescePostWorkItem: DispatchWorkItem?
 
     var fraction: Double {
         guard isActive, total > 0 else { return 0 }
@@ -71,6 +87,16 @@ final class SortProgressTracker: ObservableObject {
     /// Caption under / beside the bar (shown in organizer).
     /// Uses interpolated `String(localized:)` — avoids printf/catalog format drift traps.
     var bannerCaption: String {
+        if isActive {
+            switch energyHoldKind {
+            case .thermal:
+                return String(localized: "Paused — letting things cool off.", comment: "Sort caption when thermal state is critical.")
+            case .lowPower:
+                return String(localized: "Paused — Low Power Mode.", comment: "Sort caption when macOS Low Power Mode is on.")
+            case .none:
+                break
+            }
+        }
         if isActive, runState == .stopping {
             return String(localized: "Stopping after this file…", comment: "Sort caption while stop is requested and current item is finishing.")
         }
@@ -87,6 +113,14 @@ final class SortProgressTracker: ObservableObject {
     /// Menu bar tooltip while sorting.
     func menuBarTooltip() -> String {
         guard isActive else { return String(localized: "Binky", comment: "Menu bar status item tooltip (idle).") }
+        switch energyHoldKind {
+        case .thermal:
+            return String(localized: "Binky — Paused (cooling down)", comment: "Menu bar tooltip when sort paused for thermal.")
+        case .lowPower:
+            return String(localized: "Binky — Paused (Low Power Mode)", comment: "Menu bar tooltip when sort paused for Low Power Mode.")
+        case .none:
+            break
+        }
         if runState == .paused {
             let base = subtitleForCountsOnly()
             if base.isEmpty {
@@ -172,8 +206,12 @@ final class SortProgressTracker: ObservableObject {
         total = batchTotal
         isActive = true
         runState = .running
+        energyHoldKind = .none
+        coalesceProgressNotifications = batchTotal >= Self.bigSortEnergyCoalesceThreshold
+        coalescePostWorkItem?.cancel()
+        coalescePostWorkItem = nil
         latestAnimationPulse = nil
-        postSnapshot()
+        postSnapshotFlush()
     }
 
     func startFile(path: String, displayName: String, animationBucket: SortAnimationBucket) {
@@ -181,28 +219,38 @@ final class SortProgressTracker: ObservableObject {
         currentItems.removeAll(where: { $0.path == path })
         currentItems.append(ActiveSortItem(id: UUID(), path: path, displayName: displayName))
         latestAnimationPulse = SortAnimationPulse(id: UUID(), bucket: animationBucket)
-        postSnapshot()
+        postSnapshotCoalesced()
     }
 
     func finishFile(path: String) {
         guard isActive else { return }
+        coalescePostWorkItem?.cancel()
+        coalescePostWorkItem = nil
         // Keep the last processed filename visible until the next file starts so
         // the sheet doesn't bounce to a generic "Next file starting…" state.
         if total > 0 {
             completed = min(completed + 1, total)
         }
-        postSnapshot()
+        if coalesceProgressNotifications, completed < total {
+            postSnapshotCoalesced()
+        } else {
+            postSnapshotFlush()
+        }
     }
 
     func end() {
         isActive = false
         currentItems.removeAll()
         runState = .running
+        energyHoldKind = .none
+        coalesceProgressNotifications = false
+        coalescePostWorkItem?.cancel()
+        coalescePostWorkItem = nil
         latestAnimationPulse = nil
         if total > 0 {
             completed = min(completed, total)
         }
-        postSnapshot()
+        postSnapshotFlush()
         zeroCountsWhileIdle()
     }
 
@@ -210,7 +258,18 @@ final class SortProgressTracker: ObservableObject {
         guard isActive else { return }
         guard runState != state else { return }
         runState = state
-        postSnapshot()
+        postSnapshotFlush()
+    }
+
+    func setEnergyHold(_ kind: SortEnergyHoldKind) {
+        guard isActive else { return }
+        energyHoldKind = kind
+        postSnapshotFlush()
+    }
+
+    func clearEnergyHold() {
+        energyHoldKind = .none
+        postSnapshotFlush()
     }
 
     /// Keeps fraction at 0 between batches (`isActive` is already false).
@@ -226,9 +285,13 @@ final class SortProgressTracker: ObservableObject {
         completed = 0
         currentItems = []
         runState = .running
+        energyHoldKind = .none
+        coalesceProgressNotifications = false
+        coalescePostWorkItem?.cancel()
+        coalescePostWorkItem = nil
         latestAnimationPulse = nil
         if shouldPost {
-            postSnapshot()
+            postSnapshotFlush()
         }
     }
 
@@ -260,6 +323,25 @@ final class SortProgressTracker: ObservableObject {
                 SortProgressTracker.notificationRunStateKey: runState.rawValue,
             ]
         )
+    }
+
+    private func postSnapshotCoalesced() {
+        guard coalesceProgressNotifications else {
+            postSnapshot()
+            return
+        }
+        coalescePostWorkItem?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.postSnapshot()
+        }
+        coalescePostWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: work)
+    }
+
+    private func postSnapshotFlush() {
+        coalescePostWorkItem?.cancel()
+        coalescePostWorkItem = nil
+        postSnapshot()
     }
 
     /// Passed to `DownloadsSortOrchestrator.sort(... progress:)`.

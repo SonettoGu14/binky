@@ -4,6 +4,24 @@ import SwiftUI
 
 private let prefsLog = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Binky", category: "BinkyPreferences")
 
+// MARK: - Energy (large-batch sorting / thermal)
+
+/// `UserDefaults` keys for energy behavior. Also read from ``EnergyConditions`` / ``SortEnergy`` off the main actor.
+enum EnergySettingsKey {
+    static let pauseOnLowPowerMode = "energy.pauseOnLowPowerMode"
+    static let pauseOnThermalCritical = "energy.pauseOnThermalCritical"
+    static let bigBatchThreshold = "energy.bigBatchThreshold"
+    static let throttleProfile = "energy.throttleProfile"
+}
+
+enum EnergyThrottleProfile: String, CaseIterable, Identifiable, Sendable {
+    case auto
+    case gentle
+    case aggressive
+
+    var id: String { rawValue }
+}
+
 final class BinkyPreferences: ObservableObject {
 
     init() {
@@ -54,6 +72,27 @@ final class BinkyPreferences: ObservableObject {
     @AppStorage("notifyWhenDone")       var notifyWhenDone: Bool = false
     @AppStorage("playSoundEffects")     var playSoundEffects: Bool = true
     @AppStorage("reduceMotion")         var reduceMotion: Bool = false
+
+    @AppStorage(EnergySettingsKey.pauseOnLowPowerMode) var energyPauseOnLowPowerMode: Bool = true
+    @AppStorage(EnergySettingsKey.pauseOnThermalCritical) var energyPauseOnThermalCritical: Bool = true
+    /// File count at which inter-file thermal pacing and progress coalescing apply.
+    @AppStorage(EnergySettingsKey.bigBatchThreshold) private var energyBigBatchThresholdStorage: Int = 200
+    @AppStorage(EnergySettingsKey.throttleProfile) private var energyThrottleProfileRaw: String = EnergyThrottleProfile.auto.rawValue
+
+    /// Clamped 50…10,000; persisted via `energyBigBatchThresholdStorage`.
+    var energyBigBatchThreshold: Int {
+        get { Self.clampBigBatchThreshold(energyBigBatchThresholdStorage) }
+        set { energyBigBatchThresholdStorage = Self.clampBigBatchThreshold(newValue) }
+    }
+
+    var energyThrottleProfile: EnergyThrottleProfile {
+        get { EnergyThrottleProfile(rawValue: energyThrottleProfileRaw) ?? .auto }
+        set { energyThrottleProfileRaw = newValue.rawValue }
+    }
+
+    private static func clampBigBatchThreshold(_ v: Int) -> Int {
+        min(max(v, 50), 10_000)
+    }
 
     /// Shows Binky in the menu bar (Sort Now, pause watching, Settings).
     @AppStorage("ui.showMenuBarIcon") var showMenuBarIcon: Bool = true

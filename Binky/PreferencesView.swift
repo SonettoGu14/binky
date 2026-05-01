@@ -173,6 +173,43 @@ private struct GeneralTab: View {
             }
 
             Section {
+                Toggle(String(localized: "Pause sorting on Low Power Mode", comment: "Settings: Energy section."), isOn: Binding(
+                    get: { prefs.energyPauseOnLowPowerMode },
+                    set: { prefs.energyPauseOnLowPowerMode = $0 }
+                ))
+                Toggle(String(localized: "Pause sorting when thermal state is critical", comment: "Settings: Energy section."), isOn: Binding(
+                    get: { prefs.energyPauseOnThermalCritical },
+                    set: { prefs.energyPauseOnThermalCritical = $0 }
+                ))
+                Stepper(value: Binding(
+                    get: { prefs.energyBigBatchThreshold },
+                    set: { prefs.energyBigBatchThreshold = $0 }
+                ), in: 50...10_000, step: 50) {
+                    Text(String.localizedStringWithFormat(
+                        String(localized: "Big-batch threshold: %lld files", comment: "Settings: Energy section; file count before thermal pacing and progress coalescing."),
+                        Int64(prefs.energyBigBatchThreshold)
+                    ))
+                }
+                Picker(selection: Binding(
+                    get: { prefs.energyThrottleProfile },
+                    set: { prefs.energyThrottleProfile = $0 }
+                )) {
+                    Text(String(localized: "Auto", comment: "Settings: Energy throttle profile.")).tag(EnergyThrottleProfile.auto)
+                    Text(String(localized: "Gentle", comment: "Settings: Energy throttle profile.")).tag(EnergyThrottleProfile.gentle)
+                    Text(String(localized: "Aggressive", comment: "Settings: Energy throttle profile.")).tag(EnergyThrottleProfile.aggressive)
+                } label: {
+                    Text(String(localized: "Large-batch pacing", comment: "Settings: Energy throttle picker label."))
+                }
+                .pickerStyle(.segmented)
+                Text(String(localized: "Applies to large sorts and watch-folder batches. Lower threshold means pacing starts sooner. Aggressive finishes faster when the Mac is warm; Gentle eases CPU and disk.", comment: "Settings: Energy section footnote."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } header: {
+                Text(String(localized: "Energy", comment: "Settings: General tab section title."))
+            }
+
+            Section {
                 Toggle(String(localized: "Play sound when done", comment: "Settings UI."), isOn: Binding(
                     get: { prefs.playSoundEffects },
                     set: { prefs.playSoundEffects = $0 }

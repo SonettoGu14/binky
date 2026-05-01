@@ -45,7 +45,7 @@ enum WatchFolderPathResolver {
 
 /// Builds routing rules from `BinkyPreferences`: global watch + presets with unique paths.
 /// If the same path is both global and unique-preset, **preset wins** (checked first).
-struct WatchPipelineRegistry {
+struct WatchPipelineRegistry: Sendable {
     let globalPath: String?
     let presetPaths: [(UUID, String)]
 

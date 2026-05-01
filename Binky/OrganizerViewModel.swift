@@ -120,17 +120,52 @@ final class OrganizerViewModel: ObservableObject {
         deliverCompletedSort(outcome, prefs: prefs)
     }
 
-    /// Sort explicit files (drop, Open panel, Finder Services). Skips items not under the active inbox root.
+    /// Sort explicit files (drop, Open panel, Finder Services / right-click).
+    ///
+    /// - Files: must live under the active inbox root (kept from earlier behavior).
+    /// - Folders: expand to their top-level files; the folder itself becomes the ad-hoc inbox
+    ///   root for those files, even when it sits outside the watched inbox. Subfolders are not
+    ///   descended — matches the Sweep model.
     func sortIncomingFiles(_ urls: [URL], prefs: BinkyPreferences) async {
         transientBannerMessage = nil
-        let root = prefs.activeSortSweepRootDirectory().standardizedFileURL
-        let rootPath = root.path
-        let filtered = urls.map(\.standardizedFileURL).filter { url in
-            guard url.isFileURL else { return false }
-            let p = url.path
-            return p == rootPath || p.hasPrefix(rootPath + "/")
+        let fm = FileManager.default
+        let inboxRoot = prefs.activeSortSweepRootDirectory().standardizedFileURL
+        let inboxPath = inboxRoot.path
+
+        var files: [URL] = []
+        var rootOverride: [URL: URL] = [:]
+        var seen: Set<URL> = []
+
+        for raw in urls {
+            let std = raw.standardizedFileURL
+            guard std.isFileURL else { continue }
+            var isDir: ObjCBool = false
+            guard fm.fileExists(atPath: std.path, isDirectory: &isDir) else { continue }
+
+            if isDir.boolValue {
+                guard let entries = try? fm.contentsOfDirectory(
+                    at: std,
+                    includingPropertiesForKeys: [.isDirectoryKey],
+                    options: [.skipsHiddenFiles]
+                ) else { continue }
+                for entry in entries {
+                    let entryStd = entry.standardizedFileURL
+                    var entryIsDir: ObjCBool = false
+                    guard fm.fileExists(atPath: entryStd.path, isDirectory: &entryIsDir),
+                          !entryIsDir.boolValue else { continue }
+                    guard seen.insert(entryStd).inserted else { continue }
+                    files.append(entryStd)
+                    rootOverride[entryStd] = std
+                }
+            } else {
+                let p = std.path
+                guard p == inboxPath || p.hasPrefix(inboxPath + "/") else { continue }
+                guard seen.insert(std).inserted else { continue }
+                files.append(std)
+            }
         }
-        guard !filtered.isEmpty else {
+
+        guard !files.isEmpty else {
             flashTransientStatus(
                 String(localized: "Those aren’t in the inbox. Drop them in the watched folder first.", comment: "Organizer transient when dropped paths are outside the active inbox root.")
             )
@@ -143,8 +178,9 @@ final class OrganizerViewModel: ObservableObject {
             return
         }
         let outcome = await DownloadsSortOrchestrator.shared.sort(
-            files: filtered,
+            files: files,
             prefs: prefs,
+            rootOverride: rootOverride,
             progress: SortProgressTracker.orchestratorClosure()
         )
         guard outcome.hasWork else { return }

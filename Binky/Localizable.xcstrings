@@ -3675,6 +3675,105 @@
         }
       }
     },
+    "Aggressive" : {
+      "comment" : "Settings: Energy throttle profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Aggressive"
+          }
+        }
+      }
+    },
+    "Applies to large sorts and watch-folder batches. Lower threshold means pacing starts sooner. Aggressive finishes faster when the Mac is warm; Gentle eases CPU and disk." : {
+      "comment" : "Settings: Energy section footnote.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Applies to large sorts and watch-folder batches. Lower threshold means pacing starts sooner. Aggressive finishes faster when the Mac is warm; Gentle eases CPU and disk."
+          }
+        }
+      }
+    },
+    "Auto" : {
+      "comment" : "Settings: Energy throttle profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Auto"
+          }
+        }
+      }
+    },
+    "Big-batch threshold: %lld files" : {
+      "comment" : "Settings: Energy section; file count before thermal pacing and progress coalescing.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Big-batch threshold: %lld files"
+          }
+        }
+      }
+    },
+    "Energy" : {
+      "comment" : "Settings: General tab section title.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Energy"
+          }
+        }
+      }
+    },
+    "Gentle" : {
+      "comment" : "Settings: Energy throttle profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Gentle"
+          }
+        }
+      }
+    },
+    "Large-batch pacing" : {
+      "comment" : "Settings: Energy throttle picker label.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Large-batch pacing"
+          }
+        }
+      }
+    },
+    "Pause sorting on Low Power Mode" : {
+      "comment" : "Settings: Energy section.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pause sorting on Low Power Mode"
+          }
+        }
+      }
+    },
+    "Pause sorting when thermal state is critical" : {
+      "comment" : "Settings: Energy section.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pause sorting when thermal state is critical"
+          }
+        }
+      }
+    },
     "Behavior" : {
       "comment" : "Settings UI.",
       "localizations" : {
@@ -3841,6 +3940,12 @@
     },
     "Binky — Paused (%@)" : {
       "comment" : "Menu bar tooltip: paused with counts."
+    },
+    "Binky — Paused (cooling down)" : {
+      "comment" : "Menu bar tooltip when sort paused for thermal."
+    },
+    "Binky — Paused (Low Power Mode)" : {
+      "comment" : "Menu bar tooltip when sort paused for Low Power Mode."
     },
     "Binky — Sorting %lld of %lld" : {
       "comment" : "Menu bar tooltip with counts.",
@@ -4043,6 +4148,9 @@
     },
     "Binky Help" : {
       "comment" : "Help menu: open help window.\nMenu: open help window."
+    },
+    "Binky is sorting files." : {
+      "comment" : "Process activity reason while sorting inbox files."
     },
     "Binky's tidying up." : {
       "comment" : "Currently sorting sheet: generic subtitle when no per-file caption."
@@ -18522,6 +18630,12 @@
     },
     "Paused — %@" : {
       "comment" : "Sort caption while paused with batch progress."
+    },
+    "Paused — letting things cool off." : {
+      "comment" : "Sort caption when thermal state is critical."
+    },
+    "Paused — Low Power Mode." : {
+      "comment" : "Sort caption when macOS Low Power Mode is on."
     },
     "PDF" : {
       "comment" : "Sort rule kind filter.",

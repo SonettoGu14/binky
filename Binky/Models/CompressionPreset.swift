@@ -1,7 +1,7 @@
 import Foundation
 
 /// Organizer profile (per-preset watch folder, tags, routing rules). Renamed conceptually from Dinky-era “preset”; kept as ``CompressionPreset`` for ``UserDefaults`` compatibility.
-struct CompressionPreset: Codable, Identifiable, Equatable {
+struct CompressionPreset: Codable, Identifiable, Equatable, Sendable {
     let id: UUID
     var name: String
 

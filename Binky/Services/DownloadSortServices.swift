@@ -399,6 +399,381 @@ private enum PostSortShortcutRunner {
     }
 }
 
+// MARK: - Sort snapshot + detached loop (energy-aware)
+
+/// Frozen prefs and routing for one sort pass — safe to use from ``Task.detached``.
+private struct SortPreferencesSnapshot: Sendable {
+    let excludeExtensions: Set<String>
+    let excludeNameFragments: [String]
+    let sortCustomRulesEnabled: Bool
+    let sortRoutingRules: [InboxSortRule]
+    let sortAppendNewSemanticTagEnabled: Bool
+    let assignFinderTagsOnSortEnabled: Bool
+    let globalInboxRoot: URL
+    let watchRegistry: WatchPipelineRegistry
+    let presetsByID: [UUID: CompressionPreset]
+}
+
+private extension BinkyPreferences {
+    @MainActor
+    func makeSortPreferencesSnapshot() -> SortPreferencesSnapshot {
+        var byPresetID: [UUID: CompressionPreset] = [:]
+        for p in savedPresets {
+            byPresetID[p.id] = p
+        }
+        return SortPreferencesSnapshot(
+            excludeExtensions: sortExcludeExtensionsNormalized(),
+            excludeNameFragments: sortExcludeNameFragmentsNormalized(),
+            sortCustomRulesEnabled: sortCustomRulesEnabled,
+            sortRoutingRules: sortRoutingRules,
+            sortAppendNewSemanticTagEnabled: sortAppendNewSemanticTagEnabled,
+            assignFinderTagsOnSortEnabled: assignFinderTagsOnSortEnabled,
+            globalInboxRoot: downloadsSortRootDirectory(),
+            watchRegistry: WatchPipelineRegistry(prefs: self),
+            presetsByID: byPresetID
+        )
+    }
+}
+
+private func sortInboxContext(for fileURL: URL, snapshot: SortPreferencesSnapshot) -> (inboxRoot: URL, preset: CompressionPreset?) {
+    let reg = snapshot.watchRegistry
+    switch reg.pipeline(for: fileURL) {
+    case .global:
+        return (snapshot.globalInboxRoot, nil)
+    case .preset(let id):
+        guard let preset = snapshot.presetsByID[id] else {
+            return (snapshot.globalInboxRoot, nil)
+        }
+        if preset.watchFolderModeRaw == "unique",
+           let path = WatchFolderPathResolver.resolvedWatchDirectoryPath(
+                bookmark: preset.watchFolderBookmark,
+                storedPath: preset.watchFolderPath
+           ) {
+            return (URL(fileURLWithPath: path).standardizedFileURL, preset)
+        }
+        return (snapshot.globalInboxRoot, preset)
+    }
+}
+
+private func isURLExcludedForSort(url: URL, snapshot: SortPreferencesSnapshot) -> Bool {
+    let ext = url.pathExtension.lowercased()
+    if !snapshot.excludeExtensions.isEmpty, snapshot.excludeExtensions.contains(ext) {
+        return true
+    }
+    let base = url.lastPathComponent
+    for fragment in snapshot.excludeNameFragments {
+        guard !fragment.isEmpty else { continue }
+        if base.localizedCaseInsensitiveContains(fragment) {
+            return true
+        }
+    }
+    return false
+}
+
+private func activeSortRulesForSnapshot(snapshot: SortPreferencesSnapshot, preset: CompressionPreset?) -> [InboxSortRule] {
+    if let preset, !preset.inboxSortRules.isEmpty {
+        return preset.inboxSortRules
+    }
+    return snapshot.sortCustomRulesEnabled ? snapshot.sortRoutingRules : []
+}
+
+private func composedFinderTagsForSort(snapshot: SortPreferencesSnapshot, category: FileSortCategory, preset: CompressionPreset?, matchedRule: InboxSortRule?) -> [String] {
+    var tags: [String] = [category.semanticTagHint]
+    if let preset {
+        tags.append(contentsOf: preset.customFinderTags.map {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines)
+        }.filter { !$0.isEmpty })
+    }
+    if let matchedRule {
+        tags.append(contentsOf: matchedRule.addedTags.map {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines)
+        }.filter { !$0.isEmpty })
+    }
+    if snapshot.sortAppendNewSemanticTagEnabled {
+        tags.append("New")
+    }
+    return tags
+}
+
+private func destinationDisplayLabelForSort(root: URL, destinationDir: URL) -> String {
+    let rootPath = root.path
+    let destPath = destinationDir.path
+    guard destPath.hasPrefix(rootPath) else { return destinationDir.lastPathComponent }
+    let tail = String(destPath.dropFirst(rootPath.count)).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+    return tail.isEmpty ? destinationDir.lastPathComponent : tail
+}
+
+private func localizedMoveReasonForSort(matchedRuleName: String?, destinationDir: URL, inboxRoot: URL) -> String {
+    let label = destinationDisplayLabelForSort(root: inboxRoot, destinationDir: destinationDir)
+    if let matchedRuleName {
+        return String.localizedStringWithFormat(
+            String(localized: "Moved into “%1$@” (rule “%2$@”).", comment: "Sort audit when a custom rule matched."),
+            label,
+            matchedRuleName
+        )
+    }
+    return String.localizedStringWithFormat(
+        String(localized: "Moved into “%@”.", comment: "Sort audit reason; formatted folder name."),
+        label
+    )
+}
+
+private final class SortRunGate: @unchecked Sendable {
+    private enum ControlState {
+        case running
+        case paused
+        case stopRequested
+    }
+
+    private let lock = NSLock()
+    private var control: ControlState = .running
+    private var sessionActive = true
+
+    func setRunning() {
+        lock.lock()
+        control = .running
+        lock.unlock()
+    }
+
+    func setPaused() {
+        lock.lock()
+        control = .paused
+        lock.unlock()
+    }
+
+    func setStopRequested() {
+        lock.lock()
+        control = .stopRequested
+        lock.unlock()
+    }
+
+    func stopRequested() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return control == .stopRequested
+    }
+
+    func endSession() {
+        lock.lock()
+        sessionActive = false
+        lock.unlock()
+    }
+
+    func continueWhenSortPermitsProgress() async -> Bool {
+        while true {
+            lock.lock()
+            let c = control
+            let active = sessionActive
+            lock.unlock()
+            if !active { return false }
+            if c == .paused {
+                try? await Task.sleep(for: .milliseconds(130))
+                if Task.isCancelled { return false }
+                continue
+            }
+            return c != .stopRequested
+        }
+    }
+}
+
+private enum SortWork {
+    nonisolated static func applyEnergyThrottleBetweenFiles(batchSize: Int) async {
+        await Task.yield()
+        guard EnergyConditions.shared.shouldPauseFully else {
+            let sleepNanos = EnergyConditions.shared.interFileSleepNanos(batchSize: batchSize)
+            if sleepNanos > 0 {
+                try? await Task.sleep(nanoseconds: sleepNanos)
+            }
+            return
+        }
+        let holdKind = EnergyConditions.shared.energyHoldKindForProgressUI()
+        await MainActor.run {
+            SortProgressTracker.shared.setEnergyHold(holdKind)
+        }
+        await EnergyConditions.shared.waitUntilOK()
+        await MainActor.run {
+            SortProgressTracker.shared.clearEnergyHold()
+        }
+        let sleepNanos = EnergyConditions.shared.interFileSleepNanos(batchSize: batchSize)
+        if sleepNanos > 0 {
+            try? await Task.sleep(nanoseconds: sleepNanos)
+        }
+    }
+
+    /// Runs the per-file pipeline off the main actor. Progress closure is ``Sendable`` and safe to call from here.
+    /// `rootOverride` lets the caller pin specific files to an ad-hoc inbox root (e.g. a right-clicked folder).
+    nonisolated static func runSortWorkLoop(
+        workURLs: [URL],
+        snapshot: SortPreferencesSnapshot,
+        rootOverride: [URL: URL],
+        gate: SortRunGate,
+        progress: (@Sendable (SortProgressEvent) -> Void)?
+    ) async -> (rows: [SortBatchEntry], tagWriteFailures: Int) {
+        let fm = FileManager.default
+        var rows: [SortBatchEntry] = []
+        var renameCounter = 1
+        var tagWriteFailures = 0
+
+        for standardized in workURLs {
+            guard await gate.continueWhenSortPermitsProgress() else { break }
+            let pathKey = standardized.path
+            let displayName = standardized.lastPathComponent
+            var didReportFileStarted = false
+            defer {
+                if didReportFileStarted {
+                    progress?(.fileFinished(path: pathKey))
+                }
+            }
+
+            func emitFileStarted(categoryForAnimation: FileSortCategory) {
+                progress?(.fileStarted(path: pathKey, displayName: displayName, animationBucket: categoryForAnimation.sortAnimationBucket))
+                didReportFileStarted = true
+            }
+
+            if looksTransientIncomplete(standardized) {
+                emitFileStarted(categoryForAnimation: .review)
+                rows.append(SortBatchEntry(
+                    id: UUID(), sourcePath: standardized.path, destinationPath: nil, category: .review, disposition: .skippedTransient,
+                    reason: String(localized: "Temporary download artifact — skipping until finalized.", comment: "Sort log."),
+                    matchedRuleName: nil
+                ))
+                await applyEnergyThrottleBetweenFiles(batchSize: workURLs.count)
+                continue
+            }
+
+            guard await waitUntilStable(at: standardized, continueCheck: {
+                await gate.continueWhenSortPermitsProgress()
+            }) else {
+                if gate.stopRequested() {
+                    break
+                }
+                emitFileStarted(categoryForAnimation: .review)
+                rows.append(SortBatchEntry(
+                    id: UUID(), sourcePath: standardized.path, destinationPath: nil, category: .review, disposition: .skippedStableCheckTimeout,
+                    reason: String(localized: "File never stabilized before timeout.", comment: "Sort log."),
+                    matchedRuleName: nil
+                ))
+                await applyEnergyThrottleBetweenFiles(batchSize: workURLs.count)
+                continue
+            }
+
+            guard await gate.continueWhenSortPermitsProgress() else { break }
+
+            if isURLExcludedForSort(url: standardized, snapshot: snapshot) {
+                emitFileStarted(categoryForAnimation: .misc)
+                rows.append(SortBatchEntry(
+                    id: UUID(), sourcePath: standardized.path, destinationPath: nil, category: .misc, disposition: .skippedExcluded,
+                    reason: String(localized: "Skipped — file matches your ignore list.", comment: "Sort log."),
+                    matchedRuleName: nil
+                ))
+                await applyEnergyThrottleBetweenFiles(batchSize: workURLs.count)
+                continue
+            }
+
+            let signals = SortRulesEvaluator.loadSignals(url: standardized)
+                ?? SortRulesEvaluator.FileSignals(
+                    ext: standardized.pathExtension.lowercased(),
+                    baseName: standardized.lastPathComponent,
+                    byteSize: 0,
+                    addedToDirectoryDate: nil,
+                    creationDate: nil,
+                    modificationDate: nil
+                )
+
+            let (defaultRoot, preset) = sortInboxContext(for: standardized, snapshot: snapshot)
+            let inboxRoot = rootOverride[standardized] ?? defaultRoot
+            let activeRules = activeSortRulesForSnapshot(snapshot: snapshot, preset: preset)
+            let matchedRule = SortRulesEvaluator.firstMatchingRule(in: activeRules, signals: signals)
+
+            let category: FileSortCategory
+            let destinationDir: URL
+            let preferredFilename: String
+            let ruleName: String?
+
+            if let rule = matchedRule {
+                category = SortRulesEvaluator.customRuleTagCategory
+                destinationDir = SortRulesEvaluator.destinationDirectory(rule: rule, category: category, inboxRoot: inboxRoot)
+                preferredFilename = SortRulesEvaluator.renamedFilename(originalURL: standardized, rule: rule, renameCounter: renameCounter)
+                if rule.renameStyle != .none { renameCounter += 1 }
+                ruleName = rule.name
+            } else {
+                category = FileClassification.categorize(url: standardized)
+                destinationDir = StarterDestinations.directory(for: category, root: inboxRoot)
+                preferredFilename = standardized.lastPathComponent
+                ruleName = nil
+            }
+
+            emitFileStarted(categoryForAnimation: category)
+
+            if standardized.deletingLastPathComponent().standardizedFileURL == destinationDir.standardizedFileURL,
+               standardized.lastPathComponent == preferredFilename {
+                rows.append(SortBatchEntry(
+                    id: UUID(), sourcePath: standardized.path, destinationPath: standardized.path, category: category, disposition: .kept,
+                    reason: String(localized: "Already sorted into this destination.", comment: "Sort log."),
+                    matchedRuleName: ruleName
+                ))
+                await applyEnergyThrottleBetweenFiles(batchSize: workURLs.count)
+                continue
+            }
+
+            let target = DownloadsSortOrchestrator.uniquify(destinationDirectory: destinationDir, preferredFilename: preferredFilename)
+
+            do {
+                try fm.createDirectory(at: destinationDir, withIntermediateDirectories: true)
+                try fm.moveItem(at: standardized, to: target)
+
+                if snapshot.assignFinderTagsOnSortEnabled {
+                    let okTag = FinderTagApplicator.merge(
+                        composedFinderTagsForSort(snapshot: snapshot, category: category, preset: preset, matchedRule: matchedRule),
+                        onto: target
+                    )
+                    if !okTag {
+                        tagWriteFailures += 1
+                    }
+                }
+
+                if snapshot.assignFinderTagsOnSortEnabled, snapshot.sortAppendNewSemanticTagEnabled,
+                   let preset, preset.newTagExpiryDays > 0 {
+                    await MainActor.run {
+                        NewTagExpiryService.shared.register(file: target, expiryDays: preset.newTagExpiryDays)
+                    }
+                }
+
+                if let preset, !preset.postSortShortcutName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    await MainActor.run {
+                        PostSortShortcutRunner.run(shortcutName: preset.postSortShortcutName, fileURL: target)
+                    }
+                }
+
+                rows.append(SortBatchEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    destinationPath: target.path,
+                    category: category,
+                    disposition: .moved,
+                    reason: localizedMoveReasonForSort(matchedRuleName: ruleName, destinationDir: destinationDir, inboxRoot: inboxRoot),
+                    matchedRuleName: ruleName
+                ))
+
+            } catch {
+                rows.append(SortBatchEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    destinationPath: nil,
+                    category: category,
+                    disposition: .skippedError,
+                    reason: error.localizedDescription,
+                    matchedRuleName: ruleName
+                ))
+            }
+
+            await applyEnergyThrottleBetweenFiles(batchSize: workURLs.count)
+        }
+
+        return (rows, tagWriteFailures)
+    }
+}
+
 // MARK: - Physical layout helpers
 
 enum StarterDestinations {
@@ -459,6 +834,7 @@ final class DownloadsSortOrchestrator {
     /// Only one sort pass at a time — concurrent entry points queue or no-op (see single-flight `sort`).
     private(set) var isSorting: Bool = false
     private var sortControlState: SortControlState = .running
+    private var sortRunGate: SortRunGate?
 
     var canPause: Bool {
         isSorting && sortControlState == .running
@@ -475,18 +851,21 @@ final class DownloadsSortOrchestrator {
     func pauseCurrentSort() {
         guard canPause else { return }
         sortControlState = .paused
+        sortRunGate?.setPaused()
         SortProgressTracker.shared.setRunState(.paused)
     }
 
     func resumeCurrentSort() {
         guard canResume else { return }
         sortControlState = .running
+        sortRunGate?.setRunning()
         SortProgressTracker.shared.setRunState(.running)
     }
 
     func stopCurrentSort() {
         guard canStop else { return }
         sortControlState = .stopRequested
+        sortRunGate?.setStopRequested()
         SortProgressTracker.shared.setRunState(.stopping)
     }
 
@@ -496,7 +875,10 @@ final class DownloadsSortOrchestrator {
     }
 
     /// Shows where files would land **without** waiting on stability or moving anything.
-    func previewSort(files urls: [URL], prefs: BinkyPreferences) -> [SortPreviewEntry] {
+    /// `rootOverride` pins specific files to an ad-hoc inbox root (e.g. a right-clicked folder
+    /// that should act as its own one-shot inbox). Keys are matched against each file's
+    /// `standardizedFileURL`.
+    func previewSort(files urls: [URL], prefs: BinkyPreferences, rootOverride: [URL: URL] = [:]) -> [SortPreviewEntry] {
         prefs.reconcileFolderBookmarksIfNeeded()
         let fm = FileManager.default
         var renameCounter = 1
@@ -538,7 +920,8 @@ final class DownloadsSortOrchestrator {
                     modificationDate: nil
                 )
 
-            let (inboxRoot, preset) = prefs.sortContext(for: standardized)
+            let (defaultRoot, preset) = prefs.sortContext(for: standardized)
+            let inboxRoot = rootOverride[standardized] ?? defaultRoot
             let activeRules = activeSortRulesForSort(prefs: prefs, preset: preset)
             let matchedRule = SortRulesEvaluator.firstMatchingRule(in: activeRules, signals: signals)
 
@@ -640,9 +1023,15 @@ final class DownloadsSortOrchestrator {
         return ordered
     }
 
-    func sort(files urls: [URL], prefs: BinkyPreferences, progress: (@Sendable (SortProgressEvent) -> Void)? = nil) async -> SortBatchOutcome {
-        let fm = FileManager.default
-
+    /// `rootOverride` pins specific files to an ad-hoc inbox root (e.g. a right-clicked folder
+    /// in Finder Services that should act as its own one-shot inbox). Keys are matched against
+    /// each file's `standardizedFileURL`.
+    func sort(
+        files urls: [URL],
+        prefs: BinkyPreferences,
+        rootOverride: [URL: URL] = [:],
+        progress: (@Sendable (SortProgressEvent) -> Void)? = nil
+    ) async -> SortBatchOutcome {
         guard !isSorting else {
             NotificationCenter.default.post(name: .binkySortRejectedBecauseBusy, object: nil)
             return Self.emptyOutcome()
@@ -651,15 +1040,35 @@ final class DownloadsSortOrchestrator {
         isSorting = true
         sortControlState = .running
         SortProgressTracker.shared.setRunState(.running)
+
+        let gate = SortRunGate()
+        sortRunGate = gate
+
+        let activity = ProcessInfo.processInfo.beginActivity(
+            options: .userInitiated,
+            reason: String(localized: "Binky is sorting files.", comment: "Process activity reason while sorting inbox files.")
+        )
         defer {
+            ProcessInfo.processInfo.endActivity(activity)
+            sortRunGate?.endSession()
+            sortRunGate = nil
             isSorting = false
             sortControlState = .running
         }
 
         let startedAt = Date()
         prefs.reconcileFolderBookmarksIfNeeded()
+        let snapshot = prefs.makeSortPreferencesSnapshot()
 
-        let uniqueRoots = Set(urls.map { prefs.sortContext(for: $0.standardizedFileURL).inboxRoot })
+        let normalizedOverride: [URL: URL] = Dictionary(
+            rootOverride.map { ($0.key.standardizedFileURL, $0.value.standardizedFileURL) },
+            uniquingKeysWith: { first, _ in first }
+        )
+
+        let uniqueRoots = Set(urls.map { url -> URL in
+            let std = url.standardizedFileURL
+            return normalizedOverride[std] ?? prefs.sortContext(for: std).inboxRoot
+        })
         for root in uniqueRoots {
             StarterDestinations.ensure(downloadsRoot: root)
         }
@@ -670,141 +1079,18 @@ final class DownloadsSortOrchestrator {
             progress?(.batchEnded)
         }
 
-        var rows: [SortBatchEntry] = []
-        var renameCounter = 1
-        var tagWriteFailures = 0
+        let loopResult = await Task.detached(priority: .utility) { [workURLs, snapshot, normalizedOverride, gate, progress] in
+            await SortWork.runSortWorkLoop(
+                workURLs: workURLs,
+                snapshot: snapshot,
+                rootOverride: normalizedOverride,
+                gate: gate,
+                progress: progress
+            )
+        }.value
 
-        for standardized in workURLs {
-            guard await continueWhenSortPermitsProgress() else { break }
-            let pathKey = standardized.path
-            let displayName = standardized.lastPathComponent
-            var didReportFileStarted = false
-            defer {
-                if didReportFileStarted {
-                    progress?(.fileFinished(path: pathKey))
-                }
-            }
-
-            func emitFileStarted(categoryForAnimation: FileSortCategory) {
-                progress?(.fileStarted(path: pathKey, displayName: displayName, animationBucket: categoryForAnimation.sortAnimationBucket))
-                didReportFileStarted = true
-            }
-
-            if looksTransientIncomplete(standardized) {
-                emitFileStarted(categoryForAnimation: .review)
-                rows.append(entry(path: standardized.path, dest: nil, category: .review, disposition: .skippedTransient,
-                    reason: String(localized: "Temporary download artifact — skipping until finalized.", comment: "Sort log."),
-                    matchedRuleName: nil))
-                continue
-            }
-
-            guard await waitUntilStable(at: standardized, continueCheck: { [weak self] in
-                guard let self else { return false }
-                return await self.continueWhenSortPermitsProgress()
-            }) else {
-                if sortControlState == .stopRequested {
-                    break
-                }
-                emitFileStarted(categoryForAnimation: .review)
-                rows.append(entry(path: standardized.path, dest: nil, category: .review, disposition: .skippedStableCheckTimeout,
-                    reason: String(localized: "File never stabilized before timeout.", comment: "Sort log."),
-                    matchedRuleName: nil))
-                continue
-            }
-
-            guard await continueWhenSortPermitsProgress() else { break }
-
-            if SortRulesEvaluator.isExcluded(url: standardized, prefs: prefs) {
-                emitFileStarted(categoryForAnimation: .misc)
-                rows.append(entry(path: standardized.path, dest: nil, category: .misc, disposition: .skippedExcluded,
-                    reason: String(localized: "Skipped — file matches your ignore list.", comment: "Sort log."),
-                    matchedRuleName: nil))
-                continue
-            }
-
-            let signals = SortRulesEvaluator.loadSignals(url: standardized)
-                ?? SortRulesEvaluator.FileSignals(
-                    ext: standardized.pathExtension.lowercased(),
-                    baseName: standardized.lastPathComponent,
-                    byteSize: 0,
-                    addedToDirectoryDate: nil,
-                    creationDate: nil,
-                    modificationDate: nil
-                )
-
-            let (inboxRoot, preset) = prefs.sortContext(for: standardized)
-            let activeRules = activeSortRulesForSort(prefs: prefs, preset: preset)
-            let matchedRule = SortRulesEvaluator.firstMatchingRule(in: activeRules, signals: signals)
-
-            let category: FileSortCategory
-            let destinationDir: URL
-            let preferredFilename: String
-            let ruleName: String?
-
-            if let rule = matchedRule {
-                category = SortRulesEvaluator.customRuleTagCategory
-                destinationDir = SortRulesEvaluator.destinationDirectory(rule: rule, category: category, inboxRoot: inboxRoot)
-                preferredFilename = SortRulesEvaluator.renamedFilename(originalURL: standardized, rule: rule, renameCounter: renameCounter)
-                if rule.renameStyle != .none { renameCounter += 1 }
-                ruleName = rule.name
-            } else {
-                category = FileClassification.categorize(url: standardized)
-                destinationDir = StarterDestinations.directory(for: category, root: inboxRoot)
-                preferredFilename = standardized.lastPathComponent
-                ruleName = nil
-            }
-
-            emitFileStarted(categoryForAnimation: category)
-
-            if standardized.deletingLastPathComponent().standardizedFileURL == destinationDir.standardizedFileURL,
-               standardized.lastPathComponent == preferredFilename {
-                rows.append(entry(path: standardized.path, dest: standardized.path, category: category, disposition: .kept,
-                                  reason: String(localized: "Already sorted into this destination.", comment: "Sort log."),
-                                  matchedRuleName: ruleName))
-                continue
-            }
-
-            let target = DownloadsSortOrchestrator.uniquify(destinationDirectory: destinationDir, preferredFilename: preferredFilename)
-
-            do {
-                try fm.createDirectory(at: destinationDir, withIntermediateDirectories: true)
-                try fm.moveItem(at: standardized, to: target)
-
-                if prefs.assignFinderTagsOnSortEnabled {
-                    let okTag = FinderTagApplicator.merge(
-                        composedFinderTagsForSort(prefs: prefs, category: category, preset: preset, matchedRule: matchedRule),
-                        onto: target
-                    )
-                    if !okTag {
-                        tagWriteFailures += 1
-                    }
-                }
-
-                if prefs.assignFinderTagsOnSortEnabled, prefs.sortAppendNewSemanticTagEnabled,
-                   let preset, preset.newTagExpiryDays > 0 {
-                    NewTagExpiryService.shared.register(file: target, expiryDays: preset.newTagExpiryDays)
-                }
-
-                if let preset, !preset.postSortShortcutName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    PostSortShortcutRunner.run(shortcutName: preset.postSortShortcutName, fileURL: target)
-                }
-
-                rows.append(entry(path: standardized.path,
-                                  dest: target.path,
-                                  category: category,
-                                  disposition: .moved,
-                                  reason: localizedMoveReason(category: category, matchedRuleName: ruleName, destinationDir: destinationDir, inboxRoot: inboxRoot),
-                                  matchedRuleName: ruleName))
-
-            } catch {
-                rows.append(entry(path: standardized.path,
-                                  dest: nil,
-                                  category: category,
-                                  disposition: .skippedError,
-                                  reason: error.localizedDescription,
-                                  matchedRuleName: ruleName))
-            }
-        }
+        let rows = loopResult.rows
+        let tagWriteFailures = loopResult.tagWriteFailures
 
         let elapsed = Date().timeIntervalSince(startedAt)
         lastUndoPairs = rows
@@ -832,41 +1118,12 @@ final class DownloadsSortOrchestrator {
         return outcome
     }
 
-    private func continueWhenSortPermitsProgress() async -> Bool {
-        while isSorting, sortControlState == .paused {
-            try? await Task.sleep(for: .milliseconds(130))
-            if Task.isCancelled { return false }
-        }
-        return sortControlState != .stopRequested
-    }
-
     private func destinationDisplayLabel(root: URL, destinationDir: URL) -> String {
         let rootPath = root.path
         let destPath = destinationDir.path
         guard destPath.hasPrefix(rootPath) else { return destinationDir.lastPathComponent }
         let tail = String(destPath.dropFirst(rootPath.count)).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
         return tail.isEmpty ? destinationDir.lastPathComponent : tail
-    }
-
-    private func entry(path: String, dest: String?, category: FileSortCategory,
-                       disposition: SortDisposition, reason: String, matchedRuleName: String?) -> SortBatchEntry {
-        .init(id: UUID(), sourcePath: path, destinationPath: dest, category: category, disposition: disposition, reason: reason,
-              matchedRuleName: matchedRuleName)
-    }
-
-    private func localizedMoveReason(category _: FileSortCategory, matchedRuleName: String?, destinationDir: URL, inboxRoot: URL) -> String {
-        let label = destinationDisplayLabel(root: inboxRoot, destinationDir: destinationDir)
-        if let matchedRuleName {
-            return String.localizedStringWithFormat(
-                String(localized: "Moved into “%1$@” (rule “%2$@”).", comment: "Sort audit when a custom rule matched."),
-                label,
-                matchedRuleName
-            )
-        }
-        return String.localizedStringWithFormat(
-            String(localized: "Moved into “%@”.", comment: "Sort audit reason; formatted folder name."),
-            label
-        )
     }
 
     /// Reverses the given move pairs: pulls each file back from `destination` to `source`.
@@ -1155,9 +1412,20 @@ final class WatchSortCoordinator {
             }
             try? await Task.sleep(for: .milliseconds(800))
             if Task.isCancelled { return }
-            let batch = Array(queuedIncoming)
+            var batch = Array(queuedIncoming)
             queuedIncoming.removeAll()
             guard !batch.isEmpty else { return }
+            while EnergyConditions.shared.shouldPauseFully {
+                if Task.isCancelled {
+                    queuedIncoming.formUnion(batch)
+                    return
+                }
+                try? await Task.sleep(for: .milliseconds(250))
+            }
+            guard !Task.isCancelled else {
+                queuedIncoming.formUnion(batch)
+                return
+            }
             let outcome = await DownloadsSortOrchestrator.shared.sort(
                 files: batch,
                 prefs: prefs,
