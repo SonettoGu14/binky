@@ -12,9 +12,10 @@
 #   4. Creates the DMG (+ zip for in-app updater), then updates Casks/binky.rb (version + sha256 of the zip) for Homebrew
 #   5. Commits, tags, pushes, and publishes the GitHub release
 #
-# Release notes are built from `git log $PREV_GIT_TAG..HEAD` (subjects only, chronological),
-# excluding the “Bump to v$VERSION” commit, so what ships on GitHub matches the repo. Edit the
-# release on GitHub afterward if you want prose or grouping; the list is the source of truth.
+# Release notes: if a previous `v*` tag exists, notes use `git log $PREV_GIT_TAG..HEAD` (subjects
+# only, chronological), excluding the “Bump to v$VERSION” commit. With **no** prior tag (first
+# public release), notes list the full repo history the same way. Edit the release on GitHub
+# afterward if you want prose or grouping.
 #
 # Commit all app/source changes before running: the tag must point at a tree that includes the full
 # app, not only version-string files.
@@ -115,8 +116,7 @@ fi
 
 PREV_GIT_TAG=$(git tag -l 'v*' --sort=-version:refname | head -1 || true)
 if [ -z "$PREV_GIT_TAG" ]; then
-  echo "✗ No previous v* tags found. Create at least one release tag first, or edit release.sh for your case."
-  exit 1
+  echo "→ No previous v* tags (treating this as first public release for release notes)."
 fi
 
 # ── 3. Build ──────────────────────────────────────────────────────────────────
@@ -173,14 +173,22 @@ echo "→ Tagging and publishing release…"
 git tag "v$VERSION"
 git push origin "v$VERSION"
 
-echo "→ Composing release notes from git ($PREV_GIT_TAG..HEAD, excluding version bump)…"
+if [ -n "$PREV_GIT_TAG" ]; then
+  echo "→ Composing release notes from git ($PREV_GIT_TAG..HEAD, excluding version bump)…"
+else
+  echo "→ Composing release notes from git (full history, excluding version bump)…"
+fi
 NOTES_FILE=$(mktemp)
 {
   echo "## Binky $VERSION"
   echo ""
-  echo "Changes since **$PREV_GIT_TAG** (commit subjects from this repo):"
+  if [ -n "$PREV_GIT_TAG" ]; then
+    echo "Changes since **$PREV_GIT_TAG** (commit subjects from this repo):"
+  else
+    echo "First public release — commit subjects from this repo (chronological):"
+  fi
   echo ""
-  if git rev-parse "$PREV_GIT_TAG" >/dev/null 2>&1; then
+  if [ -n "$PREV_GIT_TAG" ] && git rev-parse "$PREV_GIT_TAG" >/dev/null 2>&1; then
     LIST=$(git log --no-merges "$PREV_GIT_TAG"..HEAD --pretty=format:'%s' --reverse | grep -vFx "Bump to v$VERSION" || true)
     if [ -n "$LIST" ]; then
       echo "$LIST" | while IFS= read -r subject; do
@@ -189,8 +197,17 @@ NOTES_FILE=$(mktemp)
     else
       echo "- *(No commits listed besides the version bump — describe this release manually on GitHub if needed.)*"
     fi
-  else
+  elif [ -n "$PREV_GIT_TAG" ]; then
     echo "- **Warning:** git tag \`$PREV_GIT_TAG\` not found locally. Run \`git fetch --tags\` or edit release notes on GitHub."
+  else
+    LIST=$(git log --no-merges --pretty=format:'%s' --reverse | grep -vFx "Bump to v$VERSION" || true)
+    if [ -n "$LIST" ]; then
+      echo "$LIST" | while IFS= read -r subject; do
+        [ -n "$subject" ] && echo "- $subject"
+      done
+    else
+      echo "- *(No commit subjects found — describe this release manually on GitHub if needed.)*"
+    fi
   fi
   echo ""
   echo "## Install"
