@@ -81,26 +81,25 @@ fi
 
 if [ "$OLD_MARKETING" != "$VERSION" ]; then
   echo "→ Updating site/index.html…"
-  sed -i '' "s/v$OLD_MARKETING · Requires/v$VERSION · Requires/g" site/index.html
-  sed -i '' "s/v$OLD_MARKETING\/Binky-$OLD_MARKETING.dmg/v$VERSION\/Binky-$VERSION.dmg/g" site/index.html
-  sed -i '' "s/\"softwareVersion\": \"$OLD_MARKETING\"/\"softwareVersion\": \"$VERSION\"/g" site/index.html
+  sed -E -i '' "s|\"softwareVersion\": \"[0-9]+\.[0-9]+\.[0-9]+\"|\"softwareVersion\": \"$VERSION\"|g" site/index.html
+  sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+/Binky-[0-9]+\.[0-9]+\.[0-9]+\.dmg|v$VERSION/Binky-$VERSION.dmg|g" site/index.html
+  sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+ · Requires|v$VERSION · Requires|g" site/index.html
 
   echo "→ Updating site/llms.txt…"
-  sed -i '' "s/v$OLD_MARKETING/v$VERSION/g" site/llms.txt
-  sed -i '' "s/Binky-$OLD_MARKETING\.dmg/Binky-$VERSION.dmg/g" site/llms.txt
+  sed -E -i '' "s|Download v[0-9]+\.[0-9]+\.[0-9]+:|Download v$VERSION:|g" site/llms.txt
+  sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+/Binky-[0-9]+\.[0-9]+\.[0-9]+\.dmg|v$VERSION/Binky-$VERSION.dmg|g" site/llms.txt
 
   if [ -f site/homepage.md ]; then
     echo "→ Updating site/homepage.md…"
-    sed -i '' "s/v$OLD_MARKETING/v$VERSION/g" site/homepage.md
-    sed -i '' "s/Binky-$OLD_MARKETING\.dmg/Binky-$VERSION.dmg/g" site/homepage.md
+    sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+/Binky-[0-9]+\.[0-9]+\.[0-9]+\.dmg|v$VERSION/Binky-$VERSION.dmg|g" site/homepage.md
   fi
 
   if compgen -G "site/compare/*/index.html" > /dev/null || [ -f site/compare/index.html ]; then
     echo "→ Updating site/compare/**/index.html…"
     for f in site/compare/*/index.html site/compare/index.html; do
       [ -f "$f" ] || continue
-      sed -i '' "s/v$OLD_MARKETING · Requires/v$VERSION · Requires/g" "$f"
-      sed -i '' "s/v$OLD_MARKETING\/Binky-$OLD_MARKETING.dmg/v$VERSION\/Binky-$VERSION.dmg/g" "$f"
+      sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+ · Requires|v$VERSION · Requires|g" "$f"
+      sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+/Binky-[0-9]+\.[0-9]+\.[0-9]+\.dmg|v$VERSION/Binky-$VERSION.dmg|g" "$f"
     done
   fi
 else

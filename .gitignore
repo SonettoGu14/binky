@@ -12,6 +12,7 @@ BinkyCoreImage/.build/
 
 # Release archives — host on GitHub Releases, not in the repo
 Dinky-*.zip
+Binky-*.zip
 
 # Local Netlify folder
 .netlify
