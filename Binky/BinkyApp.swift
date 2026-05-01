@@ -110,7 +110,7 @@ private struct BinkyShortcutCommands: View {
         }
         .keyboardShortcut(prefs.shortcut(for: .openFiles).swiftUIKeyboardShortcut)
 
-        Button(String(localized: "Sort Downloads Now", comment: "File menu: sweep Downloads inbox.")) {
+        Button(String(localized: "Sort Now", comment: "File menu: run an immediate sort for the watched folder.")) {
             NotificationCenter.default.post(name: .binkyStartSort, object: nil)
         }
         .keyboardShortcut(prefs.shortcut(for: .sortNow).swiftUIKeyboardShortcut)

@@ -36,12 +36,12 @@ extension Notification.Name {
 enum S {
     // Drop zone — idle taglines cycle with each animation loop (English brand voice)
     static let dropIdleTaglines: [String] = [
-        "Binky Free keeps Downloads tidy.",
+        "Binky Free keeps your folders tidy.",
         "Sorted. Tagged. Findable.",
         "Your inbox, quietly handled.",
         "Trust the trail.",
-        "Downloads calm.",
-        "Less clutter, same Downloads.",
+        "Folder calm.",
+        "Less clutter, same files.",
     ]
     static func dropIdle(loop: Int) -> String {
         dropIdleTaglines[loop % dropIdleTaglines.count]
@@ -51,10 +51,10 @@ enum S {
     static func organizerEmptyTagline(loop: Int) -> String {
         let lines: [String] = [
             String(localized: "Fussy inbox. Meet Binky.", comment: "Organizer empty state: rotating playful tagline."),
-            String(localized: "Downloads acting up? Pop in a Binky.", comment: "Organizer empty state: rotating playful tagline."),
+            String(localized: "Files acting up? Pop in a Binky.", comment: "Organizer empty state: rotating playful tagline."),
             String(localized: "Quiets the mess right down.", comment: "Organizer empty state: rotating playful tagline."),
             String(localized: "Files were screaming. Binky helped.", comment: "Organizer empty state: rotating playful tagline."),
-            String(localized: "The pacifier for your Downloads.", comment: "Organizer empty state: rotating playful tagline."),
+            String(localized: "The pacifier for your folders.", comment: "Organizer empty state: rotating playful tagline."),
             String(localized: "Sh. Binky's handling it.", comment: "Organizer empty state: rotating playful tagline."),
         ]
         return lines[loop % lines.count]

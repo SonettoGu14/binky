@@ -355,7 +355,7 @@ private struct AppearanceTab: View {
                         BinkyMenuBarController.shared.refresh()
                     }
                 ))
-                Text(String(localized: "Keeps Downloads sorting awake even when the window is closed. Use the menu bar for Sort Now and History.", comment: "Settings UI: menu bar mode hint."))
+                Text(String(localized: "Keeps watch-folder sorting awake even when the window is closed. Use the menu bar for Sort Now and History.", comment: "Settings UI: menu bar mode hint."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

@@ -1,12 +1,12 @@
 # Binky Help
 
-Binky keeps your **Downloads inbox** tidy: it watches for finished files, moves them into sensible folders, optionally adds Finder tags, and shows clear **summary + history** so you always know what happened.
+Binky keeps your **watched folder** tidy: it watches for finished files, moves them into sensible folders, optionally adds Finder tags, and shows clear **summary + history** so you always know what happened.
 
 ## Quick start
 
-1. Leave **Watch this folder** on (defaults to your Downloads inbox).
+1. Leave **Watch this folder** on (defaults to your Downloads folder).
 2. Drop files into that folder. Binky waits until downloads look **stable**, then sorts them.
-3. Use **Sort Downloads Now** (`{{SK_SORT_NOW}}`) any time to sweep everything sitting at the top level of the inbox.
+3. Use **Sort Now** (`{{SK_SORT_NOW}}`) any time to sweep everything sitting at the top level of the watched folder.
 
 Optional: After a sort, use **Send to Dinky** on the summary sheet (or **Watch in Dinky** on a destination folder) to hand off images, PDFs, and videos to [Dinky](https://dinkyapp.com) for compression, or set Dinky to watch those folders so future drops are slimmed automatically.
 
@@ -28,7 +28,7 @@ Optional: After a sort, use **Send to Dinky** on the summary sheet (or **Watch i
 | Action | Shortcut |
 | --- | --- |
 | Open Files… | `{{SK_OPEN_FILES}}` |
-| Sort Downloads Now | `{{SK_SORT_NOW}}` |
+| Sort Now | `{{SK_SORT_NOW}}` |
 | Settings | `{{SK_SETTINGS}}` |
 | Binky Help | `{{SK_HELP}}` |
 | Last Sort Summary… | `{{SK_LAST_SORT}}` |
@@ -37,8 +37,8 @@ Optional: After a sort, use **Send to Dinky** on the summary sheet (or **Watch i
 
 **Sort with Binky** appears in Finder **Services** (and as a **Quick Action**). Turn it on under **System Settings -> Keyboard -> Keyboard Shortcuts -> Services**.
 
-- **Folders:** Right-click a folder and choose **Sort with Binky**. Binky treats that folder as a one-shot inbox. It sorts the **files at the top level** into the usual subfolders (`Images`, `Documents`, etc.) **inside** the folder you picked. Nested subfolders are left alone.
-- **Single files:** Same routing rules as the main window, but the file has to live **inside** the inbox you are watching. Anything outside that inbox is ignored.
+- **Folders:** Right-click a folder and choose **Sort with Binky**. Binky treats that folder as a one-shot source folder. It sorts the **files at the top level** into the usual subfolders (`Images`, `Documents`, etc.) **inside** the folder you picked. Nested subfolders are left alone.
+- **Single files:** Same routing rules as the main window, but the file has to live **inside** the watched folder. Anything outside that folder is ignored.
 
 Dropping **folders** or **files** onto Binky's **Dock icon** follows the same rules.
 

@@ -18,7 +18,7 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .openFiles: return String(localized: "Open Files…", comment: "Menu and shortcuts: open file picker.")
-        case .sortNow: return String(localized: "Sort Downloads Now", comment: "Menu: run Downloads organization pass.")
+        case .sortNow: return String(localized: "Sort Now", comment: "Menu: run an immediate sort for the watched folder.")
         }
     }
 
