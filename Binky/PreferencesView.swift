@@ -58,7 +58,6 @@ enum PreferencesTab: Int, CaseIterable, Hashable {
 
 struct PreferencesView: View {
     @EnvironmentObject var prefs: BinkyPreferences
-    @EnvironmentObject var updater: UpdateChecker
     @State private var selectedTab: PreferencesTab = .general
 
     var body: some View {
@@ -67,7 +66,6 @@ struct PreferencesView: View {
                 .tabItem { Label(String(localized: "General", comment: "Settings UI."), systemImage: "gearshape") }
                 .tag(PreferencesTab.general)
                 .environmentObject(prefs)
-                .environmentObject(updater)
             DestinationsTab()
                 .tabItem { Label(String(localized: "Sorting", comment: "Settings tab: sort sorted folders and routing rules."), systemImage: "line.3.horizontal.decrease") }
                 .tag(PreferencesTab.destinations)
@@ -108,7 +106,6 @@ struct PreferencesView: View {
 
 private struct GeneralTab: View {
     @EnvironmentObject var prefs: BinkyPreferences
-    @EnvironmentObject var updater: UpdateChecker
     // Mirror the live `SMAppService.mainApp` status so the toggle stays in sync if the user changes it
     // from System Settings → General → Login Items while Binky is open.
     @State private var launchAtLoginEnabled: Bool = LaunchAtLoginManager.isEnabled

@@ -16,6 +16,9 @@ struct OrganizerMainView: View {
     @State private var showingSortPreview = false
     @State private var sortPreviewRows: [SortPreviewEntry] = []
 
+    /// Same persistence key as Dinky below-update review strip.
+    @AppStorage("reviewPromptBelowUpdateDismissed") private var reviewPromptBelowUpdateDismissed = false
+
     private static let absoluteTimeFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateStyle = .medium
@@ -352,7 +355,7 @@ struct OrganizerMainView: View {
                     .animation(.easeInOut(duration: 0.42), value: sortProgress.fraction)
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, showReviewBanner ? 10 : 16)
+                .padding(.top, (showReviewBanner || showUpdateBanner) ? 10 : 16)
                 .padding(.bottom, 14)
                 .background(Color.primary.opacity(0.035))
                 .overlay(alignment: .bottom) {
@@ -365,6 +368,23 @@ struct OrganizerMainView: View {
     private var activityMainPane: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 0) {
+                if showUpdateBanner {
+                    VStack(spacing: 8) {
+                        UpdateBanner(updater: updater, itemCount: updateBannerItemCount)
+                            .environmentObject(prefs)
+                        if !reviewPromptBelowUpdateDismissed {
+                            ReviewPromptBanner {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    reviewPromptBelowUpdateDismissed = true
+                                }
+                            }
+                        }
+                    }
+                    .animation(.easeInOut(duration: 0.25), value: updater.availableVersion)
+                    Divider()
+                        .opacity(0.35)
+                }
+
                 if showReviewBanner {
                     reviewBanner
                         .padding(.horizontal, 20)
@@ -650,6 +670,28 @@ struct OrganizerMainView: View {
 
     private var showReviewBanner: Bool {
         reviewFolderItemCount > 0 || (vm.lastSortOutcome?.reviewQueuedCount ?? 0) > 0
+    }
+
+    /// Match Dinky: show when an update is due, and keep the strip visible through download/install/failure
+    /// so manual “Install Update” from the alert isn’t silent when the same version was previously dismissed.
+    private var showUpdateBanner: Bool {
+        switch updater.installState {
+        case .downloading, .installing, .failed:
+            return true
+        case .idle:
+            return updater.shouldShow(dismissedVersion: prefs.dismissedUpdateVersion)
+        }
+    }
+
+    /// Organizer parallel to Dinky `vm.items.count` — warn before relaunch clears in-flight sort / pending summary.
+    private var updateBannerItemCount: Int {
+        var n = 0
+        if vm.pendingSortOutcome != nil { n += 1 }
+        if sortProgress.isActive {
+            let remaining = sortProgress.total - sortProgress.completed
+            n += max(remaining, 1)
+        }
+        return n
     }
 
     private var reviewBannerCount: Int64 {

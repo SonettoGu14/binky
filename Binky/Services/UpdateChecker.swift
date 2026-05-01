@@ -108,8 +108,18 @@ final class UpdateChecker: ObservableObject {
     /// then replaces the running bundle **after** this process exits (shell script).
     /// Copying over `Bundle.main.bundleURL` while running hangs — never do that in-process.
     func downloadAndInstall() async {
-        guard case .idle = installState else { return }
-        guard let assetURL = downloadURL else { return }
+        switch installState {
+        case .idle, .failed:
+            break
+        default:
+            return
+        }
+        guard let assetURL = downloadURL else {
+            installState = .failed(
+                String(localized: "No download URL for this release.", comment: "In-app updater: asset URL missing.")
+            )
+            return
+        }
         installState = .downloading(progress: 0)
 
         do {

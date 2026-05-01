@@ -2103,6 +2103,17 @@
     "After sorting" : {
       "comment" : "Profile editor section: post-sort shortcut."
     },
+    "Aggressive" : {
+      "comment" : "Settings: Energy throttle profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Aggressive"
+          }
+        }
+      }
+    },
     "All caught up." : {
       "comment" : "Manual update: no update available.",
       "localizations" : {
@@ -3122,6 +3133,17 @@
         }
       }
     },
+    "Applies to large sorts and watch-folder batches. Lower threshold means pacing starts sooner. Aggressive finishes faster when the Mac is warm; Gentle eases CPU and disk." : {
+      "comment" : "Settings: Energy section footnote.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Applies to large sorts and watch-folder batches. Lower threshold means pacing starts sooner. Aggressive finishes faster when the Mac is warm; Gentle eases CPU and disk."
+          }
+        }
+      }
+    },
     "Approve Binky in System Settings → General → Login Items." : {
       "comment" : "Settings UI."
     },
@@ -3210,6 +3232,17 @@
     },
     "Audio" : {
       "comment" : "Sort rule kind filter."
+    },
+    "Auto" : {
+      "comment" : "Settings: Energy throttle profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Auto"
+          }
+        }
+      }
     },
     "Auto-clear queue when done" : {
       "comment" : "Settings UI.",
@@ -3675,105 +3708,6 @@
         }
       }
     },
-    "Aggressive" : {
-      "comment" : "Settings: Energy throttle profile.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Aggressive"
-          }
-        }
-      }
-    },
-    "Applies to large sorts and watch-folder batches. Lower threshold means pacing starts sooner. Aggressive finishes faster when the Mac is warm; Gentle eases CPU and disk." : {
-      "comment" : "Settings: Energy section footnote.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Applies to large sorts and watch-folder batches. Lower threshold means pacing starts sooner. Aggressive finishes faster when the Mac is warm; Gentle eases CPU and disk."
-          }
-        }
-      }
-    },
-    "Auto" : {
-      "comment" : "Settings: Energy throttle profile.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Auto"
-          }
-        }
-      }
-    },
-    "Big-batch threshold: %lld files" : {
-      "comment" : "Settings: Energy section; file count before thermal pacing and progress coalescing.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Big-batch threshold: %lld files"
-          }
-        }
-      }
-    },
-    "Energy" : {
-      "comment" : "Settings: General tab section title.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Energy"
-          }
-        }
-      }
-    },
-    "Gentle" : {
-      "comment" : "Settings: Energy throttle profile.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Gentle"
-          }
-        }
-      }
-    },
-    "Large-batch pacing" : {
-      "comment" : "Settings: Energy throttle picker label.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Large-batch pacing"
-          }
-        }
-      }
-    },
-    "Pause sorting on Low Power Mode" : {
-      "comment" : "Settings: Energy section.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Pause sorting on Low Power Mode"
-          }
-        }
-      }
-    },
-    "Pause sorting when thermal state is critical" : {
-      "comment" : "Settings: Energy section.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Pause sorting when thermal state is critical"
-          }
-        }
-      }
-    },
     "Behavior" : {
       "comment" : "Settings UI.",
       "localizations" : {
@@ -3925,6 +3859,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最適合螢幕錄製或無聲剪輯。"
+          }
+        }
+      }
+    },
+    "Big-batch threshold: %lld files" : {
+      "comment" : "Settings: Energy section; file count before thermal pacing and progress coalescing.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Big-batch threshold: %lld files"
           }
         }
       }
@@ -8997,87 +8942,6 @@
         }
       }
     },
-    "Sorted folder (under inbox)" : {
-      "comment" : "Rule editor."
-    },
-    "Sorted folders" : {
-      "comment" : "Settings UI.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ziele"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Destinos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dossiers de destination"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cartelle di destinazione"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存先"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "대상 폴더"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bestemmingsmappen"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Destinos"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Назначения"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hedefler"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "目标位置"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "目標位置"
-          }
-        }
-      }
-    },
     "Dinky" : {
       "comment" : "Sort sheet: Dinky handoff section title."
     },
@@ -9476,9 +9340,6 @@
           }
         }
       }
-    },
-    "Downloads acting up? Pop in a Binky." : {
-      "comment" : "Organizer empty state: rotating playful tagline."
     },
     "Downloads folder" : {
       "comment" : "Settings UI.",
@@ -10109,6 +9970,17 @@
     "Enabled" : {
       "comment" : "Rule editor."
     },
+    "Energy" : {
+      "comment" : "Settings: General tab section title.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Energy"
+          }
+        }
+      }
+    },
     "Error" : {
       "comment" : "Failed compression button label.",
       "extractionState" : "stale",
@@ -10531,6 +10403,9 @@
     },
     "Files" : {
       "comment" : "Shortcuts: files parameter."
+    },
+    "Files acting up? Pop in a Binky." : {
+      "comment" : "Organizer empty state: rotating playful tagline."
     },
     "Files to sort into your watch folder sorted folders." : {
       "comment" : "Description of the files parameter in the Sort Files with Binky intent.",
@@ -11344,6 +11219,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一般的"
+          }
+        }
+      }
+    },
+    "Gentle" : {
+      "comment" : "Settings: Energy throttle profile.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Gentle"
           }
         }
       }
@@ -14153,7 +14039,7 @@
     "Keep original name" : {
       "comment" : "Sort rule rename style."
     },
-    "Keeps Downloads sorting awake even when the window is closed. Use the menu bar for Sort Now and History." : {
+    "Keeps watch-folder sorting awake even when the window is closed. Use the menu bar for Sort Now and History." : {
       "comment" : "Settings UI: menu bar mode hint."
     },
     "Kept" : {
@@ -14238,6 +14124,17 @@
     },
     "Kind" : {
       "comment" : "Rule editor."
+    },
+    "Large-batch pacing" : {
+      "comment" : "Settings: Energy throttle picker label.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Large-batch pacing"
+          }
+        }
+      }
     },
     "Last Sort Summary…" : {
       "comment" : "Application menu: reopen the last sort completion dialog.\nApplication menu: reopen the last sort summary."
@@ -16079,6 +15976,9 @@
     "No custom tags. Sorted files only get Binky's category tags." : {
       "comment" : "Profile editor: no custom tags."
     },
+    "No download URL for this release." : {
+      "comment" : "In-app updater: asset URL missing."
+    },
     "No folder selected" : {
       "comment" : "Profile editor: no per-profile watch folder.",
       "localizations" : {
@@ -17339,9 +17239,6 @@
     "Open Binky at login" : {
       "comment" : "Settings UI."
     },
-    "Open sorted folder in Dinky" : {
-      "comment" : "VoiceOver routing rule helper."
-    },
     "Open Files…" : {
       "comment" : "File menu: open file picker.\nMenu and shortcuts: open file picker.",
       "localizations" : {
@@ -17661,6 +17558,9 @@
     },
     "Open Review in Finder" : {
       "comment" : "Reveal Review folder in Finder."
+    },
+    "Open sorted folder in Dinky" : {
+      "comment" : "VoiceOver routing rule helper."
     },
     "Open Summary…" : {
       "comment" : "History row: reopen stored batch completion dialog."
@@ -18621,6 +18521,28 @@
     },
     "Pause sorting" : {
       "comment" : "Menu bar command."
+    },
+    "Pause sorting on Low Power Mode" : {
+      "comment" : "Settings: Energy section.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pause sorting on Low Power Mode"
+          }
+        }
+      }
+    },
+    "Pause sorting when thermal state is critical" : {
+      "comment" : "Settings: Energy section.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pause sorting when thermal state is critical"
+          }
+        }
+      }
     },
     "Pause watching" : {
       "comment" : "Menu bar command."
@@ -24846,17 +24768,95 @@
     "Sort ${files} with Binky" : {
 
     },
-    "Sort Downloads Now" : {
-      "comment" : "File menu: sweep Downloads inbox.\nMenu: run Downloads organization pass."
-    },
     "Sort Files" : {
       "comment" : "Shortcuts: intent title.\nShortcuts: suggested action short title."
     },
     "Sort Now" : {
-      "comment" : "Menu bar command.\nPrimary sort button."
+      "comment" : "File menu: run an immediate sort for the watched folder.\nMenu bar command.\nMenu: run an immediate sort for the watched folder.\nPrimary sort button."
     },
     "Sort rules" : {
       "comment" : "Profile editor section: sort rules."
+    },
+    "Sorted folder (under inbox)" : {
+      "comment" : "Rule editor."
+    },
+    "Sorted folders" : {
+      "comment" : "Settings UI.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziele"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destinos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dossiers de destination"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartelle di destinazione"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存先"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "대상 폴더"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestemmingsmappen"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destinos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Назначения"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hedefler"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目标位置"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目標位置"
+          }
+        }
+      }
     },
     "Sorting" : {
       "comment" : "Main pane banner title while inbox sort runs.\nSettings tab: sort sorted folders and routing rules."
@@ -26071,7 +26071,7 @@
         }
       }
     },
-    "The pacifier for your Downloads." : {
+    "The pacifier for your folders." : {
       "comment" : "Organizer empty state: rotating playful tagline."
     },
     "The previous session ended unexpectedly. Nothing is uploaded automatically — choose an option below if you’d like to share details." : {
@@ -26716,7 +26716,7 @@
         }
       }
     },
-    "Turn on Watch to tidy new downloads, or run Sort Now. You can also drop files from your watch folder here." : {
+    "Turn on Watch to tidy new files, or run Sort Now. You can also drop files from your watch folder here." : {
       "comment" : "Organizer empty activity hint."
     },
     "Undo" : {

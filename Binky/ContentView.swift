@@ -89,7 +89,12 @@ private func presentManualUpdateResult(_ result: UpdateChecker.CheckResult,
         alert.addButton(withTitle: String(localized: "What’s new", comment: "Manual update alert."))
         alert.addButton(withTitle: String(localized: "Maybe later", comment: "Manual update alert."))
 
-        guard case .idle = updater.installState else { return }
+        switch updater.installState {
+        case .idle, .failed:
+            break
+        case .downloading, .installing:
+            return
+        }
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {
             Task { await updater.downloadAndInstall() }

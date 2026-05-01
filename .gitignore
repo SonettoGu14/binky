@@ -4,6 +4,7 @@ xcuserdata/
 *.xcworkspace/xcshareddata/
 DerivedData/
 build/
+BinkyCoreImage/.build/
 *.ipa
 *.dSYM.zip
 *.dSYM
