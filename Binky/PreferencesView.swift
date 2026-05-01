@@ -26,7 +26,7 @@ private struct PreferencesRelatedTabLink: View {
         Button(title) { openTab(tab) }
             .buttonStyle(.plain)
             .font(.caption)
-            .foregroundStyle(Color.accentColor)
+            .foregroundStyle(binkyTintColor)
     }
 }
 
@@ -69,7 +69,7 @@ struct PreferencesView: View {
                 .environmentObject(prefs)
                 .environmentObject(updater)
             DestinationsTab()
-                .tabItem { Label(String(localized: "Output", comment: "Settings UI."), systemImage: "folder") }
+                .tabItem { Label(String(localized: "Sorting", comment: "Settings tab: sort destinations and routing rules."), systemImage: "line.3.horizontal.decrease") }
                 .tag(PreferencesTab.destinations)
                 .environmentObject(prefs)
             WatchFoldersTab()
@@ -90,7 +90,7 @@ struct PreferencesView: View {
                 .environmentObject(prefs)
         }
         .environment(\.openPreferencesRelatedTab, { selectedTab = $0 })
-        .frame(width: 540, height: 640)
+        .frame(width: 540, height: 720)
         .onAppear {
             if let tab = PreferencesTab.consumePendingSelection() {
                 selectedTab = tab
@@ -109,7 +109,6 @@ struct PreferencesView: View {
 private struct GeneralTab: View {
     @EnvironmentObject var prefs: BinkyPreferences
     @EnvironmentObject var updater: UpdateChecker
-    @State private var confirmResetLifetime = false
     // Mirror the live `SMAppService.mainApp` status so the toggle stays in sync if the user changes it
     // from System Settings → General → Login Items while Binky is open.
     @State private var launchAtLoginEnabled: Bool = LaunchAtLoginManager.isEnabled
@@ -135,7 +134,7 @@ private struct GeneralTab: View {
                         Button(String(localized: "Open…", comment: "Settings UI.")) { LaunchAtLoginManager.openLoginItemsSettings() }
                             .buttonStyle(.borderless)
                             .font(.caption)
-                            .foregroundStyle(Color.accentColor)
+                            .foregroundStyle(binkyTintColor)
                     }
                 }
 
@@ -146,12 +145,21 @@ private struct GeneralTab: View {
                 Text(String(localized: "Adds simple Finder tags (“New”, category hints) so files remain searchable.", comment: "Settings UI."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                PreferencesRelatedTabLink(
+                    title: String(localized: "Routing & destinations…", comment: "Settings UI: link from General to Sorting tab for tag-related destinations."),
+                    tab: .destinations
+                )
 
-                Toggle(String(localized: "Prepend the “New” tag", comment: "Settings UI."), isOn: Binding(
+                Toggle(String(localized: "Add the “New” Finder tag when sorting", comment: "Settings UI."), isOn: Binding(
                     get: { prefs.sortAppendNewSemanticTagEnabled },
                     set: { prefs.sortAppendNewSemanticTagEnabled = $0 }
                 ))
                 .disabled(!prefs.assignFinderTagsOnSortEnabled)
+                if !prefs.assignFinderTagsOnSortEnabled {
+                    Text(String(localized: "Requires “Assign Finder tags when sorting”.", comment: "Settings UI."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
 
                 Toggle(String(localized: "Show summaries after sorting", comment: "Settings UI."), isOn: Binding(
                     get: { prefs.showBatchSummaryDialog },
@@ -195,7 +203,7 @@ private struct GeneralTab: View {
                 }
                 .buttonStyle(.plain)
                 .font(.caption)
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(binkyTintColor)
             }
 
             // 5. Privacy & diagnostics
@@ -218,20 +226,7 @@ private struct GeneralTab: View {
                 }
                 .buttonStyle(.plain)
                 .font(.caption)
-                .foregroundStyle(Color.accentColor)
-            }
-
-            // 6. Session history (lifetime total; per-session list is in History window)
-            Section {
-                Button(String(localized: "Reset total saved statistics…", comment: "Settings UI.")) {
-                    confirmResetLifetime = true
-                }
-                .disabled(prefs.lifetimeSavedBytes == 0)
-                Text(String(localized: "Clears the running total shown in History. Session history is unchanged — clear that from the History window.", comment: "Settings UI."))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } header: {
-                Text(String(localized: "Session history", comment: "Settings UI."))
+                .foregroundStyle(binkyTintColor)
             }
 
             Section {
@@ -243,21 +238,6 @@ private struct GeneralTab: View {
         }
         .formStyle(.grouped)
         .onAppear { launchAtLoginEnabled = LaunchAtLoginManager.isEnabled }
-        .confirmationDialog(
-            String(localized: "Reset the running total of bytes saved across all sessions?", comment: "Settings UI."),
-            isPresented: $confirmResetLifetime,
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "Reset", comment: "Settings UI."), role: .destructive) {
-                prefs.lifetimeSavedBytes = 0
-            }
-            Button(String(localized: "Cancel", comment: "Settings UI."), role: .cancel) {}
-        } message: {
-            Text(String(localized: "This does not clear the per-session list in History.", comment: "Settings UI."))
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .binkyPrepareQuit)) { _ in
-            confirmResetLifetime = false
-        }
     }
 
     private func requestNotificationAuth() {
@@ -393,43 +373,10 @@ private struct DestinationsTab: View {
 
     var body: some View {
         Form {
-            Section {
-                Text(String(localized: "This tab controls where sorted files are placed inside your watch folder:", comment: "Destinations intro."))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text(
-                    [
-                        FileSortCategory.images.downloadsSubfolder,
-                        FileSortCategory.documents.downloadsSubfolder,
-                        FileSortCategory.archives.downloadsSubfolder,
-                        FileSortCategory.apps.downloadsSubfolder,
-                        "Media",
-                        FileSortCategory.screenshots.downloadsSubfolder,
-                        FileSortCategory.misc.downloadsSubfolder,
-                        FileSortCategory.review.downloadsSubfolder,
-                    ].joined(separator: ", ")
-                )
-                .font(.caption.monospaced())
-                .foregroundStyle(.secondary)
-                Button(String(localized: "Reveal output root in Finder", comment: "")) {
-                    let path = prefs.downloadsSortRootDirectory().path
-                    NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
-                }
-            } header: {
-                Text(String(localized: "Output folders", comment: ""))
-            } footer: {
-                Text(String(localized: "Turn off custom routing to use only these automatic buckets. Profiles can still watch extra folders.", comment: "Output folders footer."))
-                    .font(.caption)
-            }
 
             Section {
                 Toggle(String(localized: "Custom routing rules", comment: "Output settings."), isOn: $prefs.sortCustomRulesEnabled)
                 if prefs.sortCustomRulesEnabled {
-                    Text(String(localized: "Rules run top to bottom — the first match wins. If nothing matches, Binky uses automatic buckets.", comment: "Routing hint."))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
                     SortRulesListEditor(rules: Binding(
                         get: { prefs.sortRoutingRules },
                         set: { prefs.sortRoutingRules = $0 }
@@ -438,6 +385,10 @@ private struct DestinationsTab: View {
                 }
             } header: {
                 Text(String(localized: "Routing", comment: "Output settings."))
+            } footer: {
+                Text(String(localized: "First enabled rule wins. Rules run before automatic destinations (Images, Documents, Review, etc.).", comment: "Destinations tab routing section footer."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             Section {
@@ -466,51 +417,6 @@ private struct DestinationsTab: View {
                     .foregroundStyle(.secondary)
             } header: {
                 Text(String(localized: "Dry run", comment: "Output settings."))
-            }
-
-            Section {
-                Text(String(localized: "When a moved file already exists, Binky picks the next free name (same as Finder).", comment: ""))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Picker(S.duplicateNamingPickerAccessibilityLabel, selection: Binding(
-                    get: { prefs.collisionNamingStyle },
-                    set: { prefs.collisionNamingStyle = $0 }
-                )) {
-                    ForEach(CollisionNamingStyle.allCases) { style in
-                        Text(style.displayName).tag(style)
-                    }
-                }
-                .pickerStyle(.radioGroup)
-                .labelsHidden()
-
-                if prefs.collisionNamingStyle == .custom {
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack(alignment: .firstTextBaseline) {
-                            Text(S.duplicateNamingCustomFieldLabel)
-                                .foregroundStyle(.secondary)
-                            TextField(
-                                S.duplicateNamingCustomPlaceholder,
-                                text: Binding(
-                                    get: { prefs.collisionCustomPattern },
-                                    set: { prefs.collisionCustomPattern = $0 }
-                                )
-                            )
-                            .textFieldStyle(.roundedBorder)
-                            .frame(minWidth: 160)
-                            .accessibilityLabel(S.duplicateNamingCustomFieldLabel)
-                        }
-                        Text(S.duplicateNamingCustomHint)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .accessibilityElement(children: .combine)
-                }
-            } header: {
-                Text(String(localized: "Name collisions", comment: ""))
-            } footer: {
-                Text(S.duplicateNamingSectionFooter)
-                    .font(.caption)
             }
         }
         .formStyle(.grouped)
@@ -549,6 +455,7 @@ private struct SortRulesListEditor: View {
 }
 
 private struct SortRuleEditor: View {
+    @EnvironmentObject private var prefs: BinkyPreferences
     @Binding var rules: [InboxSortRule]
     let ruleIndex: Int
 
@@ -689,6 +596,18 @@ private struct SortRuleEditor: View {
                     }
                     TextField(String(localized: "Destination folder (under inbox)", comment: "Rule editor."), text: binding(\.destinationRelativePath))
                         .textFieldStyle(.roundedBorder)
+                    if DinkyBridge.isInstalled {
+                        Button(String(localized: "Watch in Dinky →", comment: "Routing rule: open destination in Dinky.")) {
+                            let trimmed = rules[ruleIndex].destinationRelativePath.trimmingCharacters(in: .whitespacesAndNewlines)
+                            let root = prefs.downloadsSortRootDirectory()
+                            let folder = trimmed.isEmpty ? root : root.appendingPathComponent(trimmed, isDirectory: true)
+                            _ = DinkyBridge.openFolder(folder)
+                        }
+                        .buttonStyle(.plain)
+                        .font(.caption)
+                        .foregroundStyle(binkyTintColor)
+                        .accessibilityLabel(String(localized: "Open destination folder in Dinky", comment: "VoiceOver routing rule helper."))
+                    }
                     Picker(String(localized: "Rename", comment: "Rule editor."), selection: binding(\.renameStyle)) {
                         ForEach(SortRenameStyle.allCases) { style in
                             Text(style.localizedTitle).tag(style)
@@ -707,6 +626,7 @@ private struct SortRuleEditor: View {
                     Text(rules[ruleIndex].name)
                         .font(.body.weight(.medium))
                 }
+                .accessibilityHint(String(localized: "Shows conditions and destinations for this rule.", comment: "VoiceOver DisclosureGroup routing rule."))
             }
         }
     }
@@ -874,7 +794,7 @@ private struct ProfilesOrganizerTab: View {
 
                 Section(String(localized: "Sort rules", comment: "Profile editor section: sort rules.")) {
                     if prefs.savedPresets[idx].inboxSortRules.isEmpty {
-                        Text(String(localized: "No rules. Binky uses default buckets.", comment: "Profile editor: empty rules."))
+                        Text(String(localized: "No rules. Binky uses default destinations.", comment: "Profile editor: empty rules."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -951,7 +871,7 @@ private struct ProfilesOrganizerTab: View {
                 if isSelected {
                     Image(systemName: "checkmark")
                         .font(.body.weight(.semibold))
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(binkyTintColor)
                 }
             }
             .padding(.vertical, 2)
@@ -975,7 +895,7 @@ private struct ProfilesOrganizerTab: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .foregroundStyle(Color.accentColor)
+        .foregroundStyle(binkyTintColor)
     }
 
     private func profileSubtitle(_ preset: CompressionPreset) -> String {
@@ -1054,9 +974,7 @@ private struct ProfilesOrganizerTab: View {
             name: uniqueProfileName(
                 baseName: String(localized: "New Profile", comment: "Default name for a newly created profile."),
                 existingNames: Set(copy.map(\.name))
-            ),
-            from: prefs,
-            format: prefs.defaultFormat
+            )
         )
         copy.append(preset)
         prefs.savedPresets = copy
@@ -1254,7 +1172,7 @@ private struct WatchFoldersTab: View {
                         Button(String(localized: "Choose…", comment: "Settings UI.")) { pickGlobalWatchFolder() }
                             .buttonStyle(.bordered)
                     }
-                    Text(String(localized: "This is the folder Binky monitors for new files. Where files are moved after sorting is configured in Output.", comment: "Settings UI."))
+                    Text(String(localized: "This is the folder Binky monitors for new files. Where files are moved after sorting is configured in Destinations.", comment: "Settings UI."))
                     .font(.caption)
                         .foregroundStyle(.secondary)
 

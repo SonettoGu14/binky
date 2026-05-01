@@ -3,25 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Binky sorts your files.</title>
-  <meta name="description" content="Binky sorts your files. Watch a folder, route the mess, review the unknowns. Free and open source for macOS." />
+  <title>Quiets your Downloads. — Binky</title>
+  <meta name="description" content="Binky watches your Downloads, waits for files to finish landing, then routes them where they belong. Review destination catches the unknowns. Free during beta for macOS." />
 
   <link rel="canonical" href="https://binkyfiles.com" />
   <link rel="icon" type="image/png" href="Binky%20App%20Icon.png" />
   <link rel="apple-touch-icon" href="Binky%20App%20Icon.png" />
 
-  <meta property="og:title" content="Binky sorts your files." />
-  <meta property="og:description" content="Watch a folder. Route the mess. Review the unknowns. Runs on your Mac only." />
-  <meta property="og:image" content="https://binkyfiles.com/screenshots/og-image.svg" />
+  <meta property="og:title" content="Quiets your Downloads. — Binky" />
+  <meta property="og:description" content="Watches your inbox, waits for files to settle, routes them where they belong. Review catches the unknowns. Free during beta for macOS." />
+  <meta property="og:image" content="https://binkyfiles.com/screenshots/sorting.webp" />
   <meta property="og:url" content="https://binkyfiles.com" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Binky" />
   <meta property="og:locale" content="en_US" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Binky sorts your files." />
-  <meta name="twitter:description" content="Watch a folder. Route the mess. Review the unknowns. Runs on your Mac only." />
-  <meta name="twitter:image" content="https://binkyfiles.com/screenshots/og-image.svg" />
+  <meta name="twitter:title" content="Quiets your Downloads. — Binky" />
+  <meta name="twitter:description" content="Watches your inbox, waits for files to settle, routes them where they belong. Review catches the unknowns. Free during beta for macOS." />
+  <meta name="twitter:image" content="https://binkyfiles.com/screenshots/sorting.webp" />
 
   <script type="application/ld+json">
   {
@@ -30,7 +30,7 @@
     "name": "Binky",
     "operatingSystem": "macOS",
     "applicationCategory": "UtilitiesApplication",
-    "description": "Keeps Downloads tidy: stable-file detection, custom sort rules, buckets for Images PDFs Media Documents Archives Apps Screenshots Misc, optional Finder tags with auto-expiry, sort preview, Review for unknowns, history with undo where possible. Menu bar mode. Native SwiftUI.",
+    "description": "Keeps Downloads tidy: stable-file detection, custom sort rules, destinations for Images PDFs Media Documents Archives Apps Screenshots Misc, optional Finder tags, sort preview, Review for unknowns, history with undo where possible. Menu bar mode. Native SwiftUI.",
     "url": "https://binkyfiles.com",
     "downloadUrl": "https://github.com/heyderekj/binky/releases/latest",
     "softwareVersion": "beta",
@@ -1632,9 +1632,9 @@
       </div>
     </div>
     <h1>Binky</h1>
-    <p class="tagline">Binky sorts your files.</p>
+    <p class="tagline">Quiets your Downloads.</p>
     <p class="description">
-      <span class="description-chip">Coming soon</span>A macOS app that sorts your files into buckets. Automatic stable-file detection. Free and open source.
+      A native macOS app that watches your inbox, waits for files to finish landing, then routes them into sensible destinations. Review catches the unknowns. Free and open source.
     </p>
 
     <div class="buttons">
@@ -1651,7 +1651,7 @@
         GitHub<span id="gh-stars"> · <span class="gh-star-anchor" aria-hidden="true">★</span><span id="gh-stars-count"></span></span>
       </a>
     </div>
-    <p class="version">Not yet available · Requires macOS 14 Sonoma or later · <button type="button" class="faq-inline-link version-install-link" onclick="window.fathom&&window.fathom.trackEvent('install_modal_from_version'); document.getElementById('install-modal').classList.add('install-modal--help','open')" aria-haspopup="dialog" aria-controls="install-modal"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>How to Install</button></p>
+    <p class="version">Free during beta · Requires macOS 14 Sonoma or later · <button type="button" class="faq-inline-link version-install-link" onclick="window.fathom&&window.fathom.trackEvent('install_modal_from_version'); document.getElementById('install-modal').classList.add('install-modal--help','open')" aria-haspopup="dialog" aria-controls="install-modal"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>How to Install</button></p>
   </section>
 
   <!-- Install modal -->
@@ -1724,23 +1724,19 @@
   </div>
 
     <section class="screenshots">
-    <!-- Row 1: Sort + Buckets -->
+    <!-- Row 1: Sort + Destinations -->
     <div class="ss-row">
-      <div class="ss-placeholder ss-placeholder--1" role="img" aria-label="Screenshot placeholder: Sort Downloads Now">
-        <svg class="ss-placeholder-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd"/></svg>
-        <span class="ss-placeholder-caption">Sort Downloads Now</span>
-        <span class="ss-placeholder-sub">Real UI shots later. For now, imagine the tantrum fading.</span>
-      </div>
+      <img src="screenshots/sorting.webp" alt="Binky organizer window showing Downloads sorted into destinations" class="ss-screenshot" loading="lazy" />
       <div class="ss-card">
         <div class="ss-card-features">
           <div class="ss-card-feature">
             <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.5 21a3 3 0 0 0 3-3v-4.5a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3V18a3 3 0 0 0 3 3h15ZM1.5 10.146V6a3 3 0 0 1 3-3h5.379a2.25 2.25 0 0 1 1.59.659l2.122 2.121c.14.141.331.22.53.22H19.5a3 3 0 0 1 3 3v1.146A4.483 4.483 0 0 0 19.5 9h-15a4.483 4.483 0 0 0-3 1.146Z"/><path fill-rule="evenodd" d="M12 12.75a.75.75 0 0 1 .75.75v3.69l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72v-3.69a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd"/></svg>
-            <h3>Buckets</h3>
+            <h3>Destinations</h3>
             <p>Images, PDFs, media, documents, archives, apps, screenshots, misc.</p>
           </div>
           <div class="ss-card-feature">
             <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M3 2.25a.75.75 0 0 1 .75.75v.54l1.838-.46a9.75 9.75 0 0 1 6.725.738l.108.054A8.25 8.25 0 0 0 18 4.524l3.11-.732a.75.75 0 0 1 .917.81 47.784 47.784 0 0 0 .005 10.337.75.75 0 0 1-.574.812l-3.114.733a9.75 9.75 0 0 1-6.594-.77l-.108-.054a8.25 8.25 0 0 0-5.69-.625l-2.202.55V21a.75.75 0 0 1-1.5 0V3A.75.75 0 0 1 3 2.25Z" clip-rule="evenodd"/></svg>
-            <h3>Review bucket</h3>
+            <h3>Review destination</h3>
             <p>Unknowns land here first. Nothing sketchy silently disappears.</p>
           </div>
           <div class="ss-card-feature">
@@ -1763,11 +1759,7 @@
         <p class="ss-card-hero-text">New files show up, Binky notices, then routes when they're done writing. Optional always-on; your call.</p>
         <p class="ss-card-hero-text">Profiles set destinations and Finder tags. Cloud-synced paths work once the file is fully on disk. <a href="#faq-watch-inbox">FAQ →</a></p>
       </div>
-      <div class="ss-placeholder ss-placeholder--2" role="img" aria-label="Screenshot placeholder: Watch folder">
-        <svg class="ss-placeholder-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" /><path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clip-rule="evenodd" /></svg>
-        <span class="ss-placeholder-caption">Watch a folder</span>
-        <span class="ss-placeholder-sub">Defaults to ~/Downloads. Sh. Binky's handling it.</span>
-      </div>
+      <img src="screenshots/profiles.webp" alt="Binky profiles panel showing destination rules and watch folder settings" class="ss-screenshot" loading="lazy" />
     </div>
 
   </section>
@@ -1882,7 +1874,7 @@
     <div class="cmp-row">
       <div class="cmp-text-card">
         <h2 class="cmp-title">Match the tool to the tantrum.</h2>
-        <p class="cmp-desc">Hazel is a full rules engine. Neatify runs from the menu bar. Binky watches a folder, sorts into buckets, and flags the weird stuff — with custom rules when buckets aren’t enough.</p>
+        <p class="cmp-desc">Hazel is a full rules engine. Neatify runs from the menu bar. Binky watches a folder, sorts into destinations, and flags the weird stuff — with custom rules when destinations aren’t enough.</p>
         <p class="cmp-footnote">Rough tradeoffs — pricing and features move. <a href="/compare/">Full comparisons →</a></p>
       </div>
       <div class="comparison-card">
@@ -1930,7 +1922,7 @@
               <tr>
                 <td class="cmp-label-cell"><div class="cmp-label">
                   <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M3 2.25a.75.75 0 0 1 .75.75v.54l1.838-.46a9.75 9.75 0 0 1 6.725.738l.108.054A8.25 8.25 0 0 0 18 4.524l3.11-.732a.75.75 0 0 1 .917.81 47.784 47.784 0 0 0 .005 10.337.75.75 0 0 1-.574.812l-3.114.733a9.75 9.75 0 0 1-6.594-.77l-.108-.054a8.25 8.25 0 0 0-5.69-.625l-2.202.55V21a.75.75 0 0 1-1.5 0V3A.75.75 0 0 1 3 2.25Z" clip-rule="evenodd"/></svg>
-                  Review bucket
+                  Review destination
                 </div></td>
                 <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
                 <td data-col="hazel"><span class="cmp-cross">—</span></td>
@@ -2031,7 +2023,7 @@
 
       <div class="faq-item">
         <h3 class="faq-q">Do I need to be technical to use this?</h3>
-        <p class="faq-a">Nope. Out of the box, Binky watches a folder and sorts files into buckets. No rules to write, no scripting. The rule builder is there if you ever want fancy routing — most people never need it.</p>
+        <p class="faq-a">Nope. Out of the box, Binky watches a folder and sorts files into destinations. No rules to write, no scripting. The rule builder is there if you ever want fancy routing — most people never need it.</p>
       </div>
 
       <div class="faq-item">
@@ -2055,7 +2047,7 @@
       </div>
 
       <div class="faq-item">
-        <h3 class="faq-q">What file types go in which bucket?</h3>
+        <h3 class="faq-q">What file types go in which destination?</h3>
         <p class="faq-a">Images (jpg, png, gif, webp, svg, heic…), PDFs, Media (mp4, mov, mp3, m4a…), Documents (doc, txt, md, xls…), Archives (zip, rar, 7z, tar…), Apps (dmg, pkg, app), Screenshots (matched by name pattern), Misc (everything else). Unknowns or ambiguous types go to Review.</p>
       </div>
 
@@ -2066,12 +2058,12 @@
 
       <div class="faq-item">
         <h3 class="faq-q">Can I set custom routing rules?</h3>
-        <p class="faq-a">Yep. Match by name, extension, kind, size, or date — then route to any folder you choose. Good for sending client files to client folders, project exports to project folders, receipts to wherever receipts go. Rules can also rename on the way and add Finder tags. They run before the default buckets.</p>
+        <p class="faq-a">Yep. Match by name, extension, kind, size, or date — then route to any folder you choose. Good for sending client files to client folders, project exports to project folders, receipts to wherever receipts go. Rules can also rename on the way and add Finder tags. They run before the default destinations.</p>
       </div>
 
       <div class="faq-item">
         <h3 class="faq-q">Does it move originals or make copies?</h3>
-        <p class="faq-a">Moves originals. Nothing duplicated, nothing left behind in Downloads. That's why the stable-file gate and Review bucket exist — Binky won't touch a file it isn't sure about.</p>
+        <p class="faq-a">Moves originals. Nothing duplicated, nothing left behind in Downloads. That's why the stable-file gate and Review destination exist — Binky won't touch a file it isn't sure about.</p>
       </div>
 
       <div class="faq-item">

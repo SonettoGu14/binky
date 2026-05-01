@@ -17,22 +17,9 @@ final class GlobalHotkeyManager {
 
     private init() {}
 
-    /// Reads `UserDefaults` keys written by `BinkyPreferences` (`shortcut.pasteClipboardGlobal`, `shortcut.pasteClipboard`).
+    /// Legacy clipboard compression hotkey removed — always clears registration.
     func syncFromDefaults() {
-        let d = UserDefaults.standard
-        let globalOn = d.object(forKey: "shortcut.pasteClipboardGlobal") as? Bool ?? false
-        guard globalOn else {
-            unregister()
-            return
-        }
-        let data = d.data(forKey: "shortcut.pasteClipboard") ?? Data()
-        let shortcut: CustomShortcut
-        if data.isEmpty {
-            shortcut = ShortcutAction.pasteClipboard.defaultShortcut
-        } else {
-            shortcut = (try? JSONDecoder().decode(CustomShortcut.self, from: data)) ?? ShortcutAction.pasteClipboard.defaultShortcut
-        }
-        register(shortcut)
+        unregister()
     }
 
     /// Registers the given shortcut, replacing any previous registration.
@@ -72,7 +59,6 @@ final class GlobalHotkeyManager {
     private func handleHotKeyPressed() {
         DispatchQueue.main.async {
             Self.activateMainWindow()
-            NotificationCenter.default.post(name: .binkyPasteClipboard, object: nil)
         }
     }
 

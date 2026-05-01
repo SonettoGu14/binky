@@ -183,9 +183,9 @@ enum SortRulesEvaluator {
             let rel = sanitizedRelativeDestination(rule.destinationRelativePath)
             return inboxRoot.appendingPathComponent(rel, isDirectory: true)
         }
-        return StarterBuckets.directory(for: category, root: inboxRoot)
+        return StarterDestinations.directory(for: category, root: inboxRoot)
     }
 
-    /// Category used for Finder tags when a custom rule matched (neutral bucket).
+    /// Category used for Finder tags when a custom rule matched (neutral destination).
     static var customRuleTagCategory: FileSortCategory { .misc }
 }

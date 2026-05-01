@@ -42,7 +42,7 @@ struct ContentView: View {
                     await vm.sortIncomingFiles(urls, prefs: prefs)
                 }
             }
-            .onReceive(NotificationCenter.default.publisher(for: .binkyStartCompression)) { _ in
+            .onReceive(NotificationCenter.default.publisher(for: .binkyStartSort)) { _ in
                 Task {
                     await vm.runInteractiveDownloadsSweep(prefs: prefs)
                 }
@@ -63,7 +63,7 @@ struct ContentView: View {
         panel.allowsMultipleSelection = true
         panel.canChooseDirectories = false
         panel.canChooseFiles = true
-        panel.directoryURL = prefs.downloadsSortRootDirectory()
+        panel.directoryURL = prefs.activeSortSweepRootDirectory()
         panel.prompt = String(localized: "Sort", comment: "Open panel button.")
         if panel.runModal() == .OK {
             Task {

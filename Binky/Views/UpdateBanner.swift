@@ -20,7 +20,7 @@ struct UpdateBanner: View {
                         .frame(width: 14, height: 14)
                 default:
                     Image(systemName: "arrow.down.circle.fill")
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(binkyTintColor)
                         .font(.system(size: 14, weight: .semibold))
                 }
             }
@@ -86,7 +86,7 @@ struct UpdateBanner: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
-                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.accentColor))
+                        .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(binkyTintColor))
                     }
                     .buttonStyle(.plain)
                     .fixedSize(horizontal: true, vertical: false)
@@ -107,7 +107,7 @@ struct UpdateBanner: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
-                    .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.accentColor))
+                    .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(binkyTintColor))
                 }
                 .buttonStyle(.plain)
             }

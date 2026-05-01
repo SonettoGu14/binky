@@ -3,7 +3,7 @@ import XCTest
 
 final class DownloadSortClassificationTests: XCTestCase {
 
-    func testPdfRoutesToPdfBucket() {
+    func testPdfRoutesToPdfDestination() {
         let url = URL(fileURLWithPath: "/tmp/invoice.pdf")
         XCTAssertEqual(FileClassification.categorize(url: url), .pdf)
     }
@@ -31,6 +31,25 @@ final class DownloadSortClassificationTests: XCTestCase {
     func testInstallerRoutesToApps() {
         XCTAssertEqual(FileClassification.categorize(url: URL(fileURLWithPath: "/a/Binky.dmg")), .apps)
         XCTAssertEqual(FileClassification.categorize(url: URL(fileURLWithPath: "/a/Thing.pkg")), .apps)
+    }
+
+    func testSortAnimationBucketImageLike() {
+        XCTAssertEqual(FileSortCategory.images.sortAnimationBucket, .images)
+        XCTAssertEqual(FileSortCategory.screenshots.sortAnimationBucket, .images)
+    }
+
+    func testSortAnimationBucketVideoLike() {
+        XCTAssertEqual(FileSortCategory.video.sortAnimationBucket, .videos)
+    }
+
+    func testSortAnimationBucketDefaultsToDocuments() {
+        XCTAssertEqual(FileSortCategory.pdf.sortAnimationBucket, .documents)
+        XCTAssertEqual(FileSortCategory.audio.sortAnimationBucket, .documents)
+        XCTAssertEqual(FileSortCategory.documents.sortAnimationBucket, .documents)
+        XCTAssertEqual(FileSortCategory.archives.sortAnimationBucket, .documents)
+        XCTAssertEqual(FileSortCategory.apps.sortAnimationBucket, .documents)
+        XCTAssertEqual(FileSortCategory.misc.sortAnimationBucket, .documents)
+        XCTAssertEqual(FileSortCategory.review.sortAnimationBucket, .documents)
     }
 
     func testTransientSuffixRoutesToReview() {

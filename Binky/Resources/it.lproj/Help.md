@@ -33,7 +33,7 @@ Non è necessario aprire prima l'app. Scegli quello che si adatta al tuo modo di
 
 ## Where files go
 
-Impostalo una volta in **Impostazioni → Output**.
+Impostalo una volta in **Impostazioni → Destinazioni**.
 
 - **Stessa cartella dell'originale** *(predefinito)*: mantiene le cose in ordine e in locale.
 - **Cartella Download**: utile se elabori molto da email o messaggi.

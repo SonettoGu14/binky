@@ -7,87 +7,53 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5CBDB89C2F9041F600E7E9C0 /* avifenc in Resources */ = {isa = PBXBuildFile; fileRef = 5CBDB8972F9041F600E7E9C0 /* avifenc */; };
-		5CBDB89D2F9041F600E7E9C0 /* oxipng in Resources */ = {isa = PBXBuildFile; fileRef = 5CBDB89A2F9041F600E7E9C0 /* oxipng */; };
-		5CBDB89E2F9041F600E7E9C0 /* cwebp in Resources */ = {isa = PBXBuildFile; fileRef = 5CBDB8992F9041F600E7E9C0 /* cwebp */; };
 		AA000001000000000000001 /* BinkyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1983E259BC5A494A9D936B63 /* BinkyApp.swift */; };
 		AA000002000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96F9AD6A1BD04233828DC140 /* ContentView.swift */; };
-		AA000003000000000000003 /* CompressionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB16B6B1534C999F261F79 /* CompressionService.swift */; };
 		AA000004000000000000004 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89ED8C350A5D404EA5F1CCF6 /* PreferencesView.swift */; };
 		AA000005000000000000005 /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FE17DC818E44D3F88D6F88A /* Strings.swift */; };
-		AA000006000000000000006 /* ImageItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFDD8F0AED14F8CA2C3F9A7 /* ImageItem.swift */; };
-		AA000007000000000000007 /* CompressionFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC05EE39C6DE4195A1EF551B /* CompressionFormat.swift */; };
 		AA000008000000000000008 /* BinkyPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D3DAE858994431BC84C13F /* BinkyPreferences.swift */; };
 		AA000009000000000000009 /* DropZoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D9DE1C999B470FBB27E454 /* DropZoneView.swift */; };
-		AA000010000000000000010 /* ResultsRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B63EBD7088E4C9BAB7A45DC /* ResultsRowView.swift */; };
-		AA000011000000000000011 /* AntyMascotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1032BF7B7A74FAF99A74DB7 /* AntyMascotView.swift */; };
 		AA000012000000000000012 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74EE7205601D464484113FEB /* Assets.xcassets */; };
 		AA000013000000000000013 /* Preview Content/Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E71A34AFC5CA41FDACAEE19D /* Preview Content/Preview Assets.xcassets */; };
 		AG000001000000000000001 /* View+AdaptiveGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AG100001000000000000001 /* View+AdaptiveGlass.swift */; };
 		AI000001000000000000001 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = AI100001000000000000001 /* AppIcon.icon */; };
 		ASH00001000000000000001 /* BinkyAppShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = ASH10001000000000000001 /* BinkyAppShortcuts.swift */; };
-		BB000001000000000000001 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB100001000000000000001 /* SidebarView.swift */; };
-		BC000001000000000000001 /* BatchCompletionSummarySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC100001000000000000001 /* BatchCompletionSummarySheet.swift */; };
-		CC000001000000000000001 /* ContentClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC100001000000000000001 /* ContentClassifier.swift */; };
-		CCS000001000000000000001 /* CompressionConfirmationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCS100001000000000000001 /* CompressionConfirmationSheet.swift */; };
-		CI000001000000000000001 /* ClipboardImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CI100001000000000000001 /* ClipboardImporter.swift */; };
 		CP000001000000000000001 /* CompressionPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = CP100001000000000000001 /* CompressionPreset.swift */; };
-		CRD000001000000000000001 /* CompressionResultDetailSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = CRD100001000000000000001 /* CompressionResultDetailSheets.swift */; };
-		CT000001000000000000001 /* CompressionTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = CT100001000000000000001 /* CompressionTiming.swift */; };
-		CU000001000000000000001 /* CompressionUndo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CU100001000000000000001 /* CompressionUndo.swift */; };
 		DD000003000000000000003 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD000002000000000000002 /* AppDelegate.swift */; };
 		DR000001000000000000001 /* DiagnosticsReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DR100001000000000000001 /* DiagnosticsReporter.swift */; };
-		DS000001000000000000001 /* PDFDocumentSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DS100001000000000000001 /* PDFDocumentSampler.swift */; };
 		BAC00200000000000000001 /* BinkyActivationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC00100000000000000001 /* BinkyActivationPolicy.swift */; };
 		BMBC0020000000000000001 /* BinkyMenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BMBC0010000000000000001 /* BinkyMenuBarController.swift */; };
 		DST00009900000000000001 /* DownloadSortServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = DST10009900000000000001 /* DownloadSortServices.swift */; };
+		DNKBLD1000010000000001 /* DinkyBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DNKBRG1000010000000001 /* DinkyBridge.swift */; };
 		NTEXP002000000000000001 /* NewTagExpiry.swift in Sources */ = {isa = PBXBuildFile; fileRef = NTEXP102000000000000001 /* NewTagExpiry.swift */; };
 		SREM0020000000000000001 /* SortRoutingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = SREM0010000000000000001 /* SortRoutingModels.swift */; };
 		SREV0020000000000000001 /* SortRulesEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = SREV0010000000000000001 /* SortRulesEvaluator.swift */; };
 		SPSH0020000000000000001 /* SortPreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = SPSH0010000000000000001 /* SortPreviewSheet.swift */; };
-		FC000001000000000000001 /* FinderCommentsCopier.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC100001000000000000001 /* FinderCommentsCopier.swift */; };
 		FW000001000000000000001 /* FolderWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = FW100001000000000000001 /* FolderWatcher.swift */; };
 		GH000001000000000000001 /* GlobalHotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH100001000000000000001 /* GlobalHotkeyManager.swift */; };
 		HM000001000000000000001 /* Help.md in Resources */ = {isa = PBXBuildFile; fileRef = HMVGRP00000000000000001 /* Help.md */; };
 		HS000001000000000000001 /* HistorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = HS100001000000000000001 /* HistorySheet.swift */; };
 		HW000001000000000000001 /* HelpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = HW100001000000000000001 /* HelpWindow.swift */; };
 		ICAT00000100000000000001 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = ICATREF0000000000000001 /* InfoPlist.xcstrings */; };
-		ICFR0000010000000000001 /* ImageCompressionFormatResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = ICFR1000010000000000001 /* ImageCompressionFormatResolver.swift */; };
-		IPS00001000000000000001 /* ImagePreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = IPS10001000000000000001 /* ImagePreviewSheet.swift */; };
 		KS000001000000000000001 /* CustomShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = KS100001000000000000001 /* CustomShortcut.swift */; };
-		LB000001000000000000001 /* lib in Resources */ = {isa = PBXBuildFile; fileRef = LB100001000000000000001 /* lib */; };
 		LCAT00000100000000000001 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = LCATREF0000000000000001 /* Localizable.xcstrings */; };
 		LL000001000000000000001 /* LaunchAtLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LL100001000000000000001 /* LaunchAtLoginManager.swift */; };
-		MT000001000000000000001 /* MediaType.swift in Sources */ = {isa = PBXBuildFile; fileRef = MT100001000000000000001 /* MediaType.swift */; };
-		OC000001000000000000001 /* PDFOCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = OC100001000000000000001 /* PDFOCRService.swift */; };
 		OES000001000000000000001 /* OrganizerEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = OES100001000000000000001 /* OrganizerEmptyStateView.swift */; };
-		OH000001000000000000001 /* OriginalsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = OH100001000000000000001 /* OriginalsHandler.swift */; };
-		OP000001000000000000001 /* OutputPathUniqueness.swift in Sources */ = {isa = PBXBuildFile; fileRef = OP100001000000000000001 /* OutputPathUniqueness.swift */; };
 		ORGMAIN001000000000000001 /* OrganizerMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ORGMAIN100001000000000001 /* OrganizerMainView.swift */; };
 		ORGVM00000100000000000001 /* OrganizerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ORGVM10000100000000000001 /* OrganizerViewModel.swift */; };
-		PC000001000000000000001 /* PDFCompressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = PC100001000000000000001 /* PDFCompressor.swift */; };
-		PE000001000000000000001 /* PDFPreserveExperimentalMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = PE100001000000000000001 /* PDFPreserveExperimentalMode.swift */; };
-		PH000001000000000000001 /* PDFPreserveHeuristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = PH100001000000000000001 /* PDFPreserveHeuristics.swift */; };
-		PI000001000000000000001 /* PDFImageDownsampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = PI100001000000000000001 /* PDFImageDownsampler.swift */; };
-		PM000001000000000000001 /* PDFCompressionMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = PM100001000000000000001 /* PDFCompressionMetrics.swift */; };
-		PQ000001000000000000001 /* PDFSmartQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = PQ100001000000000000001 /* PDFSmartQuality.swift */; };
-		QP000001000000000000001 /* qpdf in Resources */ = {isa = PBXBuildFile; fileRef = QP100001000000000000001 /* qpdf */; };
 		RB000001000000000000001 /* ReviewPromptBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = RB100001000000000000001 /* ReviewPromptBanner.swift */; };
 		SC000001000000000000001 /* SettingsChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC100001000000000000001 /* SettingsChrome.swift */; };
 		SH000001000000000000001 /* ShortcutRecorderField.swift in Sources */ = {isa = PBXBuildFile; fileRef = SH100001000000000000001 /* ShortcutRecorderField.swift */; };
-		SP000001000000000000001 /* SavingsPerspective.swift in Sources */ = {isa = PBXBuildFile; fileRef = SP100001000000000000001 /* SavingsPerspective.swift */; };
 		SR000001000000000000001 /* SessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = SR100001000000000000001 /* SessionRecord.swift */; };
 		SRTINT001000000000000001 /* SortFilesWithBinkyIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRTINT100001000000000001 /* SortFilesWithBinkyIntent.swift */; };
 		SSR000001000000000000001 /* SummaryStatRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = SSR100001000000000000001 /* SummaryStatRow.swift */; };
 		UB000001000000000000001 /* UpdateBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = UB100001000000000000001 /* UpdateBanner.swift */; };
 		UC000001000000000000001 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = UC100001000000000000001 /* UpdateChecker.swift */; };
-		UD000001000000000000001 /* URLDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = UD100001000000000000001 /* URLDownloader.swift */; };
-		VC000001000000000000001 /* VideoCompressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = VC100001000000000000001 /* VideoCompressor.swift */; };
-		VCC0001000000000000001 /* VideoContentClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = VCC1001000000000000001 /* VideoContentClassifier.swift */; };
-		VQ000001000000000000001 /* VideoSmartQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = VQ100001000000000000001 /* VideoSmartQuality.swift */; };
 		WR000001000000000000001 /* WatchRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = WR100001000000000000001 /* WatchRegistry.swift */; };
-		XTBLD00000000000000001 /* PDFScanDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = XTREF00000000000000001 /* PDFScanDetectionTests.swift */; };
 		XTBLD00000000000000002 /* DownloadSortClassificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = XTREF00000000000000002 /* DownloadSortClassificationTests.swift */; };
+		SPTKR200001BK000002 /* SortProgressTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = SPTKR100001FR000001 /* SortProgressTracker.swift */; };
+		BBAR200001BK000002 /* BinkySortProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBAR100001FR000001 /* BinkySortProgressBar.swift */; };
+		CURS200001BK000002 /* CurrentlySortingSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CURS100001FR000001 /* CurrentlySortingSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -104,36 +70,20 @@
 		06FD4F8D9AC8412C83F517C6 /* Binky.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Binky.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1983E259BC5A494A9D936B63 /* BinkyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyApp.swift; sourceTree = "<group>"; };
 		4FE17DC818E44D3F88D6F88A /* Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
-		4FFDD8F0AED14F8CA2C3F9A7 /* ImageItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageItem.swift; sourceTree = "<group>"; };
 		56D9DE1C999B470FBB27E454 /* DropZoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropZoneView.swift; sourceTree = "<group>"; };
-		5B63EBD7088E4C9BAB7A45DC /* ResultsRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsRowView.swift; sourceTree = "<group>"; };
 		5BC7D00FC2B14EF09CB7F833 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		5BEB16B6B1534C999F261F79 /* CompressionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionService.swift; sourceTree = "<group>"; };
-		5CBDB8972F9041F600E7E9C0 /* avifenc */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = avifenc; sourceTree = "<group>"; };
-		5CBDB8992F9041F600E7E9C0 /* cwebp */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cwebp; sourceTree = "<group>"; };
-		5CBDB89A2F9041F600E7E9C0 /* oxipng */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = oxipng; sourceTree = "<group>"; };
 		74EE7205601D464484113FEB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		89ED8C350A5D404EA5F1CCF6 /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
 		96F9AD6A1BD04233828DC140 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		AC05EE39C6DE4195A1EF551B /* CompressionFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionFormat.swift; sourceTree = "<group>"; };
 		AG100001000000000000001 /* View+AdaptiveGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+AdaptiveGlass.swift"; sourceTree = "<group>"; };
 		AI100001000000000000001 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		ASH10001000000000000001 /* BinkyAppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyAppShortcuts.swift; sourceTree = "<group>"; };
-		BB100001000000000000001 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
-		BC100001000000000000001 /* BatchCompletionSummarySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchCompletionSummarySheet.swift; sourceTree = "<group>"; };
-		CC100001000000000000001 /* ContentClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentClassifier.swift; sourceTree = "<group>"; };
-		CCS100001000000000000001 /* CompressionConfirmationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionConfirmationSheet.swift; sourceTree = "<group>"; };
-		CI100001000000000000001 /* ClipboardImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardImporter.swift; sourceTree = "<group>"; };
 		CP100001000000000000001 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
-		CRD100001000000000000001 /* CompressionResultDetailSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionResultDetailSheets.swift; sourceTree = "<group>"; };
-		CT100001000000000000001 /* CompressionTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionTiming.swift; sourceTree = "<group>"; };
-		CU100001000000000000001 /* CompressionUndo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionUndo.swift; sourceTree = "<group>"; };
-		D1032BF7B7A74FAF99A74DB7 /* AntyMascotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AntyMascotView.swift; sourceTree = "<group>"; };
 		DD000001000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DD000002000000000000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DR100001000000000000001 /* DiagnosticsReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsReporter.swift; sourceTree = "<group>"; };
-		DS100001000000000000001 /* PDFDocumentSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFDocumentSampler.swift; sourceTree = "<group>"; };
 		DST10009900000000000001 /* DownloadSortServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSortServices.swift; sourceTree = "<group>"; };
+		DNKBRG1000010000000001 /* DinkyBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinkyBridge.swift; sourceTree = "<group>"; };
 		NTEXP102000000000000001 /* NewTagExpiry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTagExpiry.swift; sourceTree = "<group>"; };
 		BAC00100000000000000001 /* BinkyActivationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyActivationPolicy.swift; sourceTree = "<group>"; };
 		BMBC0010000000000000001 /* BinkyMenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyMenuBarController.swift; sourceTree = "<group>"; };
@@ -143,7 +93,6 @@
 		E71A34AFC5CA41FDACAEE19D /* Preview Content/Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Content/Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F5D3DAE858994431BC84C13F /* BinkyPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyPreferences.swift; sourceTree = "<group>"; };
 		F68BBF685BAD4911BEC725DB /* Binky.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Binky.entitlements; sourceTree = "<group>"; };
-		FC100001000000000000001 /* FinderCommentsCopier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderCommentsCopier.swift; sourceTree = "<group>"; };
 		FW100001000000000000001 /* FolderWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderWatcher.swift; sourceTree = "<group>"; };
 		GH100001000000000000001 /* GlobalHotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalHotkeyManager.swift; sourceTree = "<group>"; };
 		HMDE0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = de.lproj/Help.md; sourceTree = "<group>"; };
@@ -162,43 +111,26 @@
 		HS100001000000000000001 /* HistorySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistorySheet.swift; sourceTree = "<group>"; };
 		HW100001000000000000001 /* HelpWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpWindow.swift; sourceTree = "<group>"; };
 		ICATREF0000000000000001 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
-		ICFR1000010000000000001 /* ImageCompressionFormatResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompressionFormatResolver.swift; sourceTree = "<group>"; };
-		IPS10001000000000000001 /* ImagePreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewSheet.swift; sourceTree = "<group>"; };
 		KS100001000000000000001 /* CustomShortcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomShortcut.swift; sourceTree = "<group>"; };
-		LB100001000000000000001 /* lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = lib; sourceTree = "<group>"; };
 		LCATREF0000000000000001 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		LL100001000000000000001 /* LaunchAtLoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginManager.swift; sourceTree = "<group>"; };
-		MT100001000000000000001 /* MediaType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaType.swift; sourceTree = "<group>"; };
-		OC100001000000000000001 /* PDFOCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFOCRService.swift; sourceTree = "<group>"; };
 		OES100001000000000000001 /* OrganizerEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerEmptyStateView.swift; sourceTree = "<group>"; };
-		OH100001000000000000001 /* OriginalsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OriginalsHandler.swift; sourceTree = "<group>"; };
-		OP100001000000000000001 /* OutputPathUniqueness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputPathUniqueness.swift; sourceTree = "<group>"; };
 		ORGMAIN100001000000000001 /* OrganizerMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerMainView.swift; sourceTree = "<group>"; };
 		ORGVM10000100000000000001 /* OrganizerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerViewModel.swift; sourceTree = "<group>"; };
-		PC100001000000000000001 /* PDFCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFCompressor.swift; sourceTree = "<group>"; };
-		PE100001000000000000001 /* PDFPreserveExperimentalMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFPreserveExperimentalMode.swift; sourceTree = "<group>"; };
-		PH100001000000000000001 /* PDFPreserveHeuristics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFPreserveHeuristics.swift; sourceTree = "<group>"; };
-		PI100001000000000000001 /* PDFImageDownsampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFImageDownsampler.swift; sourceTree = "<group>"; };
-		PM100001000000000000001 /* PDFCompressionMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFCompressionMetrics.swift; sourceTree = "<group>"; };
-		PQ100001000000000000001 /* PDFSmartQuality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFSmartQuality.swift; sourceTree = "<group>"; };
-		QP100001000000000000001 /* qpdf */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = qpdf; sourceTree = "<group>"; };
 		RB100001000000000000001 /* ReviewPromptBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptBanner.swift; sourceTree = "<group>"; };
 		SC100001000000000000001 /* SettingsChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsChrome.swift; sourceTree = "<group>"; };
 		SH100001000000000000001 /* ShortcutRecorderField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderField.swift; sourceTree = "<group>"; };
-		SP100001000000000000001 /* SavingsPerspective.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsPerspective.swift; sourceTree = "<group>"; };
 		SR100001000000000000001 /* SessionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRecord.swift; sourceTree = "<group>"; };
 		SRTINT100001000000000001 /* SortFilesWithBinkyIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortFilesWithBinkyIntent.swift; sourceTree = "<group>"; };
 		SSR100001000000000000001 /* SummaryStatRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryStatRow.swift; sourceTree = "<group>"; };
 		UB100001000000000000001 /* UpdateBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateBanner.swift; sourceTree = "<group>"; };
 		UC100001000000000000001 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
-		UD100001000000000000001 /* URLDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLDownloader.swift; sourceTree = "<group>"; };
-		VC100001000000000000001 /* VideoCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCompressor.swift; sourceTree = "<group>"; };
-		VCC1001000000000000001 /* VideoContentClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoContentClassifier.swift; sourceTree = "<group>"; };
-		VQ100001000000000000001 /* VideoSmartQuality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoSmartQuality.swift; sourceTree = "<group>"; };
 		WR100001000000000000001 /* WatchRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRegistry.swift; sourceTree = "<group>"; };
 		XTPRD00000000000000001 /* BinkyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BinkyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		XTREF00000000000000001 /* PDFScanDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFScanDetectionTests.swift; sourceTree = "<group>"; };
 		XTREF00000000000000002 /* DownloadSortClassificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSortClassificationTests.swift; sourceTree = "<group>"; };
+		SPTKR100001FR000001 /* SortProgressTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortProgressTracker.swift; sourceTree = "<group>"; };
+		BBAR100001FR000001 /* BinkySortProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkySortProgressBar.swift; sourceTree = "<group>"; };
+		CURS100001FR000001 /* CurrentlySortingSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentlySortingSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -223,13 +155,9 @@
 			isa = PBXGroup;
 			children = (
 				SREM0010000000000000001 /* SortRoutingModels.swift */,
-				4FFDD8F0AED14F8CA2C3F9A7 /* ImageItem.swift */,
-				PE100001000000000000001 /* PDFPreserveExperimentalMode.swift */,
-				AC05EE39C6DE4195A1EF551B /* CompressionFormat.swift */,
 				F5D3DAE858994431BC84C13F /* BinkyPreferences.swift */,
 				CP100001000000000000001 /* CompressionPreset.swift */,
 				SR100001000000000000001 /* SessionRecord.swift */,
-				MT100001000000000000001 /* MediaType.swift */,
 				KS100001000000000000001 /* CustomShortcut.swift */,
 			);
 			path = Models;
@@ -238,21 +166,16 @@
 		32ED8DD8E46E4623979A137D /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				BBAR100001FR000001 /* BinkySortProgressBar.swift */,
+				CURS100001FR000001 /* CurrentlySortingSheet.swift */,
 				SPSH0010000000000000001 /* SortPreviewSheet.swift */,
 				56D9DE1C999B470FBB27E454 /* DropZoneView.swift */,
 				OES100001000000000000001 /* OrganizerEmptyStateView.swift */,
-				5B63EBD7088E4C9BAB7A45DC /* ResultsRowView.swift */,
-				CCS100001000000000000001 /* CompressionConfirmationSheet.swift */,
 				SSR100001000000000000001 /* SummaryStatRow.swift */,
-				D1032BF7B7A74FAF99A74DB7 /* AntyMascotView.swift */,
-				BB100001000000000000001 /* SidebarView.swift */,
 				SC100001000000000000001 /* SettingsChrome.swift */,
 				UB100001000000000000001 /* UpdateBanner.swift */,
 				RB100001000000000000001 /* ReviewPromptBanner.swift */,
-				IPS10001000000000000001 /* ImagePreviewSheet.swift */,
 				HS100001000000000000001 /* HistorySheet.swift */,
-				BC100001000000000000001 /* BatchCompletionSummarySheet.swift */,
-				CRD100001000000000000001 /* CompressionResultDetailSheets.swift */,
 				HW100001000000000000001 /* HelpWindow.swift */,
 				SH100001000000000000001 /* ShortcutRecorderField.swift */,
 			);
@@ -276,7 +199,6 @@
 				96F9AD6A1BD04233828DC140 /* ContentView.swift */,
 				ORGVM10000100000000000001 /* OrganizerViewModel.swift */,
 				ORGMAIN100001000000000001 /* OrganizerMainView.swift */,
-				5BEB16B6B1534C999F261F79 /* CompressionService.swift */,
 				89ED8C350A5D404EA5F1CCF6 /* PreferencesView.swift */,
 				4FE17DC818E44D3F88D6F88A /* Strings.swift */,
 				LCATREF0000000000000001 /* Localizable.xcstrings */,
@@ -299,7 +221,6 @@
 			isa = PBXGroup;
 			children = (
 				E168EFE304164DA3B71EFE4F /* bin */,
-				LB100001000000000000001 /* lib */,
 				HMVGRP00000000000000001 /* Help.md */,
 			);
 			path = Resources;
@@ -318,10 +239,6 @@
 		E168EFE304164DA3B71EFE4F /* bin */ = {
 			isa = PBXGroup;
 			children = (
-				5CBDB8972F9041F600E7E9C0 /* avifenc */,
-				5CBDB8992F9041F600E7E9C0 /* cwebp */,
-				5CBDB89A2F9041F600E7E9C0 /* oxipng */,
-				QP100001000000000000001 /* qpdf */,
 				5BC7D00FC2B14EF09CB7F833 /* README.md */,
 			);
 			path = bin;
@@ -347,37 +264,19 @@
 		SV100001000000000000001 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				SPTKR100001FR000001 /* SortProgressTracker.swift */,
 				UC100001000000000000001 /* UpdateChecker.swift */,
-				OH100001000000000000001 /* OriginalsHandler.swift */,
-				CU100001000000000000001 /* CompressionUndo.swift */,
-				UD100001000000000000001 /* URLDownloader.swift */,
 				LL100001000000000000001 /* LaunchAtLoginManager.swift */,
 				BAC00100000000000000001 /* BinkyActivationPolicy.swift */,
 				BMBC0010000000000000001 /* BinkyMenuBarController.swift */,
-				CC100001000000000000001 /* ContentClassifier.swift */,
-				ICFR1000010000000000001 /* ImageCompressionFormatResolver.swift */,
-				CI100001000000000000001 /* ClipboardImporter.swift */,
 				FW100001000000000000001 /* FolderWatcher.swift */,
 				SREV0010000000000000001 /* SortRulesEvaluator.swift */,
 				DST10009900000000000001 /* DownloadSortServices.swift */,
+				DNKBRG1000010000000001 /* DinkyBridge.swift */,
 				NTEXP102000000000000001 /* NewTagExpiry.swift */,
-				PC100001000000000000001 /* PDFCompressor.swift */,
-				VC100001000000000000001 /* VideoCompressor.swift */,
-				PQ100001000000000000001 /* PDFSmartQuality.swift */,
-				DS100001000000000000001 /* PDFDocumentSampler.swift */,
-				OC100001000000000000001 /* PDFOCRService.swift */,
-				PH100001000000000000001 /* PDFPreserveHeuristics.swift */,
-				VQ100001000000000000001 /* VideoSmartQuality.swift */,
-				VCC1001000000000000001 /* VideoContentClassifier.swift */,
 				WR100001000000000000001 /* WatchRegistry.swift */,
 				GH100001000000000000001 /* GlobalHotkeyManager.swift */,
 				DR100001000000000000001 /* DiagnosticsReporter.swift */,
-				CT100001000000000000001 /* CompressionTiming.swift */,
-				PM100001000000000000001 /* PDFCompressionMetrics.swift */,
-				PI100001000000000000001 /* PDFImageDownsampler.swift */,
-				FC100001000000000000001 /* FinderCommentsCopier.swift */,
-				OP100001000000000000001 /* OutputPathUniqueness.swift */,
-				SP100001000000000000001 /* SavingsPerspective.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -385,7 +284,6 @@
 		XTGRP00000000000000001 /* BinkyTests */ = {
 			isa = PBXGroup;
 			children = (
-				XTREF00000000000000001 /* PDFScanDetectionTests.swift */,
 				XTREF00000000000000002 /* DownloadSortClassificationTests.swift */,
 			);
 			path = BinkyTests;
@@ -401,7 +299,6 @@
 				998A23993F5848F1B732DC47 /* Sources */,
 				E21DF18078534E6AAFC3CD56 /* Frameworks */,
 				E3643529CC4842C6B993EE52 /* Resources */,
-				RS000001000000000000001 /* Re-sign bundled binaries */,
 			);
 			buildRules = (
 			);
@@ -483,11 +380,6 @@
 				AI000001000000000000001 /* AppIcon.icon in Resources */,
 				AA000012000000000000012 /* Assets.xcassets in Resources */,
 				AA000013000000000000013 /* Preview Content/Preview Assets.xcassets in Resources */,
-				5CBDB89C2F9041F600E7E9C0 /* avifenc in Resources */,
-				5CBDB89D2F9041F600E7E9C0 /* oxipng in Resources */,
-				5CBDB89E2F9041F600E7E9C0 /* cwebp in Resources */,
-				QP000001000000000000001 /* qpdf in Resources */,
-				LB000001000000000000001 /* lib in Resources */,
 				HM000001000000000000001 /* Help.md in Resources */,
 				LCAT00000100000000000001 /* Localizable.xcstrings in Resources */,
 				ICAT00000100000000000001 /* InfoPlist.xcstrings in Resources */,
@@ -497,25 +389,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		RS000001000000000000001 /* Re-sign bundled binaries */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Re-sign bundled binaries";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Re-sign all bundled CLI binaries and dylibs with ad-hoc signatures.\n# Required because install_name_tool invalidates Homebrew-supplied signatures.\nRESOURCES=\"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/Resources\"\nfor f in \"$RESOURCES/avifenc\" \"$RESOURCES/cwebp\" \"$RESOURCES/oxipng\" \"$RESOURCES/qpdf\" \"$RESOURCES\"/lib/*.dylib; do\n  [ -f \"$f\" ] && codesign -s - --force \"$f\"\ndone\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -530,67 +403,39 @@
 				ORGMAIN001000000000000001 /* OrganizerMainView.swift in Sources */,
 				OES000001000000000000001 /* OrganizerEmptyStateView.swift in Sources */,
 				SRTINT001000000000000001 /* SortFilesWithBinkyIntent.swift in Sources */,
-				AA000003000000000000003 /* CompressionService.swift in Sources */,
 				AA000004000000000000004 /* PreferencesView.swift in Sources */,
 				AA000005000000000000005 /* Strings.swift in Sources */,
-				AA000006000000000000006 /* ImageItem.swift in Sources */,
-				PE000001000000000000001 /* PDFPreserveExperimentalMode.swift in Sources */,
-				AA000007000000000000007 /* CompressionFormat.swift in Sources */,
 				AA000008000000000000008 /* BinkyPreferences.swift in Sources */,
 				AA000009000000000000009 /* DropZoneView.swift in Sources */,
-				AA000010000000000000010 /* ResultsRowView.swift in Sources */,
-				CCS000001000000000000001 /* CompressionConfirmationSheet.swift in Sources */,
 				SSR000001000000000000001 /* SummaryStatRow.swift in Sources */,
-				AA000011000000000000011 /* AntyMascotView.swift in Sources */,
-				BB000001000000000000001 /* SidebarView.swift in Sources */,
+				BBAR200001BK000002 /* BinkySortProgressBar.swift in Sources */,
+				CURS200001BK000002 /* CurrentlySortingSheet.swift in Sources */,
 				SC000001000000000000001 /* SettingsChrome.swift in Sources */,
 				UC000001000000000000001 /* UpdateChecker.swift in Sources */,
 				UB000001000000000000001 /* UpdateBanner.swift in Sources */,
 				RB000001000000000000001 /* ReviewPromptBanner.swift in Sources */,
-				CC000001000000000000001 /* ContentClassifier.swift in Sources */,
-				ICFR0000010000000000001 /* ImageCompressionFormatResolver.swift in Sources */,
 				AG000001000000000000001 /* View+AdaptiveGlass.swift in Sources */,
-				CI000001000000000000001 /* ClipboardImporter.swift in Sources */,
-				OH000001000000000000001 /* OriginalsHandler.swift in Sources */,
-				CU000001000000000000001 /* CompressionUndo.swift in Sources */,
-				UD000001000000000000001 /* URLDownloader.swift in Sources */,
 				LL000001000000000000001 /* LaunchAtLoginManager.swift in Sources */,
 				FW000001000000000000001 /* FolderWatcher.swift in Sources */,
 				BAC00200000000000000001 /* BinkyActivationPolicy.swift in Sources */,
 				BMBC0020000000000000001 /* BinkyMenuBarController.swift in Sources */,
+				SPTKR200001BK000002 /* SortProgressTracker.swift in Sources */,
 				DST00009900000000000001 /* DownloadSortServices.swift in Sources */,
+				DNKBLD1000010000000001 /* DinkyBridge.swift in Sources */,
 				SREM0020000000000000001 /* SortRoutingModels.swift in Sources */,
 				SREV0020000000000000001 /* SortRulesEvaluator.swift in Sources */,
 				SPSH0020000000000000001 /* SortPreviewSheet.swift in Sources */,
-				IPS00001000000000000001 /* ImagePreviewSheet.swift in Sources */,
 				HS000001000000000000001 /* HistorySheet.swift in Sources */,
-				BC000001000000000000001 /* BatchCompletionSummarySheet.swift in Sources */,
-				CRD000001000000000000001 /* CompressionResultDetailSheets.swift in Sources */,
 				CP000001000000000000001 /* CompressionPreset.swift in Sources */,
 				SR000001000000000000001 /* SessionRecord.swift in Sources */,
 				ASH00001000000000000001 /* BinkyAppShortcuts.swift in Sources */,
-				MT000001000000000000001 /* MediaType.swift in Sources */,
 				NTEXP002000000000000001 /* NewTagExpiry.swift in Sources */,
-				PC000001000000000000001 /* PDFCompressor.swift in Sources */,
-				VC000001000000000000001 /* VideoCompressor.swift in Sources */,
-				PQ000001000000000000001 /* PDFSmartQuality.swift in Sources */,
-				DS000001000000000000001 /* PDFDocumentSampler.swift in Sources */,
-				OC000001000000000000001 /* PDFOCRService.swift in Sources */,
-				PH000001000000000000001 /* PDFPreserveHeuristics.swift in Sources */,
-				VQ000001000000000000001 /* VideoSmartQuality.swift in Sources */,
-				VCC0001000000000000001 /* VideoContentClassifier.swift in Sources */,
 				WR000001000000000000001 /* WatchRegistry.swift in Sources */,
 				HW000001000000000000001 /* HelpWindow.swift in Sources */,
 				KS000001000000000000001 /* CustomShortcut.swift in Sources */,
 				SH000001000000000000001 /* ShortcutRecorderField.swift in Sources */,
 				GH000001000000000000001 /* GlobalHotkeyManager.swift in Sources */,
 				DR000001000000000000001 /* DiagnosticsReporter.swift in Sources */,
-				CT000001000000000000001 /* CompressionTiming.swift in Sources */,
-				PM000001000000000000001 /* PDFCompressionMetrics.swift in Sources */,
-				PI000001000000000000001 /* PDFImageDownsampler.swift in Sources */,
-				FC000001000000000000001 /* FinderCommentsCopier.swift in Sources */,
-				OP000001000000000000001 /* OutputPathUniqueness.swift in Sources */,
-				SP000001000000000000001 /* SavingsPerspective.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -598,7 +443,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				XTBLD00000000000000001 /* PDFScanDetectionTests.swift in Sources */,
 				XTBLD00000000000000002 /* DownloadSortClassificationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -1,6 +1,6 @@
 # Binky
 
-A native macOS app that calms a fussy Downloads folder. Binky watches your inbox (defaults to `~/Downloads`), waits for files to finish downloading, then routes them into clear buckets like Images, PDFs, Media, Documents, Archives, Apps, Screenshots, and Misc.
+A native macOS app that calms a fussy Downloads folder. Binky watches your inbox (defaults to `~/Downloads`), waits for files to finish downloading, then routes them into clear destinations — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, and Misc.
 
 Unknown or sketchy extensions do not disappear silently: they land in **Review** first. Optional Finder tags, move summaries, and session history make it easy to verify what happened and undo where possible.
 
@@ -28,7 +28,7 @@ Hey! I'm [Derek Castelli](https://www.heyderekj.com), a full-time freelance web 
 - **Sort Downloads Now** - one-click sort with stable-file checks and collision-safe moves
 - **Watch folder** - monitor Downloads continuously and route new files as they settle
 - **Profiles and rules** - define destination behavior per profile with predictable routing
-- **Review bucket** - unknown or ambiguous extensions get held for inspection first
+- **Review destination** — unknown or ambiguous extensions get held for inspection first
 - **History and undo-friendly flow** - batch summaries with moved, skipped, and review counts
 - **Finder Quick Action and Services** - run "Sort with Binky" on selected files
 - **Apple Shortcuts support** - "Sort Files" App Intent can hand paths to Binky

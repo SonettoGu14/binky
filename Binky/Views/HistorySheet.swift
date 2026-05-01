@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct HistorySheet: View {
     @EnvironmentObject var prefs: BinkyPreferences
@@ -74,7 +75,7 @@ struct HistorySheet: View {
                         }
                         .buttonStyle(.plain)
                         .font(.caption)
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(binkyTintColor)
                         .help(String(localized: "Show the move/review summary from this run.", comment: "History Open Summary tooltip."))
                     }
                 }
@@ -85,17 +86,8 @@ struct HistorySheet: View {
                     Text(historySessionFileCountLabel(record.fileCount))
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    if isSortSessionRecord(record) {
-                        Text(
-                            String.localizedStringWithFormat(
-                                String(localized: "%lld moved", comment: "History row: files moved count."),
-                                record.totalBytesSaved
-                            )
-                        )
-                        .font(.system(.caption2, design: .monospaced))
-                        .foregroundStyle(.tertiary)
-                    } else {
-                        Text(formattedSize(record.totalBytesSaved) + String(localized: " saved", comment: "Suffix after size in history row."))
+                    if isSortSessionRecord(record), record.totalBytesMoved > 0 {
+                        Text(formattedSize(record.totalBytesMoved) + String(localized: " moved", comment: "Suffix after size in history row."))
                             .font(.system(.caption2, design: .monospaced))
                             .foregroundStyle(.tertiary)
                     }
@@ -103,9 +95,27 @@ struct HistorySheet: View {
             }
             .padding(.vertical, 4)
             .listRowSeparatorTint(.primary.opacity(0.08))
+            .contextMenu {
+                let urls = sessionCompressibleURLs(record)
+                if DinkyBridge.isInstalled, !urls.isEmpty {
+                    Button(String(localized: "Send session files to Dinky", comment: "History context menu.")) {
+                        _ = DinkyBridge.openFiles(urls)
+                    }
+                }
+            }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+    }
+
+    private func sessionCompressibleURLs(_ record: SessionRecord) -> [URL] {
+        guard let data = record.batchSummaryData,
+              let outcome = try? JSONDecoder().decode(SortBatchOutcome.self, from: data) else { return [] }
+        let moved = outcome.entries.compactMap { e -> URL? in
+            guard e.disposition == .moved, let d = e.destinationPath else { return nil }
+            return URL(fileURLWithPath: d)
+        }
+        return DinkyBridge.compressibleURLs(from: moved)
     }
 
     private func isSortSessionRecord(_ record: SessionRecord) -> Bool {

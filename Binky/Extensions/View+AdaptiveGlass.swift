@@ -36,6 +36,17 @@ extension View {
             self.modifier(LegacySymbolRotationModifier())
         }
     }
+
+    /// Keeps action labels readable on liquid glass while preserving normal tint
+    /// behavior on older material backdrops.
+    @ViewBuilder
+    func adaptiveGlassActionForeground() -> some View {
+        if #available(macOS 26, *) {
+            self.foregroundStyle(.white)
+        } else {
+            self.foregroundStyle(.primary)
+        }
+    }
 }
 
 /// Spin for Sonoma: `TimelineView` + `rotationEffect` (no `SymbolEffect.rotate`).

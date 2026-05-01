@@ -8,6 +8,8 @@ Binky keeps your **Downloads inbox** tidy: it watches for finished files, moves 
 2. Drop files into that folder — Binky waits until downloads look **stable**, then sorts them.
 3. Use **Sort Now** (`{{SK_SORT_NOW}}`) any time to sweep everything sitting at the top level of the inbox.
 
+Optional: After a sort, use **Send to Dinky** on the summary sheet (or **Watch … in Dinky** on a destination folder) to hand off images, PDFs, and videos to [Dinky](https://dinkyapp.com) for compression—or set Dinky to watch those folders so future drops get slimmed automatically.
+
 ## Where files go (starter profile)
 
 | Kind | Folder |

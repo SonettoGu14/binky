@@ -6,18 +6,8 @@ enum DropZonePhase: Equatable {
     case idle, hovering, processing, done
 }
 
-/// Which product surface owns the drop zone (affects copy, not interaction).
-enum DropZoneWorkflow: Equatable {
-    /// Compression queue (legacy main window).
-    case compress
-    /// Downloads inbox sorting (organizer window).
-    case organizeInbox
-}
-
 struct DropZoneView: View {
     var phase: DropZonePhase
-    /// Defaults to compression copy for existing call sites.
-    var workflow: DropZoneWorkflow = .compress
     let onOpenPanel: () -> Void
     var onPaste: () -> Void = {}
     var onLoop: () -> Void = {}
@@ -68,23 +58,11 @@ struct DropZoneView: View {
         case .idle:
             let head = String(localized: "Drop files here", comment: "Drop zone idle hint.")
             let browse = String(localized: "or click to browse", comment: "Drop zone idle hint.")
-            let pasteKey = prefs.shortcut(for: .pasteClipboard).displayString
-            let paste = String(localized: "or paste (\(pasteKey))", comment: "Drop zone; argument is paste shortcut.")
-            return "\(head) \(browse) \(paste)"
+            return "\(head) \(browse)"
         case .hovering:
-            switch workflow {
-            case .compress:
-                return String(localized: "Release to compress", comment: "Drop zone while dragging files.")
-            case .organizeInbox:
-                return String(localized: "Release to sort", comment: "Organizer drop zone while dragging files.")
-            }
+            return String(localized: "Release to sort", comment: "Organizer drop zone while dragging files.")
         case .processing:
-            switch workflow {
-            case .compress:
-                return String(localized: "Compressing…", comment: "Drop zone during compression.")
-            case .organizeInbox:
-                return String(localized: "Sorting…", comment: "Organizer drop zone while sorting.")
-            }
+            return String(localized: "Sorting…", comment: "Organizer drop zone while sorting.")
         case .done:
             return String(localized: "All done!", comment: "Drop zone when batch completes.")
         }
@@ -93,26 +71,11 @@ struct DropZoneView: View {
     private var dropZoneAccessibilityHint: String {
         switch phase {
         case .idle:
-            switch workflow {
-            case .compress:
-                return String(localized: "Activate to open the file picker. You can also paste when the clipboard has a compressible item.", comment: "VoiceOver hint for main drop zone when idle.")
-            case .organizeInbox:
-                return String(localized: "Activate to open the file picker. You can also paste when the clipboard has a file to sort from your watch folder.", comment: "VoiceOver hint for organizer drop zone when idle.")
-            }
+            return String(localized: "Activate to open the file picker.", comment: "VoiceOver hint for organizer drop zone when idle.")
         case .hovering:
-            switch workflow {
-            case .compress:
-                return String(localized: "Release the dragged items to add them to the queue.", comment: "VoiceOver hint for drop zone while dragging.")
-            case .organizeInbox:
-                return String(localized: "Release the dragged items to sort files from your watch folder.", comment: "VoiceOver hint for organizer drop zone while dragging.")
-            }
+            return String(localized: "Release the dragged items to sort files from your watch folder.", comment: "VoiceOver hint for organizer drop zone while dragging.")
         case .processing:
-            switch workflow {
-            case .compress:
-                return String(localized: "Compression is in progress.", comment: "VoiceOver hint while compressing.")
-            case .organizeInbox:
-                return String(localized: "Sorting is in progress.", comment: "VoiceOver hint while sorting inbox.")
-            }
+            return String(localized: "Sorting is in progress.", comment: "VoiceOver hint while sorting inbox.")
         case .done:
             return String(localized: "Activate to choose more files.", comment: "VoiceOver hint for drop zone when a batch finished.")
         }
@@ -127,11 +90,11 @@ struct DropZoneView: View {
         case .hovering:
             ZStack {
                 Circle()
-                    .stroke(Color.accentColor.opacity(0.18), lineWidth: 1.5)
+                    .stroke(binkyTintColor.opacity(0.18), lineWidth: 1.5)
                     .frame(width: 144, height: 144)
                     .scaleEffect(ringScale).opacity(ringOpacity)
                 Circle()
-                    .stroke(Color.accentColor.opacity(0.28), lineWidth: 1.5)
+                    .stroke(binkyTintColor.opacity(0.28), lineWidth: 1.5)
                     .frame(width: 110, height: 110)
                     .scaleEffect(ringScale).opacity(ringOpacity)
                 Circle()
@@ -140,7 +103,7 @@ struct DropZoneView: View {
                                  Color(red: 0.79, green: 0.18, blue: 0.56)],
                         startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(width: 80, height: 80)
-                    .shadow(color: Color.accentColor.opacity(0.45), radius: 18, x: 0, y: 6)
+                    .shadow(color: binkyTintColor.opacity(0.45), radius: 18, x: 0, y: 6)
                 Image(systemName: "arrow.down")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(.white)
@@ -155,7 +118,7 @@ struct DropZoneView: View {
         case .processing:
             Image(systemName: "arrow.triangle.2.circlepath")
                 .font(.system(size: 52, weight: .ultraLight))
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(binkyTintColor)
                 .symbolRotationRepeatingEffect()
 
         case .done:
@@ -189,23 +152,14 @@ struct DropZoneView: View {
                     .font(.title3).foregroundStyle(.primary)
                 Text(String(localized: "or click to browse", comment: "Drop zone idle hint."))
                     .font(.caption).foregroundStyle(.secondary)
-                Button(action: onPaste) {
-                    Text(String(localized: "or paste (\(prefs.shortcut(for: .pasteClipboard).displayString))", comment: "Drop zone; argument is paste shortcut."))
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                }
-                .buttonStyle(.plain)
-                .contentShape(Rectangle())
-                if workflow == .organizeInbox {
-                    Text(S.organizerDropHint)
-                        .font(.caption2)
-                        .foregroundStyle(.quaternary)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 4)
-                }
+                Text(S.organizerDropHint)
+                    .font(.caption2)
+                    .foregroundStyle(.quaternary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 4)
             }
         case .hovering:
-            Text(hoveringCaption)
+            Text(String(localized: "Release to sort", comment: "Organizer drop zone while dragging files."))
                 .font(.title3.weight(.semibold)).foregroundStyle(.white)
                 .padding(.horizontal, 18).padding(.vertical, 8)
                 .background(
@@ -213,29 +167,11 @@ struct DropZoneView: View {
                         colors: [Color(red: 0.93, green: 0.24, blue: 0.48),
                                  Color(red: 0.79, green: 0.18, blue: 0.56)],
                         startPoint: .leading, endPoint: .trailing))
-                    .shadow(color: Color.accentColor.opacity(0.4), radius: 12, x: 0, y: 4))
+                    .shadow(color: binkyTintColor.opacity(0.4), radius: 12, x: 0, y: 4))
         case .processing:
-            Text(processingCaption).font(.title3).foregroundStyle(.secondary)
+            Text(String(localized: "Sorting…", comment: "Organizer drop zone while sorting.")).font(.title3).foregroundStyle(.secondary)
         case .done:
             Text(String(localized: "All done!", comment: "Drop zone when batch completes.")).font(.title3.weight(.medium)).foregroundStyle(Color.green)
-        }
-    }
-
-    private var hoveringCaption: String {
-        switch workflow {
-        case .compress:
-            return String(localized: "Release to compress", comment: "Drop zone while dragging files.")
-        case .organizeInbox:
-            return String(localized: "Release to sort", comment: "Organizer drop zone while dragging files.")
-        }
-    }
-
-    private var processingCaption: String {
-        switch workflow {
-        case .compress:
-            return String(localized: "Compressing…", comment: "Drop zone during compression.")
-        case .organizeInbox:
-            return String(localized: "Sorting…", comment: "Organizer drop zone while sorting.")
         }
     }
 
@@ -264,7 +200,7 @@ private extension View {
 private enum FileCardType {
     case image, video, pdf
 
-    /// UTTypes aligned with Binky-supported types (see `MediaType`).
+    /// UTTypes aligned with common inbox file kinds (icons only).
     var workspaceContentType: UTType {
         switch self {
         case .image: return .jpeg

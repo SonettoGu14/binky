@@ -15,7 +15,7 @@ enum BinkySubscriptionTier: String, Codable, Sendable {
     }
 }
 
-// MARK: - Semantic buckets + starter folders
+// MARK: - Semantic destinations + starter folders
 
 enum FileSortCategory: String, CaseIterable, Codable, Sendable {
     case images, pdf, video, audio, documents, archives, apps, screenshots, misc, review
@@ -44,6 +44,15 @@ enum FileSortCategory: String, CaseIterable, Codable, Sendable {
         default: return "New"
         }
     }
+
+    /// Three-bucket visuals for organizer empty-state animation. Non-image/video routes to `documents`.
+    var sortAnimationBucket: SortAnimationBucket {
+        switch self {
+        case .images, .screenshots: return .images
+        case .video: return .videos
+        case .pdf, .audio, .documents, .archives, .apps, .misc, .review: return .documents
+        }
+    }
 }
 
 enum SortDisposition: String, Codable, Sendable {
@@ -67,6 +76,8 @@ struct SortBatchOutcome: Identifiable, Equatable, Codable, Sendable {
     let started: Date
     let elapsed: TimeInterval
     let entries: [SortBatchEntry]
+    /// Secondary messages (Finder tag failures, offline tools, etc.) — not persisted as audit rows.
+    var ancillaryWarnings: [String]
 
     var movedCount: Int { entries.filter { $0.disposition == .moved }.count }
     var keptCount: Int { entries.filter { $0.disposition == .kept }.count }
@@ -80,7 +91,7 @@ struct SortBatchOutcome: Identifiable, Equatable, Codable, Sendable {
         })
     }
 
-    /// Review bucket moves (confidence path).
+    /// Review destination moves (confidence path).
     var reviewQueuedCount: Int {
         entries.filter { $0.disposition == .moved && $0.category == .review }.count
     }
@@ -95,11 +106,36 @@ struct SortBatchOutcome: Identifiable, Equatable, Codable, Sendable {
         }
     }
 
-    init(id: UUID, started: Date, elapsed: TimeInterval, entries: [SortBatchEntry]) {
+    init(id: UUID, started: Date, elapsed: TimeInterval, entries: [SortBatchEntry], ancillaryWarnings: [String] = []) {
         self.id = id
         self.started = started
         self.elapsed = elapsed
         self.entries = entries
+        self.ancillaryWarnings = ancillaryWarnings
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, started, elapsed, entries, ancillaryWarnings
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        started = try c.decode(Date.self, forKey: .started)
+        elapsed = try c.decode(TimeInterval.self, forKey: .elapsed)
+        entries = try c.decode([SortBatchEntry].self, forKey: .entries)
+        ancillaryWarnings = try c.decodeIfPresent([String].self, forKey: .ancillaryWarnings) ?? []
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(started, forKey: .started)
+        try c.encode(elapsed, forKey: .elapsed)
+        try c.encode(entries, forKey: .entries)
+        if !ancillaryWarnings.isEmpty {
+            try c.encode(ancillaryWarnings, forKey: .ancillaryWarnings)
+        }
     }
 }
 
@@ -119,7 +155,11 @@ private func looksTransientIncomplete(_ url: URL) -> Bool {
 
 // MARK: - Stability waits
 
-private func waitUntilStable(at url: URL, maxSeconds: Double = 120) async -> Bool {
+private func waitUntilStable(
+    at url: URL,
+    maxSeconds: Double = 120,
+    continueCheck: (() async -> Bool)? = nil
+) async -> Bool {
     let fm = FileManager.default
     var lastBytes: Int64?
     var lastMod: Date?
@@ -127,6 +167,9 @@ private func waitUntilStable(at url: URL, maxSeconds: Double = 120) async -> Boo
     let end = Date().addingTimeInterval(maxSeconds)
 
     while Date() < end {
+        if let continueCheck, await continueCheck() == false {
+            return false
+        }
         guard fm.fileExists(atPath: url.path) else { return false }
         do {
             let v = try url.resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey])
@@ -206,9 +249,11 @@ enum FinderTagApplicator {
 
     private static let xattrName = "com.apple.metadata:_kMDItemUserTags"
 
-    static func merge(_ newTags: [String], onto url: URL) {
+    /// - Returns: Whether the xattr write succeeded (or was a no-op merge).
+    @discardableResult
+    static func merge(_ newTags: [String], onto url: URL) -> Bool {
         let trimmed = newTags.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
-        guard !trimmed.isEmpty else { return }
+        guard !trimmed.isEmpty else { return true }
 
         let path = url.path
 
@@ -217,14 +262,20 @@ enum FinderTagApplicator {
 
         guard let data = try? PropertyListSerialization.data(fromPropertyList: merged, format: .binary, options: 0),
               merged != existingNormalized || existingPlistData(onPath: path) == nil
-        else { return }
+        else { return true }
 
+        var ok = false
         path.withCString { cPath in
             data.withUnsafeBytes { ptr in
-                let buf = UnsafeRawPointer(ptr.bindMemory(to: UInt8.self).baseAddress!)
-                let _ = Darwin.setxattr(cPath, xattrName, buf, data.count, 0, 0)
+                guard let base = ptr.bindMemory(to: UInt8.self).baseAddress else {
+                    ok = false
+                    return
+                }
+                let rc = Darwin.setxattr(cPath, xattrName, base, data.count, 0, 0)
+                ok = (rc == 0)
             }
         }
+        return ok
     }
 
     /// Removes tag names (case-insensitive) from Finder tags, rewriting the xattr as a simple string list.
@@ -350,7 +401,7 @@ private enum PostSortShortcutRunner {
 
 // MARK: - Physical layout helpers
 
-enum StarterBuckets {
+enum StarterDestinations {
     static func directory(for cat: FileSortCategory, root: URL) -> URL {
         root.appendingPathComponent(cat.downloadsSubfolder, isDirectory: true)
     }
@@ -365,8 +416,19 @@ enum StarterBuckets {
 
 // MARK: - Orchestrator
 
+/// Summary of undoing a stored list of `(destination, source)` pairs (reverses sort moves).
+struct UndoMovesSummary: Sendable {
+    let attempted: Int
+    let failures: Int
+}
+
 @MainActor
 final class DownloadsSortOrchestrator {
+    private enum SortControlState {
+        case running
+        case paused
+        case stopRequested
+    }
 
     static let shared = DownloadsSortOrchestrator()
 
@@ -390,6 +452,48 @@ final class DownloadsSortOrchestrator {
 
     /// `(destination,isOriginalSource)`
     private(set) var lastUndoPairs: [(URL, URL)] = []
+
+    /// ID of the outcome from the last finished `sort` pass (for clearing pinned undo when the summary sheet undoes that same batch).
+    private(set) var lastCompletedSortID: UUID?
+
+    /// Only one sort pass at a time — concurrent entry points queue or no-op (see single-flight `sort`).
+    private(set) var isSorting: Bool = false
+    private var sortControlState: SortControlState = .running
+
+    var canPause: Bool {
+        isSorting && sortControlState == .running
+    }
+
+    var canResume: Bool {
+        isSorting && sortControlState == .paused
+    }
+
+    var canStop: Bool {
+        isSorting && sortControlState != .stopRequested
+    }
+
+    func pauseCurrentSort() {
+        guard canPause else { return }
+        sortControlState = .paused
+        SortProgressTracker.shared.setRunState(.paused)
+    }
+
+    func resumeCurrentSort() {
+        guard canResume else { return }
+        sortControlState = .running
+        SortProgressTracker.shared.setRunState(.running)
+    }
+
+    func stopCurrentSort() {
+        guard canStop else { return }
+        sortControlState = .stopRequested
+        SortProgressTracker.shared.setRunState(.stopping)
+    }
+
+    /// Empty outcome for early returns (no-op / busy); `hasWork == false`.
+    private static func emptyOutcome() -> SortBatchOutcome {
+        SortBatchOutcome(id: UUID(), started: Date(), elapsed: 0, entries: [])
+    }
 
     /// Shows where files would land **without** waiting on stability or moving anything.
     func previewSort(files urls: [URL], prefs: BinkyPreferences) -> [SortPreviewEntry] {
@@ -449,7 +553,7 @@ final class DownloadsSortOrchestrator {
                 if rule.renameStyle != .none { renameCounter += 1 }
             } else {
                 category = FileClassification.categorize(url: standardized)
-                destinationDir = StarterBuckets.directory(for: category, root: inboxRoot)
+                destinationDir = StarterDestinations.directory(for: category, root: inboxRoot)
                 preferredFilename = standardized.lastPathComponent
             }
 
@@ -522,44 +626,99 @@ final class DownloadsSortOrchestrator {
         previewSort(files: Self.topLevelInboxFiles(prefs: prefs), prefs: prefs)
     }
 
-    func sort(files urls: [URL], prefs: BinkyPreferences) async -> SortBatchOutcome {
+    /// Matches the guards at the beginning of ``sort``: only regular files that exist.
+    private func urlsEligibleForSortPass(_ urls: [URL]) -> [URL] {
         let fm = FileManager.default
+        var ordered: [URL] = []
+        for raw in urls {
+            let standardized = raw.standardizedFileURL
+            guard standardized.isFileURL else { continue }
+            var isDir: ObjCBool = false
+            guard fm.fileExists(atPath: standardized.path, isDirectory: &isDir), !isDir.boolValue else { continue }
+            ordered.append(standardized)
+        }
+        return ordered
+    }
+
+    func sort(files urls: [URL], prefs: BinkyPreferences, progress: (@Sendable (SortProgressEvent) -> Void)? = nil) async -> SortBatchOutcome {
+        let fm = FileManager.default
+
+        guard !isSorting else {
+            NotificationCenter.default.post(name: .binkySortRejectedBecauseBusy, object: nil)
+            return Self.emptyOutcome()
+        }
+
+        isSorting = true
+        sortControlState = .running
+        SortProgressTracker.shared.setRunState(.running)
+        defer {
+            isSorting = false
+            sortControlState = .running
+        }
+
         let startedAt = Date()
         prefs.reconcileFolderBookmarksIfNeeded()
 
         let uniqueRoots = Set(urls.map { prefs.sortContext(for: $0.standardizedFileURL).inboxRoot })
         for root in uniqueRoots {
-            StarterBuckets.ensure(downloadsRoot: root)
+            StarterDestinations.ensure(downloadsRoot: root)
+        }
+
+        let workURLs = urlsEligibleForSortPass(urls)
+        progress?(.batchStarted(total: workURLs.count))
+        defer {
+            progress?(.batchEnded)
         }
 
         var rows: [SortBatchEntry] = []
         var renameCounter = 1
+        var tagWriteFailures = 0
 
-        for raw in urls {
-            let standardized = raw.standardizedFileURL
-            guard standardized.isFileURL else { continue }
+        for standardized in workURLs {
+            guard await continueWhenSortPermitsProgress() else { break }
+            let pathKey = standardized.path
+            let displayName = standardized.lastPathComponent
+            var didReportFileStarted = false
+            defer {
+                if didReportFileStarted {
+                    progress?(.fileFinished(path: pathKey))
+                }
+            }
 
-            var isDir: ObjCBool = false
-            guard fm.fileExists(atPath: standardized.path, isDirectory: &isDir), !isDir.boolValue else { continue }
+            func emitFileStarted(categoryForAnimation: FileSortCategory) {
+                progress?(.fileStarted(path: pathKey, displayName: displayName, animationBucket: categoryForAnimation.sortAnimationBucket))
+                didReportFileStarted = true
+            }
 
             if looksTransientIncomplete(standardized) {
+                emitFileStarted(categoryForAnimation: .review)
                 rows.append(entry(path: standardized.path, dest: nil, category: .review, disposition: .skippedTransient,
-                                  reason: String(localized: "Temporary download artifact — skipping until finalized.", comment: "Sort log."),
-                                  matchedRuleName: nil))
+                    reason: String(localized: "Temporary download artifact — skipping until finalized.", comment: "Sort log."),
+                    matchedRuleName: nil))
                 continue
             }
 
-            guard await waitUntilStable(at: standardized) else {
+            guard await waitUntilStable(at: standardized, continueCheck: { [weak self] in
+                guard let self else { return false }
+                return await self.continueWhenSortPermitsProgress()
+            }) else {
+                if sortControlState == .stopRequested {
+                    break
+                }
+                emitFileStarted(categoryForAnimation: .review)
                 rows.append(entry(path: standardized.path, dest: nil, category: .review, disposition: .skippedStableCheckTimeout,
-                                  reason: String(localized: "File never stabilized before timeout.", comment: "Sort log."),
-                                  matchedRuleName: nil))
+                    reason: String(localized: "File never stabilized before timeout.", comment: "Sort log."),
+                    matchedRuleName: nil))
                 continue
             }
+
+            guard await continueWhenSortPermitsProgress() else { break }
 
             if SortRulesEvaluator.isExcluded(url: standardized, prefs: prefs) {
+                emitFileStarted(categoryForAnimation: .misc)
                 rows.append(entry(path: standardized.path, dest: nil, category: .misc, disposition: .skippedExcluded,
-                                  reason: String(localized: "Skipped — file matches your ignore list.", comment: "Sort log."),
-                                  matchedRuleName: nil))
+                    reason: String(localized: "Skipped — file matches your ignore list.", comment: "Sort log."),
+                    matchedRuleName: nil))
                 continue
             }
 
@@ -590,15 +749,17 @@ final class DownloadsSortOrchestrator {
                 ruleName = rule.name
             } else {
                 category = FileClassification.categorize(url: standardized)
-                destinationDir = StarterBuckets.directory(for: category, root: inboxRoot)
+                destinationDir = StarterDestinations.directory(for: category, root: inboxRoot)
                 preferredFilename = standardized.lastPathComponent
                 ruleName = nil
             }
 
+            emitFileStarted(categoryForAnimation: category)
+
             if standardized.deletingLastPathComponent().standardizedFileURL == destinationDir.standardizedFileURL,
                standardized.lastPathComponent == preferredFilename {
                 rows.append(entry(path: standardized.path, dest: standardized.path, category: category, disposition: .kept,
-                                  reason: String(localized: "Already sorted into this bucket.", comment: "Sort log."),
+                                  reason: String(localized: "Already sorted into this destination.", comment: "Sort log."),
                                   matchedRuleName: ruleName))
                 continue
             }
@@ -610,10 +771,13 @@ final class DownloadsSortOrchestrator {
                 try fm.moveItem(at: standardized, to: target)
 
                 if prefs.assignFinderTagsOnSortEnabled {
-                    FinderTagApplicator.merge(
+                    let okTag = FinderTagApplicator.merge(
                         composedFinderTagsForSort(prefs: prefs, category: category, preset: preset, matchedRule: matchedRule),
                         onto: target
                     )
+                    if !okTag {
+                        tagWriteFailures += 1
+                    }
                 }
 
                 if prefs.assignFinderTagsOnSortEnabled, prefs.sortAppendNewSemanticTagEnabled,
@@ -650,9 +814,30 @@ final class DownloadsSortOrchestrator {
                 return (URL(fileURLWithPath: dst), URL(fileURLWithPath: row.sourcePath))
             }
 
-        let outcome = SortBatchOutcome(id: UUID(), started: startedAt, elapsed: elapsed, entries: rows)
+        var warnings: [String] = []
+        if tagWriteFailures > 0 {
+            let msg =
+                tagWriteFailures == 1
+                ? String(localized: "Finder tags didn’t stick for one file — the sort still landed.", comment: "Sort ancillary warning; single-file tag failure.")
+                : String(
+                    localized: "Finder tags didn’t stick for \(tagWriteFailures) files — the sort still landed.",
+                    comment: "Sort ancillary warning; multiple tag failures. Argument is integer count."
+                )
+            warnings.append(msg)
+        }
+
+        let outcome = SortBatchOutcome(id: UUID(), started: startedAt, elapsed: elapsed, entries: rows, ancillaryWarnings: warnings)
+        lastCompletedSortID = outcome.id
         prefs.appendSortOutcomeRecord(outcome)
         return outcome
+    }
+
+    private func continueWhenSortPermitsProgress() async -> Bool {
+        while isSorting, sortControlState == .paused {
+            try? await Task.sleep(for: .milliseconds(130))
+            if Task.isCancelled { return false }
+        }
+        return sortControlState != .stopRequested
     }
 
     private func destinationDisplayLabel(root: URL, destinationDir: URL) -> String {
@@ -684,58 +869,34 @@ final class DownloadsSortOrchestrator {
         )
     }
 
-    func undoLastBatchUsingPairs() async {
+    /// Reverses the given move pairs: pulls each file back from `destination` to `source`.
+    func undoMovesReversingSort(_ pairs: [(destination: URL, source: URL)], clearPinnedUndoIfOutcomeID outcomeID: UUID?) async -> UndoMovesSummary {
         let fm = FileManager.default
-        for pair in lastUndoPairs.reversed() {
-            if fm.fileExists(atPath: pair.0.path) {
-                try? fm.moveItem(at: pair.0, to: pair.1)
+        var failures = 0
+        let attempted = pairs.count
+        for pair in pairs.reversed() {
+            guard fm.fileExists(atPath: pair.destination.path) else {
+                failures += 1
+                continue
+            }
+            do {
+                try fm.moveItem(at: pair.destination, to: pair.source)
+            } catch {
+                failures += 1
             }
         }
-        lastUndoPairs = []
-    }
-}
-
-extension BinkyPreferences {
-
-    /// Canonical watched inbox root (defaults to Downloads; honors global watch-folder bookmark path).
-    func downloadsSortRootDirectory() -> URL {
-        reconcileFolderBookmarksIfNeeded()
-        if folderWatchEnabled, !watchedFolderPath.isEmpty {
-            let normalized = watchedFolderPath.replacingOccurrences(of: "~", with: NSHomeDirectory())
-            return URL(fileURLWithPath: normalized).standardizedFileURL
+        if let outcomeID, outcomeID == lastCompletedSortID, failures == 0, attempted > 0 {
+            lastUndoPairs = []
         }
-        return FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Downloads", isDirectory: true)
-            .standardizedFileURL
+        return UndoMovesSummary(attempted: attempted, failures: failures)
     }
 
-    /// Finder tags layered on freshly sorted items (semantic tag + optional “New”).
-    func sortTagComposition(forCategory category: FileSortCategory) -> [String] {
-        var tags: [String] = []
-        if sortAppendNewSemanticTagEnabled { tags.append("New") }
-        tags.append(category.semanticTagHint)
-        return tags
-    }
-
-    /// Persists coarse history alongside compression sessions (`SessionRecord.batchSummaryData` carries `SortBatchOutcome` JSON).
-    func appendSortOutcomeRecord(_ outcome: SortBatchOutcome) {
-        let payload = try? JSONEncoder().encode(outcome)
-        guard let data = payload else { return }
-
-        let record = SessionRecord(
-            id: outcome.id,
-            timestamp: outcome.started,
-            fileCount: outcome.entries.count,
-            totalBytesSaved: Int64(outcome.entries.filter { $0.disposition == .moved }.count),
-            formats: outcome.entries.isEmpty
-                ? ["Downloads sort"]
-                : Array(Set(outcome.entries.map(\.category.rawValue))).sorted(),
-            batchSummaryData: data
-        )
-
-        var hist = sessionHistory
-        hist.insert(record, at: 0)
-        sessionHistory = Array(hist.prefix(50))
+    /// Undoes the orchestrator’s pinned “last batch” pairs (same as the most recent successful sort).
+    func undoMostRecentPinnedBatchMoves() async -> UndoMovesSummary {
+        let mapped = lastUndoPairs.map { (destination: $0.0, source: $0.1) }
+        let summary = await undoMovesReversingSort(mapped, clearPinnedUndoIfOutcomeID: nil)
+        lastUndoPairs = []
+        return summary
     }
 }
 
@@ -757,8 +918,26 @@ struct SortOutcomeSheet: View {
     var onRevealDestination: (SortBatchEntry) -> Void = { _ in }
     var onUndo: () -> Void = {}
     var onDismiss: () -> Void = {}
+    /// Feedback for transient organizer banner (partial undo / Dinky handoff).
+    var onTransientStatus: ((String) -> Void)?
+
+    init(
+        outcome: SortBatchOutcome,
+        onRevealDestination: @escaping (SortBatchEntry) -> Void = { _ in },
+        onUndo: @escaping () -> Void = {},
+        onDismiss: @escaping () -> Void = {},
+        onTransientStatus: ((String) -> Void)? = nil
+    ) {
+        self.outcome = outcome
+        self.onRevealDestination = onRevealDestination
+        self.onUndo = onUndo
+        self.onDismiss = onDismiss
+        self.onTransientStatus = onTransientStatus
+    }
 
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var sortProgress = SortProgressTracker.shared
+    @State private var undoFootnote: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -770,6 +949,13 @@ struct SortOutcomeSheet: View {
                 statChip(title: String(localized: "Kept", comment: "Sort audit"), value: outcome.keptCount, systemImage: "checkmark.circle")
                 statChip(title: String(localized: "Skipped", comment: "Sort audit"), value: outcome.skippedCount, systemImage: "minus.circle")
                 statChip(title: String(localized: "Review", comment: "Sort audit queue"), value: outcome.reviewQueuedCount, systemImage: "questionmark.circle")
+            }
+
+            ForEach(Array(outcome.ancillaryWarnings.enumerated()), id: \.offset) { _, line in
+                Text(line)
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Divider()
@@ -795,25 +981,93 @@ struct SortOutcomeSheet: View {
             }
             .frame(minHeight: 180, maxHeight: 320)
 
+            dinkySection
+
             HStack {
                 Button(role: .cancel, action: { onDismiss(); dismiss() }) {
                     Text(String(localized: "Close", comment: "Sort audit sheet dismiss."))
                 }
                 Button(String(localized: "Undo moves", comment: "Sort audit")) {
+                    undoFootnote = nil
                     Task {
-                        await DownloadsSortOrchestrator.shared.undoLastBatchUsingPairs()
-                        onUndo()
-                        dismiss()
-                        onDismiss()
+                        let summary = await DownloadsSortOrchestrator.shared.undoMovesReversingSort(
+                            outcome.reversibleMoves,
+                            clearPinnedUndoIfOutcomeID: outcome.id
+                        )
+                        if summary.failures > 0 {
+                            undoFootnote = String(
+                                localized: "\(summary.failures) of \(summary.attempted) moves couldn’t be undone — files may have moved or been renamed.",
+                                comment: "Sort sheet undo partial failure footer. Arguments are counts."
+                            )
+                        } else if summary.attempted > 0 {
+                            onUndo()
+                            dismiss()
+                            onDismiss()
+                        }
                     }
                 }
                 .keyboardShortcut("z", modifiers: [.command])
-                .disabled(outcome.reversibleMoves.isEmpty)
+                .disabled(outcome.reversibleMoves.isEmpty || sortProgress.isActive)
                 Spacer()
             }
+
+            if let undoFootnote {
+                Text(undoFootnote)
+                    .font(.caption2)
+                    .foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Text(String(localized: "Undo moves puts files back where they were before this sort.", comment: "Sort sheet footer."))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
         }
         .padding(24)
         .frame(minWidth: 520)
+    }
+
+    @ViewBuilder
+    private var dinkySection: some View {
+        let movedURLs: [URL] = outcome.entries.compactMap { e in
+            guard e.disposition == .moved, let d = e.destinationPath else { return nil }
+            return URL(fileURLWithPath: d)
+        }
+        let compressible = DinkyBridge.compressibleURLs(from: movedURLs)
+        if compressible.isEmpty {
+            EmptyView()
+        } else {
+            VStack(alignment: .leading, spacing: 10) {
+                Divider()
+                Text(String(localized: "Dinky", comment: "Sort sheet: Dinky handoff section title."))
+                    .font(.subheadline.weight(.semibold))
+                if DinkyBridge.isInstalled {
+                    Button(String.localizedStringWithFormat(String(localized: "Send %lld files to Dinky", comment: "Sort sheet: handoff button; file count."), Int64(compressible.count))) {
+                        let msg = String(localized: "Dinky couldn’t open these — try installing or reopening it.", comment: "Organizer transient when Dinky app handoff fails.")
+                        _ = DinkyBridge.openFiles(compressible) { ok in
+                            guard !ok else { return }
+                            Task { @MainActor in onTransientStatus?(msg) }
+                        }
+                    }
+                    let folders = DinkyBridge.uniqueFolders(containing: compressible)
+                    ForEach(folders, id: \.path) { folder in
+                        Button {
+                            let msg = String(localized: "Couldn’t open that folder in Dinky.", comment: "Organizer transient when Dinky folder handoff fails.")
+                            _ = DinkyBridge.openFolder(folder) { ok in
+                                guard !ok else { return }
+                                Task { @MainActor in onTransientStatus?(msg) }
+                            }
+                        } label: {
+                            Text(String.localizedStringWithFormat(String(localized: "Watch “%@” in Dinky →", comment: "Sort sheet: watch chain; folder name."), folder.lastPathComponent))
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(binkyTintColor)
+                    }
+                } else {
+                    Link(String(localized: "Compress these with Dinky ↗", comment: "Sort sheet: marketing link when Dinky not installed."), destination: DinkyBridge.marketingURL)
+                        .font(.caption)
+                }
+            }
+        }
     }
 
     private func statChip(title: String, value: Int, systemImage: String) -> some View {
@@ -840,12 +1094,15 @@ final class WatchSortCoordinator {
     private let watcher = FolderWatcher()
     private var subscriptions = Set<AnyCancellable>()
 
+    private var ingestTask: Task<Void, Never>?
+    private var queuedIncoming: Set<URL> = []
+
     init(prefs: BinkyPreferences, viewModel: OrganizerViewModel) {
         self.prefs = prefs
         self.viewModel = viewModel
 
         watcher.onNewFiles = { [weak self] incoming in
-            self?.handleIncoming(incoming)
+            self?.enqueueIncomingForDebouncedSort(incoming)
         }
 
         restartWatcherIfNeeded()
@@ -885,11 +1142,27 @@ final class WatchSortCoordinator {
         watcher.start(paths: paths)
     }
 
-    private func handleIncoming(_ incoming: [URL]) {
-        let dedup = Array(Set(incoming.map(\.standardizedFileURL))).filter(\.isFileURL)
+    private func enqueueIncomingForDebouncedSort(_ incoming: [URL]) {
+        let dedup = incoming.map(\.standardizedFileURL).filter(\.isFileURL)
         guard !dedup.isEmpty else { return }
-        Task { @MainActor in
-            let outcome = await DownloadsSortOrchestrator.shared.sort(files: dedup, prefs: prefs)
+        queuedIncoming.formUnion(dedup)
+        ingestTask?.cancel()
+        ingestTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            while DownloadsSortOrchestrator.shared.isSorting {
+                try? await Task.sleep(for: .milliseconds(120))
+                if Task.isCancelled { return }
+            }
+            try? await Task.sleep(for: .milliseconds(800))
+            if Task.isCancelled { return }
+            let batch = Array(queuedIncoming)
+            queuedIncoming.removeAll()
+            guard !batch.isEmpty else { return }
+            let outcome = await DownloadsSortOrchestrator.shared.sort(
+                files: batch,
+                prefs: prefs,
+                progress: SortProgressTracker.orchestratorClosure()
+            )
             guard outcome.hasWork else { return }
             viewModel.deliverCompletedSort(outcome, prefs: prefs)
         }

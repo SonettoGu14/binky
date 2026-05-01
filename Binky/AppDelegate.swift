@@ -3,10 +3,7 @@ import UserNotifications
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
-    private var globalPasteHotkeyObserver: NSObjectProtocol?
-
     func applicationDidFinishLaunching(_ notification: Notification) {
-        migratePDFMaxFileSizeIfNeeded()
         DiagnosticsReporter.shared.startMonitoring()
         UNUserNotificationCenter.current().delegate = self
         GlobalHotkeyManager.shared.syncFromDefaults()
@@ -18,13 +15,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         BinkyActivationPolicy.normalizeMenuBarDefaultsAtLaunch()
         BinkyActivationPolicy.apply(menuBarOnly: UserDefaults.standard.bool(forKey: "ui.menuBarOnlyMode"))
         BinkyMenuBarController.shared.refresh()
-        globalPasteHotkeyObserver = NotificationCenter.default.addObserver(
-            forName: .binkyGlobalPasteHotkeyChanged,
-            object: nil,
-            queue: .main
-        ) { _ in
-            GlobalHotkeyManager.shared.syncFromDefaults()
-        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -66,12 +56,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.post(name: .binkyOpenFiles, object: accepted)
     }
 
-    // MARK: - Clipboard Compress menu command
-
-    @objc func compressFromClipboard(_ sender: Any?) {
-        NotificationCenter.default.post(name: .binkyPasteClipboard, object: nil)
-    }
-
     // MARK: - Right-click → Services → Sort with Binky
 
     @objc func sortWithBinky(
@@ -99,16 +83,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Older builds allowed sub‑MB targets; clamp global PDF max size to 5–25 MB to match current presets.
-    private func migratePDFMaxFileSizeIfNeeded() {
-        let key = "pdfMaxFileSizeKB"
-        let v = UserDefaults.standard.integer(forKey: key)
-        guard v != 0 else { return }
-        let clamped = clampPDFMaxFileSizeKB(v)
-        if clamped != v {
-            UserDefaults.standard.set(clamped, forKey: key)
-        }
-    }
 }
 
 // MARK: - UNUserNotificationCenterDelegate

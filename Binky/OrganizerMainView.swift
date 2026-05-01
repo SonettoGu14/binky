@@ -7,13 +7,12 @@ struct OrganizerMainView: View {
     @EnvironmentObject var prefs: BinkyPreferences
     @EnvironmentObject var updater: UpdateChecker
     @ObservedObject var vm: OrganizerViewModel
+    @ObservedObject private var sortProgress = SortProgressTracker.shared
     @ObservedObject private var diagnostics = DiagnosticsReporter.shared
 
-    @StateObject private var folderWatcher = FolderWatcher()
-
     @State private var isDropTargeted = false
-    @State private var isSorting = false
     @State private var showingHistorySheet = false
+    @State private var showingCurrentlySortingSheet = false
     @State private var showingSortPreview = false
     @State private var sortPreviewRows: [SortPreviewEntry] = []
 
@@ -38,19 +37,11 @@ struct OrganizerMainView: View {
             await updater.check()
         }
         .onAppear {
-            handleAppear()
+            BinkyMenuBarController.shared.refresh()
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-            updateFolderWatcher()
-        }
-        .onChange(of: prefs.folderWatchEnabled) { _, _ in updateFolderWatcher() }
-        .onChange(of: prefs.watchedFolderPath) { _, _ in updateFolderWatcher() }
-        .onChange(of: prefs.watchedFolderBookmark) { _, _ in updateFolderWatcher() }
-        .onChange(of: prefs.folderWatchPaused) { _, _ in updateFolderWatcher() }
         .onChange(of: prefs.showMenuBarIcon) { _, _ in
             BinkyMenuBarController.shared.refresh()
         }
-        .onChange(of: prefs.savedPresetsData) { _, _ in updateFolderWatcher() }
         .onReceive(NotificationCenter.default.publisher(for: .binkyShowHistory)) { _ in
             showingHistorySheet = true
         }
@@ -66,6 +57,9 @@ struct OrganizerMainView: View {
             )
             .environmentObject(prefs)
         }
+        .sheet(isPresented: $showingCurrentlySortingSheet) {
+            CurrentlySortingSheet()
+        }
         .sheet(isPresented: $showingSortPreview) {
             SortPreviewSheet(rows: sortPreviewRows)
         }
@@ -73,8 +67,10 @@ struct OrganizerMainView: View {
             SortOutcomeSheet(
                 outcome: outcome,
                 onUndo: { vm.applySortOutcomeDismissalDefaults() },
-                onDismiss: { vm.applySortOutcomeDismissalDefaults() }
+                onDismiss: { vm.applySortOutcomeDismissalDefaults() },
+                onTransientStatus: { vm.flashTransientStatus($0) }
             )
+            .id(sortOutcomeSheetRefreshID(for: outcome))
         }
         .sheet(item: $diagnostics.pendingCrashReport) { report in
             PostCrashReportSheet(report: report, diagnostics: diagnostics)
@@ -84,6 +80,7 @@ struct OrganizerMainView: View {
             diagnostics.pendingCrashReport = nil
             showingHistorySheet = false
             showingSortPreview = false
+            showingCurrentlySortingSheet = false
         }
     }
 
@@ -148,7 +145,7 @@ struct OrganizerMainView: View {
                     )
                     organizerSettingsSidebarLink(
                         tab: .profiles,
-                        title: String(localized: "Presets", comment: "Organizer sidebar shortcut to profiles tab."),
+                        title: String(localized: "Profiles", comment: "Organizer sidebar shortcut to profiles tab."),
                         systemImage: "slider.horizontal.3"
                     )
                     organizerSettingsSidebarLink(
@@ -180,7 +177,7 @@ struct OrganizerMainView: View {
             ForEach(prefs.savedPresets) { preset in
                 profileSelectionRow(
                     name: preset.name,
-                    subtitle: preset.includedMediaTypesSummaryLabel,
+                    subtitle: preset.organizerListSubtitle,
                     isActive: prefs.activePresetID == preset.id.uuidString
                 ) {
                     prefs.activePresetID = preset.id.uuidString
@@ -200,7 +197,7 @@ struct OrganizerMainView: View {
             HStack(alignment: .top, spacing: 6) {
                 Image(systemName: isActive ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 14))
-                    .foregroundStyle(isActive ? Color.accentColor : Color.primary.opacity(0.25))
+                    .foregroundStyle(isActive ? binkyTintColor : Color.primary.opacity(0.25))
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(name)
@@ -217,7 +214,7 @@ struct OrganizerMainView: View {
             .padding(.vertical, 6)
             .background(
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(isActive ? Color.accentColor.opacity(0.08) : Color.clear)
+                    .fill(isActive ? binkyTintColor.opacity(0.08) : Color.clear)
             )
         }
         .buttonStyle(.plain)
@@ -243,7 +240,7 @@ struct OrganizerMainView: View {
             PreferencesTab.stagePendingTab(tab)
         })
         .buttonStyle(.plain)
-        .foregroundStyle(Color.accentColor)
+        .foregroundStyle(binkyTintColor)
     }
 
     /// Dinky-style sidebar row: leading SF Symbol, accent label, trailing chevron, plain hit area.
@@ -263,7 +260,7 @@ struct OrganizerMainView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .foregroundStyle(Color.accentColor)
+        .foregroundStyle(binkyTintColor)
     }
 
     private func pickGlobalWatchFolder() {
@@ -282,6 +279,89 @@ struct OrganizerMainView: View {
 
     // MARK: - Main: activity feed
 
+    private var sortProgressBanner: some View {
+        Group {
+            if sortProgress.isActive {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 14) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(String(localized: "Sorting", comment: "Main pane banner title while inbox sort runs."))
+                                .font(.subheadline.weight(.semibold))
+                            if sortProgress.bannerCaption.isEmpty == false {
+                                Text(sortProgress.bannerCaption)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
+                                    .accessibilityLabel(sortProgress.bannerCaption)
+                            }
+                        }
+                        Spacer(minLength: 0)
+                        HStack(spacing: 6) {
+                            Button {
+                                if sortProgress.runState == .paused {
+                                    DownloadsSortOrchestrator.shared.resumeCurrentSort()
+                                } else {
+                                    DownloadsSortOrchestrator.shared.pauseCurrentSort()
+                                }
+                            } label: {
+                                Image(systemName: sortProgress.runState == .paused ? "play.fill" : "pause.fill")
+                                    .symbolRenderingMode(.hierarchical)
+                                    .font(.system(size: 14, weight: .semibold))
+                            }
+                            .buttonStyle(.plain)
+                            .foregroundStyle(binkyTintColor.opacity(sortProgress.runState == .stopping ? 0.5 : 0.9))
+                            .accessibilityLabel(
+                                sortProgress.runState == .paused
+                                    ? String(localized: "Resume sort", comment: "Main banner button to resume paused sort.")
+                                    : String(localized: "Pause sort", comment: "Main banner button to pause active sort.")
+                            )
+                            .disabled(sortProgress.runState == .stopping)
+
+                            Button {
+                                DownloadsSortOrchestrator.shared.stopCurrentSort()
+                            } label: {
+                                Image(systemName: "stop.fill")
+                                    .symbolRenderingMode(.hierarchical)
+                                    .font(.system(size: 14, weight: .semibold))
+                            }
+                            .buttonStyle(.plain)
+                            .foregroundStyle(.red.opacity(sortProgress.runState == .stopping ? 0.4 : 0.8))
+                            .accessibilityLabel(String(localized: "Stop sort", comment: "Main banner button to stop active sort."))
+                            .disabled(sortProgress.runState == .stopping)
+                        }
+                        Button {
+                            showingCurrentlySortingSheet = true
+                        } label: {
+                            Image(systemName: "chevron.down.circle.fill")
+                                .symbolRenderingMode(.hierarchical)
+                                .font(.system(size: 24))
+                                .foregroundStyle(binkyTintColor.opacity(0.85))
+                                .accessibilityLabel(String(localized: "Show sort details", comment: "Opens per-file sorting sheet."))
+                                .accessibilityHint(String(localized: "Shows filenames and activity for this sort.", comment: "VoiceOver hint for sort details button."))
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    BinkySortProgressBar(
+                        fraction: sortProgress.fraction,
+                        caption: nil,
+                        compact: false,
+                        showsCaption: false
+                    )
+                    .animation(.easeInOut(duration: 0.42), value: sortProgress.fraction)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, showReviewBanner ? 10 : 16)
+                .padding(.bottom, 14)
+                .background(Color.primary.opacity(0.035))
+                .overlay(alignment: .bottom) {
+                    Divider().opacity(0.22)
+                }
+            }
+        }
+    }
+
     private var activityMainPane: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 0) {
@@ -294,12 +374,18 @@ struct OrganizerMainView: View {
                         .opacity(0.35)
                 }
 
+                sortProgressBanner
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .animation(.easeOut(duration: 0.26), value: sortProgress.isActive)
+
+                transientNoticeBanner
+
                 activitySection
             }
 
             if isDropTargeted {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(Color.accentColor.opacity(0.45), style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
+                    .strokeBorder(binkyTintColor.opacity(0.45), style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
                     .padding(14)
                     .allowsHitTesting(false)
             }
@@ -308,16 +394,63 @@ struct OrganizerMainView: View {
 
     private var inboxControlsCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            settingsSectionHeading(
-                icon: "tray.full",
-                title: String(localized: "Watch Folder", comment: "Organizer sidebar watch folder controls title.")
-            )
+            HStack(spacing: 8) {
+                settingsSectionHeading(
+                    icon: "tray.full",
+                    title: String(localized: "Watch Folder", comment: "Organizer sidebar watch folder controls title.")
+                )
 
-            Text(watchedInboxPath)
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .foregroundStyle(.tertiary)
-                .lineLimit(2)
-                .truncationMode(.middle)
+                Spacer(minLength: 0)
+
+                if prefs.folderWatchEnabled {
+                    Button {
+                        prefs.folderWatchPaused.toggle()
+                    } label: {
+                        Image(systemName: prefs.folderWatchPaused ? "play.fill" : "pause.fill")
+                            .font(.system(size: 11, weight: .bold))
+                            .frame(width: 14, height: 14)
+                            .padding(5)
+                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(prefs.folderWatchPaused ? .green : binkyTintColor)
+                    .accessibilityLabel(
+                        prefs.folderWatchPaused
+                            ? String(localized: "Resume auto-sort", comment: "Play icon button that resumes auto-sort.")
+                            : String(localized: "Pause auto-sort", comment: "Pause icon button that pauses auto-sort.")
+                    )
+                    .accessibilityHint(
+                        prefs.folderWatchPaused
+                            ? String(localized: "Resumes reacting to new files in the inbox.", comment: "VoiceOver hint for resuming auto-sort.")
+                            : String(localized: "Temporarily stops reacting to new files in the inbox.", comment: "VoiceOver hint for pausing auto-sort.")
+                    )
+                }
+            }
+
+            HStack(alignment: .center, spacing: 8) {
+                Button {
+                    openInboxInFinder()
+                } label: {
+                    Text(watchedInboxPath)
+                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .foregroundStyle(binkyTintColor)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                        .truncationMode(.middle)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(String(localized: "Show in Finder", comment: "Reveal watched inbox in Finder."))
+                .accessibilityHint(String(localized: "Opens the watched folder in a Finder window.", comment: "VoiceOver hint for watch path button."))
+
+                if prefs.folderWatchEnabled {
+                    Button(String(localized: "Choose…", comment: "Watch folder chooser button.")) {
+                        pickGlobalWatchFolder()
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
+            }
 
             HStack(spacing: 10) {
                 Toggle(String(localized: "Watch", comment: "Short watch toggle in organizer sidebar inbox card."), isOn: Binding(
@@ -329,36 +462,19 @@ struct OrganizerMainView: View {
 
                 Spacer(minLength: 0)
 
-                if isSorting {
-                    ProgressView()
-                        .controlSize(.small)
+                if sortProgress.isActive {
+                    BinkySortProgressBar(
+                        fraction: sortProgress.fraction,
+                        caption: nil,
+                        compact: true,
+                        showsCaption: false
+                    )
+                    .frame(maxWidth: 140)
+                    .transition(.opacity)
                 }
             }
 
             if prefs.folderWatchEnabled {
-                HStack(spacing: 8) {
-                    Text(prefs.watchedFolderPath.isEmpty
-                         ? String(localized: "Watching Downloads (default)", comment: "Watch folder default label when no custom folder is selected.")
-                         : watchedInboxFolderName)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                    Spacer(minLength: 0)
-                    Button(String(localized: "Choose…", comment: "Watch folder chooser button.")) {
-                        pickGlobalWatchFolder()
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                }
-
-                Toggle(String(localized: "Pause auto-sort", comment: "Temporarily stop reacting to new files in the inbox."), isOn: Binding(
-                    get: { prefs.folderWatchPaused },
-                    set: { prefs.folderWatchPaused = $0 }
-                ))
-                .toggleStyle(.checkbox)
-                .font(.system(size: 11, weight: .medium))
-
                 if prefs.folderWatchPaused {
                     Text(String(localized: "Watching is on, but new files won’t sort until you resume.", comment: "Shown when auto-sort is paused."))
                         .font(.caption2)
@@ -368,17 +484,6 @@ struct OrganizerMainView: View {
 
             HStack(spacing: 10) {
                 Button {
-                    openInboxInFinder()
-                } label: {
-                    Text(String(localized: "Show in Finder", comment: "Reveal watched inbox in Finder."))
-                }
-                .buttonStyle(.plain)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(Color.accentColor)
-
-                Spacer(minLength: 0)
-
-                Button {
                     sortPreviewRows = vm.inboxPreviewEntries(prefs: prefs)
                     showingSortPreview = true
                 } label: {
@@ -387,8 +492,10 @@ struct OrganizerMainView: View {
                 .buttonStyle(.bordered)
                 .controlSize(.small)
 
+                Spacer(minLength: 0)
+
                 Button {
-                    Task { await runSortWork { await vm.runInteractiveDownloadsSweep(prefs: prefs) } }
+                    Task { await vm.runInteractiveDownloadsSweep(prefs: prefs) }
                 } label: {
                     Text(String(localized: "Sort Now", comment: "Primary sort button."))
                 }
@@ -401,12 +508,30 @@ struct OrganizerMainView: View {
         .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(.primary.opacity(0.03)))
     }
 
-    private var watchedInboxPath: String {
-        prefs.downloadsSortRootDirectory().path
+    private var transientNoticeBanner: some View {
+        Group {
+            if let msg = vm.transientBannerMessage, !sortProgress.isActive {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "ellipsis.bubble")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(msg)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 8)
+                .background(Color.primary.opacity(0.04))
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .animation(.easeOut(duration: 0.2), value: vm.transientBannerMessage)
     }
 
-    private var watchedInboxFolderName: String {
-        URL(fileURLWithPath: watchedInboxPath).lastPathComponent
+    private var watchedInboxPath: String {
+        prefs.activeSortSweepRootDirectory().path
     }
 
     private var reviewBanner: some View {
@@ -414,23 +539,22 @@ struct OrganizerMainView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(.yellow)
             VStack(alignment: .leading, spacing: 2) {
-                Text(String(localized: "Pending review", comment: "Organizer banner when review bucket has items."))
+                Text(String(localized: "Pending review", comment: "Organizer banner when the Review destination has items."))
                     .font(.subheadline.weight(.semibold))
                 Text(
-                    String.localizedStringWithFormat(
-                        String(localized: "%lld item(s) may need a look in Review.", comment: "Organizer banner detail; review count."),
-                        reviewBannerCount
-                    )
+                    String(localized: "\(reviewBannerCount) want a second look.", comment: "Organizer banner: files in Review needing attention; integer count interpolated.")
                 )
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
             Spacer(minLength: 0)
-            Button(String(localized: "Open Review in Finder", comment: "Reveal review bucket.")) {
+            Button(String(localized: "Open Review in Finder", comment: "Reveal Review destination in Finder.")) {
                 openReviewInFinder()
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
+            .foregroundStyle(.primary)
+            .tint(.white.opacity(0.32))
         }
         .padding(12)
         .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.primary.opacity(0.06)))
@@ -444,10 +568,20 @@ struct OrganizerMainView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             VStack(alignment: .leading, spacing: 8) {
-                Text(String(localized: "Recent activity", comment: "Organizer main section title."))
-                    .font(.headline)
-                    .padding(.horizontal, 20)
-                    .padding(.top, 14)
+                HStack(spacing: 12) {
+                    Text(String(localized: "Recent activity", comment: "Organizer main section title."))
+                        .font(.headline)
+                    Spacer(minLength: 0)
+                    Button(S.clear) {
+                        clearRecentActivity()
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(binkyTintColor)
+                    .font(.subheadline.weight(.medium))
+                    .accessibilityHint(String(localized: "Clears recent activity and returns to the empty state.", comment: "VoiceOver hint for clearing recent activity."))
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 14)
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 0) {
                         ForEach(rows) { row in
@@ -491,7 +625,7 @@ struct OrganizerMainView: View {
                 }
                 .buttonStyle(.plain)
                 .font(.caption)
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(binkyTintColor)
             }
         }
         .padding(.horizontal, 20)
@@ -526,7 +660,7 @@ struct OrganizerMainView: View {
     }
 
     private var reviewFolderItemCount: Int {
-        let root = prefs.downloadsSortRootDirectory()
+        let root = prefs.activeSortSweepRootDirectory()
         let reviewURL = root.appendingPathComponent(FileSortCategory.review.downloadsSubfolder, isDirectory: true)
         guard let contents = try? FileManager.default.contentsOfDirectory(at: reviewURL, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]) else {
             return 0
@@ -546,51 +680,27 @@ struct OrganizerMainView: View {
         )
     }
 
-    // MARK: - Actions
-
-    @MainActor
-    private func runSortWork(_ work: @escaping () async -> Void) async {
-        isSorting = true
-        defer { isSorting = false }
-        await work()
+    private func sortOutcomeSheetRefreshID(for outcome: SortBatchOutcome) -> String {
+        outcome.id.uuidString
     }
 
+    // MARK: - Actions
+
     private func openInboxInFinder() {
-        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: prefs.downloadsSortRootDirectory().path)
+        let root = prefs.activeSortSweepRootDirectory()
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: root.path)
     }
 
     private func openReviewInFinder() {
-        let root = prefs.downloadsSortRootDirectory()
+        let root = prefs.activeSortSweepRootDirectory()
         let reviewURL = root.appendingPathComponent(FileSortCategory.review.downloadsSubfolder, isDirectory: true)
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: reviewURL.path)
     }
 
-    private func handleAppear() {
-        updateFolderWatcher()
-    }
-
-    private func updateFolderWatcher() {
-        prefs.reconcileFolderBookmarksIfNeeded()
-        guard !prefs.folderWatchPaused else {
-            folderWatcher.stop()
-            return
-        }
-        let reg = WatchPipelineRegistry(prefs: prefs)
-        let paths = reg.watchedRootPaths
-        guard !paths.isEmpty else {
-            folderWatcher.stop()
-            return
-        }
-        folderWatcher.onNewFiles = { incoming in
-            Task { @MainActor in
-                let dedup = Array(Set(incoming.map(\.standardizedFileURL)))
-                guard !dedup.isEmpty else { return }
-                let outcome = await DownloadsSortOrchestrator.shared.sort(files: dedup, prefs: prefs)
-                guard outcome.hasWork else { return }
-                vm.deliverCompletedSort(outcome, prefs: prefs)
-            }
-        }
-        folderWatcher.start(paths: paths)
+    private func clearRecentActivity() {
+        prefs.sessionHistory = []
+        vm.lastSortOutcome = nil
+        vm.pendingSortOutcome = nil
     }
 
     private func handleDrop(_ providers: [NSItemProvider]) -> Bool {
@@ -614,7 +724,7 @@ struct OrganizerMainView: View {
         group.notify(queue: .main) {
             guard !collected.isEmpty else { return }
             Task {
-                await runSortWork { await vm.sortIncomingFiles(collected, prefs: prefs) }
+                await vm.sortIncomingFiles(collected, prefs: prefs)
             }
         }
         return true

@@ -110,7 +110,7 @@ private struct HelpBlockView: View {
         case .quote(let text):
             HStack(alignment: .top, spacing: 10) {
                 RoundedRectangle(cornerRadius: 1.5, style: .continuous)
-                    .fill(Color.accentColor.opacity(0.6))
+                    .fill(binkyTintColor.opacity(0.6))
                     .frame(width: 3)
                 Text(LocalizedStringKey(text))
                     .font(.system(size: 13))
@@ -195,7 +195,7 @@ enum HelpDocument {
     private static func substituteShortcuts(in markdown: String, prefs: BinkyPreferences) -> String {
         let pairs: [(String, String)] = [
             ("{{SK_OPEN_FILES}}", prefs.shortcut(for: .openFiles).displayString),
-            ("{{SK_SORT_NOW}}", prefs.shortcut(for: .compressNow).displayString),
+            ("{{SK_SORT_NOW}}", prefs.shortcut(for: .sortNow).displayString),
             ("{{SK_SETTINGS}}", BinkyFixedShortcut.settings.shortcut.displayString),
             ("{{SK_HELP}}", BinkyFixedShortcut.binkyHelp.shortcut.displayString),
             ("{{SK_LAST_SORT}}", BinkyFixedShortcut.showLastBatchSummary.shortcut.displayString),

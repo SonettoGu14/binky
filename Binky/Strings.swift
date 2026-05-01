@@ -13,22 +13,22 @@ extension Notification.Name {
     static let binkyOpenPanel     = Notification.Name("binkyOpenPanel")
     static let binkyOpenFiles     = Notification.Name("binkyOpenFiles")
     static let binkyCheckUpdates  = Notification.Name("binkyCheckUpdates")
-    static let binkyPasteClipboard  = Notification.Name("binkyPasteClipboard")
     static let binkyShowHistory     = Notification.Name("binkyShowHistory")
     /// Re-present the last completed batch summary (menu / shortcut).
     static let binkyShowLastBatchSummary = Notification.Name("binkyShowLastBatchSummary")
     /// `object` is `PreferencesTab.rawValue` (Int)
     static let binkySelectPreferencesTab = Notification.Name("binkySelectPreferencesTab")
-    static let binkyClearAll            = Notification.Name("binkyClearAll")
     static let binkyToggleSidebar       = Notification.Name("binkyToggleSidebar")
-    static let binkyDeleteSelectedRows  = Notification.Name("binkyDeleteSelectedRows")
-    static let binkyStartCompression    = Notification.Name("binkyStartCompression")
-    /// Re-register the system-wide “Clipboard Compress” hotkey (toggle or shortcut changed).
-    static let binkyGlobalPasteHotkeyChanged = Notification.Name("binkyGlobalPasteHotkeyChanged")
+    /// User asked to run the Downloads / inbox sweep (`Sort Downloads Now` menu, shortcuts, menu bar).
+    static let binkyStartSort = Notification.Name("binkyStartSort")
+    /// Another sort couldn’t start because one is already in flight.
+    static let binkySortRejectedBecauseBusy = Notification.Name("binkySortRejectedBecauseBusy")
     /// Posted before quit so SwiftUI can dismiss sheets; used with `applicationShouldTerminate` / `terminateLater`.
     static let binkyPrepareQuit = Notification.Name("binkyPrepareQuit")
     /// Menu bar toggled **Pause watching** — syncs `UserDefaults` → SwiftUI preferences.
     static let binkyFolderWatchPauseChanged = Notification.Name("binkyFolderWatchPauseChanged")
+    /// Posted when sorting progress changes. `SortProgressTracker` includes values in `userInfo`.
+    static let binkySortProgressChanged = Notification.Name("binkySortProgressChanged")
 }
 
 enum S {
@@ -88,11 +88,6 @@ enum S {
 
     // Preferences
     static var prefsTitle: String { String(localized: "Preferences", comment: "macOS Settings window title.") }
-
-    /// Settings › General › Behavior — global clipboard shortcut explainer (combo comes from `CustomShortcut.displayString`).
-    static func behaviorPasteClipboardGlobalFootnote(currentShortcutDisplay: String) -> String {
-        String(localized: "Triggers Clipboard Compress from any app while Binky is running (currently \(currentShortcutDisplay)).", comment: "Settings footnote; argument is the shortcut key combo.")
-    }
 
     /// Settings › General › Compression — parallel job cap (three tiers: 1, 3, or 8).
     static var concurrentCompressionPickerLabel: String {
@@ -175,24 +170,6 @@ enum S {
     }
     static var shortcutsConflictPrefix: String { String(localized: "Already used by", comment: "Prefix when shortcut conflicts; followed by action name.") }
     static var shortcutsSystemWarningPrefix: String { String(localized: "Overrides macOS:", comment: "Prefix when shortcut may override a system shortcut.") }
-
-    // Settings → Output (duplicate filenames when saving)
-    static var duplicateNamingPickerAccessibilityLabel: String {
-        String(localized: "If that filename is already taken", comment: "VoiceOver label for duplicate-naming style picker.")
-    }
-    static var duplicateNamingSectionFooter: String {
-        String(localized: "Only when a file with the same name is already in the save folder — Binky picks the next free name.", comment: "Settings: duplicate naming section footer.")
-    }
-    static var duplicateNamingCustomFieldLabel: String {
-        String(localized: "Text to add", comment: "Settings: label for custom duplicate filename text field.")
-    }
-    static var duplicateNamingCustomPlaceholder: String {
-        String(localized: "Examples: _backup, holiday{n}", comment: "Settings: placeholder for custom duplicate pattern field.")
-    }
-    /// Explains `{n}` in plain language; middots match Shortcuts recorder hint rhythm.
-    static var duplicateNamingCustomHint: String {
-        String(localized: "Use {n} where the number should go — holiday{n} becomes holiday1, holiday2 · Skip {n} and we only add a number if there’s still a clash", comment: "Settings: caption under custom duplicate field.")
-    }
 
     /// Non-customizable menu items (matches `BinkyFixedShortcut` + system Settings).
     static var fixedMenuShortcutReference: [KeyboardShortcutReference] {

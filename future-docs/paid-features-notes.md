@@ -2,7 +2,7 @@
 
 ## Current Core Features (Shipping / Core Value)
 
-- Organizer-first Downloads sorting into starter buckets (Images, Documents, Media, Archives, Apps, Screenshots, Misc, Review).
+- Organizer-first Downloads sorting into starter destinations (Images, Documents, Media, Archives, Apps, Screenshots, Misc, Review).
 - Global watch folder with optional per-profile watch folders.
 - Profiles with custom Finder tags, per-profile routing rules, "New" tag expiry, and optional post-sort Shortcuts action.
 - Global output routing rules, exclusions, and dry-run preview.

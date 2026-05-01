@@ -6,6 +6,20 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
     static let shared = BinkyMenuBarController()
 
     private var statusItem: NSStatusItem?
+    private var menuBarPercentTimer: Timer?
+    private var menuBarShownPercent: CGFloat = 0
+
+    private override init() {
+        super.init()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(sortProgressDidChange),
+            name: .binkySortProgressChanged,
+            object: nil
+        )
+        // Prime idle tooltip/title expectations when the observer fires later.
+        menuBarShownPercent = 0
+    }
 
     func refresh() {
         let defaults = UserDefaults.standard
@@ -21,7 +35,7 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
 
         if statusItem == nil {
             let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-            item.button?.toolTip = "Binky"
+            item.button?.toolTip = String(localized: "Binky", comment: "Menu bar status item tooltip (idle).")
             item.button?.image = NSImage(systemSymbolName: "tray.and.arrow.down.fill", accessibilityDescription: "Binky")
             item.button?.image?.isTemplate = true
             let menu = NSMenu()
@@ -32,13 +46,77 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
         if let menu = statusItem?.menu {
             menuNeedsUpdate(menu)
         }
+        refreshMenuBarProgressChrome()
     }
 
     private func tearDown() {
+        invalidateMenuBarPercentTimer()
+        menuBarShownPercent = 0
         if let item = statusItem {
             NSStatusBar.system.removeStatusItem(item)
             statusItem = nil
         }
+    }
+
+    @objc private func sortProgressDidChange() {
+        refreshMenuBarProgressChrome()
+    }
+
+    /// Eased `%` beside the tray icon while sorting — reads live state from ``SortProgressTracker``.
+    private func refreshMenuBarProgressChrome() {
+        guard let btn = statusItem?.button else {
+            invalidateMenuBarPercentTimer()
+            menuBarShownPercent = 0
+            return
+        }
+
+        let tracker = SortProgressTracker.shared
+        guard tracker.isActive else {
+            invalidateMenuBarPercentTimer()
+            menuBarShownPercent = 0
+            btn.title = ""
+            btn.toolTip = String(localized: "Binky", comment: "Menu bar status item tooltip (idle).")
+            return
+        }
+
+        btn.toolTip = tracker.menuBarTooltip()
+        scheduleMenuBarPercentTimerIfNeeded()
+        syncMenuBarButtonTitleEase(btn)
+    }
+
+    private func scheduleMenuBarPercentTimerIfNeeded() {
+        guard menuBarPercentTimer == nil else { return }
+        menuBarPercentTimer = Timer.scheduledTimer(withTimeInterval: 0.058, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.syncMenuBarButtonTitleEase(self.statusItem?.button)
+            }
+        }
+        menuBarPercentTimer?.tolerance = 0.012
+    }
+
+    private func invalidateMenuBarPercentTimer() {
+        menuBarPercentTimer?.invalidate()
+        menuBarPercentTimer = nil
+    }
+
+    /// Interpolates the displayed integer `%` toward the batch fraction instead of snapping per file.
+    private func syncMenuBarButtonTitleEase(_ btn: NSButton?) {
+        guard let btn else { return }
+        let tracker = SortProgressTracker.shared
+        guard tracker.isActive else { return }
+
+        let targetPct = CGFloat(tracker.fraction * 100)
+        let delta = targetPct - menuBarShownPercent
+        if abs(delta) < CGFloat(0.35) {
+            menuBarShownPercent = targetPct
+        } else {
+            menuBarShownPercent += delta * CGFloat(0.42)
+        }
+        let rounded = Int((menuBarShownPercent + CGFloat(1e-4)).rounded())
+        let clipped = Swift.max(0, Swift.min(100, rounded))
+        btn.title = " \(clipped)%"
+        btn.toolTip = tracker.menuBarTooltip()
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
@@ -50,7 +128,32 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
             keyEquivalent: ""
         )
         sort.target = self
+        sort.isEnabled = !DownloadsSortOrchestrator.shared.isSorting
         menu.addItem(sort)
+
+        let tracker = SortProgressTracker.shared
+        if tracker.isActive {
+            let isPaused = tracker.runState == .paused
+            let sortPauseResume = NSMenuItem(
+                title: isPaused
+                    ? String(localized: "Resume sorting", comment: "Menu bar command.")
+                    : String(localized: "Pause sorting", comment: "Menu bar command."),
+                action: #selector(togglePauseSorting),
+                keyEquivalent: ""
+            )
+            sortPauseResume.target = self
+            sortPauseResume.isEnabled = tracker.runState != .stopping
+            menu.addItem(sortPauseResume)
+
+            let stopSorting = NSMenuItem(
+                title: String(localized: "Stop sorting", comment: "Menu bar command."),
+                action: #selector(stopSortingNow),
+                keyEquivalent: ""
+            )
+            stopSorting.target = self
+            stopSorting.isEnabled = tracker.runState != .stopping
+            menu.addItem(stopSorting)
+        }
 
         let paused = UserDefaults.standard.bool(forKey: "folderWatch.paused")
         let pauseItem = NSMenuItem(
@@ -112,7 +215,20 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
     }
 
     @objc private func sortNow() {
-        NotificationCenter.default.post(name: .binkyStartCompression, object: nil)
+        NotificationCenter.default.post(name: .binkyStartSort, object: nil)
+    }
+
+    @objc private func togglePauseSorting() {
+        let tracker = SortProgressTracker.shared
+        if tracker.runState == .paused {
+            DownloadsSortOrchestrator.shared.resumeCurrentSort()
+        } else if tracker.runState == .running {
+            DownloadsSortOrchestrator.shared.pauseCurrentSort()
+        }
+    }
+
+    @objc private func stopSortingNow() {
+        DownloadsSortOrchestrator.shared.stopCurrentSort()
     }
 
     @objc private func togglePauseWatching() {

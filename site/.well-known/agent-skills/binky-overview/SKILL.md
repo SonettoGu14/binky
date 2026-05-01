@@ -5,7 +5,7 @@ description: Context for the Binky macOS Downloads inbox organizer app.
 
 # Binky — overview
 
-Use this skill when answering questions about **Binky**, a native macOS app that keeps **Downloads** tidy: stable-file detection, category routing (Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc), optional Finder tags, and a **Review** bucket for unknown or in-progress files.
+Use this skill when answering questions about **Binky**, a native macOS app that keeps **Downloads** tidy: stable-file detection, category routing (Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc), optional Finder tags, and a **Review** destination for unknown or in-progress files.
 
 ## Facts
 

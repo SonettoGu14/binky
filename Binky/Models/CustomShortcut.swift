@@ -6,25 +6,19 @@ import SwiftUI
 
 enum ShortcutAction: String, CaseIterable, Identifiable {
     case openFiles
-    case pasteClipboard
-    case compressNow
-    case clearAll
-    case deleteSelected
+    case sortNow
 
     var id: String { rawValue }
 
     /// Listed in Settings ▸ Shortcuts (organizer product surface).
     static var settingsListedActions: [ShortcutAction] {
-        [.openFiles, .compressNow]
+        [.openFiles, .sortNow]
     }
 
     var title: String {
         switch self {
         case .openFiles: return String(localized: "Open Files…", comment: "Menu and shortcuts: open file picker.")
-        case .pasteClipboard: return String(localized: "Clipboard (legacy)", comment: "Menu: legacy clipboard shortcut label.")
-        case .compressNow: return String(localized: "Sort Downloads Now", comment: "Menu: run Downloads organization pass.")
-        case .clearAll: return String(localized: "Clear All", comment: "Menu: clear the file list.")
-        case .deleteSelected: return String(localized: "Delete Selected", comment: "Menu: remove selected rows.")
+        case .sortNow: return String(localized: "Sort Downloads Now", comment: "Menu: run Downloads organization pass.")
         }
     }
 
@@ -32,14 +26,8 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
         switch self {
         case .openFiles:
             return CustomShortcut(key: "o", modifiers: .command)
-        case .pasteClipboard:
-            return CustomShortcut(key: "v", modifiers: [.command, .shift])
-        case .compressNow:
+        case .sortNow:
             return CustomShortcut(key: "return", modifiers: .command)
-        case .clearAll:
-            return CustomShortcut(key: "k", modifiers: [.command, .option])
-        case .deleteSelected:
-            return CustomShortcut(key: "delete", modifiers: .command)
         }
     }
 }

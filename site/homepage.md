@@ -2,7 +2,7 @@
 
 **Tagline:** Quiets your Downloads.
 
-A native macOS app that watches your inbox (defaults to `~/Downloads`), waits for files to finish landing, then sorts them into sensible buckets — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc. Unknowns route to **Review** so nothing sketchy silently disappears. Optional Finder tags; history with reveal and undo where macOS allows.
+A native macOS app that watches your inbox (defaults to `~/Downloads`), waits for files to finish landing, then sorts them into sensible destinations — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc. Unknowns route to **Review** so nothing sketchy silently disappears. Optional Finder tags; history with reveal and undo where macOS allows.
 
 - **Site:** [binkyfiles.com](https://binkyfiles.com)
 - **Repo:** [GitHub — heyderekj/binky](https://github.com/heyderekj/binky)
@@ -16,7 +16,7 @@ A native macOS app that watches your inbox (defaults to `~/Downloads`), waits fo
 - **Watch inbox** — optional; defaults to Downloads when a bookmark is missing
 - **Finder Quick Action** — “Sort with Binky” on selected files
 - **Shortcuts** — “Sort Files” App Intent passes paths to the running app
-- **Review bucket** — ambiguous types land here first
+- **Review destination** — ambiguous types land here first
 - **History** — batch summaries; undo where possible
 
 ## Install

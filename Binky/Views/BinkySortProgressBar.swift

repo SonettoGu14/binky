@@ -1,0 +1,49 @@
+import SwiftUI
+
+/// Bar track + magenta fill + animated `%` aligned with batch fraction.
+struct BinkySortProgressBar: View {
+    /// 0 … 1
+    let fraction: Double
+    var caption: String? = nil
+    var compact: Bool = false
+    var showsCaption: Bool = true
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    /// Interpolating label (Dinky-style easing when `fraction` steps).
+    private struct PercentLabel: View, Animatable {
+        var frac: CGFloat
+        nonisolated var animatableData: CGFloat {
+            get { frac }
+            set { frac = newValue }
+        }
+
+        private var pct: Int { Int(CGFloat(frac * 100).rounded(.towardZero)) }
+
+        var body: some View {
+            Text("\(pct)%")
+                .font(.system(size: size, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(compactStyle ? Color.secondary : Color.primary.opacity(0.88))
+                .contentTransition(.numericText(countsDown: false))
+
+        private var size: CGFloat { compactStyle ? 10 : 12 }
+            private let compactStyle: Bool
+            init(fraction CGFloat, compact Bool) ?? 
+```
+
+Wait - structs can't nest with init mismatch. Simplify - pass compact as Bool to PercentLabel.
+
+
+
+```swift
+
+
+private struct PercentLabel ...
+    let compact: Bool
+    var frac: CGFloat
+```
+
+
+
+I'll rewrite the full file cleanly.

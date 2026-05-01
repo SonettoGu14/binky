@@ -6,11 +6,15 @@ import AppKit
 private final class BinkyRootModel: ObservableObject {
     let prefs: BinkyPreferences
     let organizerVM: OrganizerViewModel
+    /// Retains idle watching when the organizer window closes (menu bar only).
+    private let watchLease: WatchSortCoordinator
 
     init() {
         let p = BinkyPreferences()
         self.prefs = p
-        self.organizerVM = OrganizerViewModel()
+        let vm = OrganizerViewModel()
+        self.organizerVM = vm
+        self.watchLease = WatchSortCoordinator(prefs: p, viewModel: vm)
     }
 }
 
@@ -107,9 +111,9 @@ private struct BinkyShortcutCommands: View {
         .keyboardShortcut(prefs.shortcut(for: .openFiles).swiftUIKeyboardShortcut)
 
         Button(String(localized: "Sort Downloads Now", comment: "File menu: sweep Downloads inbox.")) {
-            NotificationCenter.default.post(name: .binkyStartCompression, object: nil)
+            NotificationCenter.default.post(name: .binkyStartSort, object: nil)
         }
-        .keyboardShortcut(prefs.shortcut(for: .compressNow).swiftUIKeyboardShortcut)
+        .keyboardShortcut(prefs.shortcut(for: .sortNow).swiftUIKeyboardShortcut)
     }
 }
 
