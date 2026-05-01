@@ -1,187 +1,67 @@
-# Welcome
+# Binky Help
 
-Dinky はファイルを小さくします。何かを追加して、より小さいバージョンを取り出します。見た目は同じで、重量は軽くなります。
-
-**画像** (JPEG、PNG、WebP、AVIF、TIFF、BMP)、**ビデオ** (MP4、MOV、M4V)、および**PDF**で動作します。
-
-すべては Mac 上で行われます。何もアップロードされていません。
-
----
+Binky keeps your **Downloads inbox** tidy: it watches for finished files, moves them into sensible folders, optionally adds Finder tags, and shows clear **summary + history** so you always know what happened.
 
 ## Quick start
 
-1. ファイル (またはファイルの山) を Dinky のウィンドウにドラッグします。
-2. カウントが下がっていくのを観察します。
-3. オリジナル (デフォルト) の隣、ダウンロード フォルダー、または選択したフォルダーで、小さいコピーを見つけます。
+1. Leave **Watch this folder** on (defaults to your Downloads inbox).
+2. Drop files into that folder. Binky waits until downloads look **stable**, then sorts them.
+3. Use **Sort Downloads Now** (`{{SK_SORT_NOW}}`) any time to sweep everything sitting at the top level of the inbox.
 
-それでおしまい。デフォルトのままで良いです。それらを自分の意のままに曲げたい場合は、読み続けてください。
+Optional: After a sort, use **Send to Dinky** on the summary sheet (or **Watch in Dinky** on a destination folder) to hand off images, PDFs, and videos to [Dinky](https://dinkyapp.com) for compression, or set Dinky to watch those folders so future drops are slimmed automatically.
 
----
+## Where files go (starter profile)
 
-## Ways to compress
-
-最初にアプリを開く必要はありません。自分の働き方に合ったものを選んでください。
-
-- **Dinky ウィンドウまたは Dock アイコンにドラッグ アンド ドロップ**します。
-- **ファイルを開く…** — `{{SK_OPEN_FILES}}` シートから選択します。
-- **クリップボード圧縮** — `{{SK_PASTE}}` は、Finder でコピーされたサポートされている **ファイル** (画像、ビデオ、PDF) または **生の画像** データ (スクリーンショットまたはブラウザからの PNG/TIFF) を貼り付けます。
-- **Finder で右クリック → サービス → Dinky で圧縮** — 任意のサイズの選択範囲で機能します。
-- **フォルダーを監視する** — Dinky は、そこに含まれる新しいものをすべて圧縮します。 (以下の *監視フォルダー* を参照してください。)
-- **クイック アクション** — システム設定 → キーボード → キーボード ショートカット → サービスで、キーボード ショートカットを「Dinky で圧縮」に割り当てます。
-
----
-
-## Where files go
-
-**[設定] → [出力]** でこれを一度設定します。
-
-- **オリジナルと同じフォルダー** *(デフォルト)* — 内容を整理してローカルに保ちます。
-- **ダウンロード フォルダー** — 電子メールやメッセージから大量の処理を行う場合に適しています。
-- **カスタム フォルダー…** — Dinky を任意の場所に指定します。
-
-### Filenames
-
-- **「-dinky」を追加** *(デフォルト)* — `photo.jpg` は `photo-dinky.jpg` になります。オリジナルは安全です。
-- **オリジナルを置換** — ファイルを上書きします。最後に 1 つのクリーンなファイルが必要な場合は、**一般** の *オリジナルをゴミ箱に移動* と組み合わせます。
-- **カスタム サフィックス** — ワークフローをいじくり回す人向け。あなたのファイリングシステムに合ったものを使用してください。
-
-> **プロのヒント:** プリセットは、ルールごとに保存場所とファイル名をオーバーライドできます。これを「スクリーンショット → `~/Desktop/web/`、オリジナルと置き換える」などに使用します。
-
----
-
-## Sidebar & formats
-
-メイン ウィンドウの右側にあるサイドバーでは、Dinky に **何を** 作るかを指示します。
-
-### Simple sidebar (default)
-
-3 つの平易な言語の選択肢: **画像**、**ビデオ**、**PDF**。カテゴリごとに 1 つ選択してドロップします。 Dinky は、適切なエンコーダ、品質、サイズを見つけ出します。
-
-### Full sidebar
-
-**[設定] → [一般] → [シンプル サイドバーの使用]** をオフに切り替えて (または個々のセクションをオンにして)、すべてのコントロールを公開します。
-
-- **画像** — 形式、コンテンツのヒント (写真 / イラスト / スクリーンショット)、最大幅、最大ファイル サイズ。
-- **ビデオ** — コーデック ファミリ (H.264 / HEVC / AV1)、品質レベル、ストリップ オーディオ。
-- **PDF** — テキストとリンクを保持するか、ファイルを最小化するために画像にフラット化します。
-
----
-
-## Smart quality
-
-**スマート品質** がオンの場合 (新しいプリセットのデフォルト)、Dinky は各ファイルを検査し、その設定を選択します。
-
-- 画像は、コンテンツに合わせて調整されたエンコーダーを取得します (忙しい写真とグラフィック — UI、イラスト、ロゴ、スクリーンショット)。
-- ビデオは解像度とソースのビットレートに基づいて階層化され、コンテンツ タイプに合わせて調整されます。画面録画とアニメーション / モーション グラフィックスは階層を上げて、テキストとエッジが読みやすい状態を保ちます。カメラの映像は EXIF のメーカー/モデルから識別されるため、過剰に保護されることはありません。 HDR ソース (Dolby Vision、HDR10、HLG) は HEVC でエクスポートされ、色が保持され、細部が強調表示されます。 H.264 は、それらをサイレントに SDR にフラット化します。
-- PDF には、ドキュメントの複雑さと、テキストが優先か画像が多いかに基づいて階層が設定されます。
-
-固定品質レベル (ビデオの場合はバランス/高、PDF の場合は低/中/高) が必要な場合は、**圧縮** のプリセットでこれをオフにします。これは、予測可能な結果が必要なバッチに役立ちます。
-
----
-
-## Presets
-
-プリセットは、保存された設定の組み合わせです。繰り返しのタスクごとに 1 つ作成します。
-
-うまく機能する例:
-
-- **Web ヒーロー画像** — WebP、最大幅 1920、`-web` を追加します。
-- **クライアント成果物** - WebP、最大幅 2560、オリジナルを置き換え、`~/Deliverables/` に保存します。
-- **画面録画** - H.264 バランス、ストリップ オーディオ。
-- **スキャンされた PDF** — フラット化、中品質、グレースケール。
-
-**[設定] → [プリセット]** で作成します。それぞれが次のことができます。
-
-- すべてのメディアまたは 1 つのタイプ (画像 / ビデオ / PDF) にのみ適用します。
-- 独自の保存場所とファイル名ルールを使用します。
-- 独自のフォルダーを監視します *(下記を参照)*。
-- メタデータを削除し、ファイル名をサニタイズし、完了したら出力フォルダーを開きます。
-
-サイドバーからいつでもアクティブなプリセットを切り替えることができます。
-
----
-
-## Watch folders
-
-ファイルをフォルダーにドロップすると、Dinky がバックグラウンドで処理します。
-
-- **グローバル ウォッチ** — *設定 → ウォッチ → グローバル*。サイドバーに現在設定されているものを使用します。 「受信」フォルダーまたはスクリーンショットフォルダーに適しています。
-- **プリセットごとの監視** — 各プリセットは、独自のルールで独自のフォルダーを監視することもできます。サイドバーとは独立して、サイドバーを自由に変更しても、プリセットは引き続き機能します。
-
-> **プロのヒント:** 「画面録画フォルダー」と、オーディオを除去して H.264 バランスに再エンコードするプリセットを組み合わせます。 「⌘⇧5」を押し、画面を録画し、停止を押します — あなたが Finder に到達する前に、Dinky は小さなファイルを用意しています。
-
----
-
-## Manual mode
-
-フルコントロールが必要な場合は、**設定 → 一般 → 手動モード** をオンにします。
-
-ドロップされたファイルは自動圧縮されません。任意の行を右クリックしてその場で形式を選択するか、キューの準備ができたら **[ファイル] → [今すぐ圧縮]** (`{{SK_COMPRESS_NOW}}`) を使用するか、最初にサイドバーで設定を変更します。 1 つのバッチに非常に異なるファイルが含まれている場合に便利です。
-
----
+| Kind | Folder |
+| --- | --- |
+| Images | Images |
+| PDFs & documents | Documents |
+| Video & audio | Media |
+| Archives (zip, etc.) | Archives |
+| Disk images / installers | Apps |
+| Screenshots | Screenshots |
+| Everything else Binky recognizes | Misc |
+| Incomplete downloads / unknown types | Review |
 
 ## Keyboard shortcuts
 
-**[設定] → [ショートカット**] にも同じリストがあるため、このページをくまなく調べる必要はありません。
-
-|ショートカット |アクション |
+| Action | Shortcut |
 | --- | --- |
-| `{{SK_OPEN_FILES}}` |ファイルを開く… |
-| `{{SK_PASTE}}` |クリップボードの圧縮 |
-| `{{SK_COMPRESS_NOW}}` |今すぐ圧縮 (キューを実行します。特に手動モードで便利です) |
-| `{{SK_CLEAR_ALL}}` |すべてクリア |
-| `{{SK_TOGGLE_SIDEBAR}}` |サイドバーの形式を切り替える |
-| `{{SK_DELETE}}` |選択した行を削除 |
-| `{{SK_SETTINGS}}` |設定 |
-| `{{SK_HELP}}` |このヘルプ ウィンドウ |
+| Open Files… | `{{SK_OPEN_FILES}}` |
+| Sort Downloads Now | `{{SK_SORT_NOW}}` |
+| Settings | `{{SK_SETTINGS}}` |
+| Binky Help | `{{SK_HELP}}` |
+| Last Sort Summary… | `{{SK_LAST_SORT}}` |
 
-**システム設定 → キーボード → キーボード ショートカット → サービス** の *Compress with Dinky* に独自のものを追加します。
+## Finder & Services
 
----
+**Sort with Binky** appears in Finder **Services** (and as a **Quick Action**). Turn it on under **System Settings -> Keyboard -> Keyboard Shortcuts -> Services**.
+
+- **Folders:** Right-click a folder and choose **Sort with Binky**. Binky treats that folder as a one-shot inbox. It sorts the **files at the top level** into the usual subfolders (`Images`, `Documents`, etc.) **inside** the folder you picked. Nested subfolders are left alone.
+- **Single files:** Same routing rules as the main window, but the file has to live **inside** the inbox you are watching. Anything outside that inbox is ignored.
+
+Dropping **folders** or **files** onto Binky's **Dock icon** follows the same rules.
+
+## Menu bar mode
+
+In **Settings -> Appearance**, keep **Show menu bar icon** on for quick access even when the window is closed.
+
+- Turn on **Menu bar only (hide Dock icon)** if you want Binky to run from the menu bar.
+- The menu bar lets you run **Sort Now**, pause/resume watching, open **History**, and jump to **Settings**.
+- Watching continues while Binky is running in menu bar mode.
+
+## History & undo
+
+Every sort run is saved in **History** (`App menu -> History…`).
+
+- Use **Open Summary…** on a history row to reopen that run's move/review summary.
+- In a summary sheet, use **Undo moves** to put files from that run back where they were.
+- Use **Last Sort Summary…** (`{{SK_LAST_SORT}}`) to reopen the most recent summary quickly.
 
 ## Shortcuts app
 
-Dinky は、ショートカット アプリに **画像の圧縮** アクションを登録します。これを使用して、選択した形式で Finder ファイルやその他のアクションを Dinky 経由でパイプ処理します。アプリ内圧縮と同じエンジンです (スマート品質、サイズ変更、メタデータの設定を考慮します)。
+Binky exposes a **Sort files** intent so you can automate sorting from the Shortcuts app, using the same routing rules as the main window.
 
----
+## Privacy
 
-## Privacy & safety
-
-- すべては**ローカル**で実行されます。アップロード、テレメトリ、アカウントはありません。
-- **クラッシュ レポート**は、*あなた*がクラッシュ後のプロンプト、「バグを報告…」メニュー、またはエラー詳細シートを介して選択した場合にのみ送信されます。システム設定で macOS 診断の共有を選択している場合、Apple はユーザーに代わって MetricKit 経由で匿名化されたクラッシュ データを Dinky に配信します。追加のデータは Mac から流出しません。
-- エンコーダー (`cwebp`、`avifenc`、`oxipng`、および Apple の組み込み PDF および AVFoundation ビデオ パイプライン) はアプリ内に組み込まれており、ファイルを直接読み取ります。
-- オリジナルはデフォルトで保持されます。 *圧縮後にオリジナルをゴミ箱に移動* は、**設定 → 一般** でオプトインされています。
-- *以下の保存の場合はスキップ* (デフォルトではオフ) は、既に無駄のないファイルが無駄に再エンコードされるのを防ぎます。
-- プリセット内の *メタデータの削除* により、EXIF、GPS、カメラ情報、およびカラー プロファイルが削除されます。写真をウェブに公開する前に試してみる価値があります。
-
----
-
-## Troubleshooting
-
-**元のファイルよりも大きなファイルが出力されました。**
-ディンキーは代わりにオリジナルを保持します。行に *「これをこれ以上小さくできませんでした。オリジナルを維持します。」* が表示されます。
-
-**ファイルがスキップされました。**
-すでに非常に小さい (*節約がしきい値を下回っている場合はスキップ*) か、エンコーダーがそれを読み取れませんでした。詳細については、行をクリックしてください。
-
-**ビデオには時間がかかります。**
-ビデオの再エンコードは CPU に負荷がかかります。 **[設定] → [一般]** の *バッチ速度* 設定は、一度に実行するファイルの数を制御します。Mac が他の作業を行っている場合は、**高速** に下げてください。
-
-**PDF でテキストの選択/ハイパーリンクが失われました。**
-*平坦化 (最小)* を使用しました。プリセットの PDF 出力を *テキストとリンクを保持* に切り替えて、再実行します。 Flatten は常にサイズに重点を置きます。有用性に関しては、常に保存が優先されます。
-
-**右クリックして「Dinky で圧縮」が表示されません。**
-インストール後に Dinky を 1 回開くと、macOS がサービスを登録します。それでも表示されない場合は、**システム設定 → キーボード → キーボード ショートカット → サービス → ファイルとフォルダー** で有効にしてください。
-
-**Dinky は JPEG を出力しないのはなぜですか?**
-WebP と AVIF は JPEG よりも厳密に優れており、同じ画質でファイルサイズが小さく、重要な部分はすべてサポートされています。プラットフォームに「.jpg」が必要な場合は、まず WebP を試してください。それは今ではほぼ普遍的に受け入れられています。本当に拒否する場所に遭遇した場合は、連絡して知らせてください。
-
----
-
-## Get in touch
-
-- サイト: [dinkyfiles.com](https://dinkyfiles.com)
-- コードと問題: [github.com/heyderekj/dinky](https://github.com/heyderekj/dinky)
-- 電子メール: [help@dinkyfiles.com](mailto:help@dinkyfiles.com)
-
-デレク・カステリによって建てられました。提案、バグ、「こんなこともできるのではないか…」などは大歓迎です。
+Nothing leaves your Mac unless **you** choose to send diagnostics from the crash reporter or open a feedback email. Learn more at **binkyfiles.com**.
