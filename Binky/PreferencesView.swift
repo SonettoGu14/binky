@@ -69,7 +69,7 @@ struct PreferencesView: View {
                 .environmentObject(prefs)
                 .environmentObject(updater)
             DestinationsTab()
-                .tabItem { Label(String(localized: "Sorting", comment: "Settings tab: sort destination folders and routing rules."), systemImage: "line.3.horizontal.decrease") }
+                .tabItem { Label(String(localized: "Sorting", comment: "Settings tab: sort sorted folders and routing rules."), systemImage: "line.3.horizontal.decrease") }
                 .tag(PreferencesTab.destinations)
                 .environmentObject(prefs)
             WatchFoldersTab()
@@ -146,7 +146,7 @@ private struct GeneralTab: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 PreferencesRelatedTabLink(
-                    title: String(localized: "Routing & destination folders…", comment: "Settings UI: link from General to Sorting tab for tag-related destination folders."),
+                    title: String(localized: "Routing & sorted folders…", comment: "Settings UI: link from General to Sorting tab for tag-related sorted folders."),
                     tab: .destinations
                 )
 
@@ -423,7 +423,7 @@ private struct DestinationsTab: View {
             } header: {
                 Text(String(localized: "Routing", comment: "Output settings."))
             } footer: {
-                Text(String(localized: "First enabled rule wins. Rules run before automatic destination folders (Images, Documents, Review folder, etc.).", comment: "Destination folders tab routing section footer."))
+                Text(String(localized: "First enabled rule wins. Rules run before automatic sorted folders (Images, Documents, Review folder, etc.).", comment: "Sorted folders tab routing section footer."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -631,7 +631,7 @@ private struct SortRuleEditor: View {
                             Text(String.localizedStringWithFormat(String(localized: "Days: %lld", comment: "Rule editor."), Int64(dateDaysBinding.wrappedValue)))
                         }
                     }
-                    TextField(String(localized: "Destination folder (under inbox)", comment: "Rule editor."), text: binding(\.destinationRelativePath))
+                    TextField(String(localized: "Sorted folder (under inbox)", comment: "Rule editor."), text: binding(\.destinationRelativePath))
                         .textFieldStyle(.roundedBorder)
                     if DinkyBridge.isInstalled {
                         Button(String(localized: "Watch in Dinky →", comment: "Routing rule: open destination in Dinky.")) {
@@ -643,7 +643,7 @@ private struct SortRuleEditor: View {
                         .buttonStyle(.plain)
                         .font(.caption)
                         .foregroundStyle(binkyTintColor)
-                        .accessibilityLabel(String(localized: "Open destination folder in Dinky", comment: "VoiceOver routing rule helper."))
+                        .accessibilityLabel(String(localized: "Open sorted folder in Dinky", comment: "VoiceOver routing rule helper."))
                     }
                     Picker(String(localized: "Rename", comment: "Rule editor."), selection: binding(\.renameStyle)) {
                         ForEach(SortRenameStyle.allCases) { style in
@@ -663,7 +663,7 @@ private struct SortRuleEditor: View {
                     Text(rules[ruleIndex].name)
                         .font(.body.weight(.medium))
                 }
-                .accessibilityHint(String(localized: "Shows conditions and destination folders for this rule.", comment: "VoiceOver DisclosureGroup routing rule."))
+                .accessibilityHint(String(localized: "Shows conditions and sorted folders for this rule.", comment: "VoiceOver DisclosureGroup routing rule."))
             }
         }
     }
@@ -831,7 +831,7 @@ private struct ProfilesOrganizerTab: View {
 
                 Section(String(localized: "Sort rules", comment: "Profile editor section: sort rules.")) {
                     if prefs.savedPresets[idx].inboxSortRules.isEmpty {
-                        Text(String(localized: "No rules. Binky uses default destination folders.", comment: "Profile editor: empty rules."))
+                        Text(String(localized: "No rules. Binky uses default sorted folders.", comment: "Profile editor: empty rules."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -1209,7 +1209,7 @@ private struct WatchFoldersTab: View {
                         Button(String(localized: "Choose…", comment: "Settings UI.")) { pickGlobalWatchFolder() }
                             .buttonStyle(.bordered)
                     }
-                    Text(String(localized: "This is the folder Binky monitors for new files. Where files are moved after sorting is configured in Destination folders.", comment: "Settings UI."))
+                    Text(String(localized: "This is the folder Binky monitors for new files. Where files are moved after sorting is configured in Sorted folders.", comment: "Settings UI."))
                     .font(.caption)
                         .foregroundStyle(.secondary)
 

@@ -27,6 +27,9 @@
   --shadow-md: oklch(0 0 0 / 0.18);
   --text-on-brand: oklch(1 0 0);
   --faq-row-even: oklch(0 0 0 / 0.03);
+  /* Full-bleed site tab strip (matches body padding) */
+  --site-tabs-pull-x: 28px;
+  --site-tabs-pull-y: 44px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -442,6 +445,8 @@ footer a:hover {
 @media (max-width: 700px) {
   body {
     padding: 32px 22px 44px;
+    --site-tabs-pull-x: 22px;
+    --site-tabs-pull-y: 32px;
   }
 
   .compare-hero {

@@ -487,7 +487,7 @@ struct OrganizerMainView: View {
                     sortPreviewRows = vm.inboxPreviewEntries(prefs: prefs)
                     showingSortPreview = true
                 } label: {
-                    Text(String(localized: "Preview…", comment: "Dry-run sort destination folders."))
+                    Text(String(localized: "Preview…", comment: "Dry-run sort sorted folders."))
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)

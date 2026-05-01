@@ -1,0 +1,101 @@
+/* Top Dinky / Binky tab strip — uses --bg, --divider, etc. from each page */
+
+.site-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  align-self: stretch;
+  box-sizing: border-box;
+  width: calc(100% + 2 * var(--site-tabs-pull-x, 0px));
+  max-width: none;
+  margin-left: calc(-1 * var(--site-tabs-pull-x, 0px));
+  margin-right: calc(-1 * var(--site-tabs-pull-x, 0px));
+  margin-top: calc(-1 * var(--site-tabs-pull-y, 0px));
+  margin-bottom: 28px;
+  padding-top: 12px;
+  padding-bottom: 0;
+  background: color-mix(in srgb, var(--text) 4%, var(--bg));
+}
+
+.site-tabs-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px 4px;
+  padding: 8px var(--site-tabs-pull-x, 24px) 0;
+}
+
+.site-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 14px 14px 0 0;
+  background: transparent;
+  border: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.site-tab:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.site-tab:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.site-tab.is-active {
+  position: relative;
+  z-index: 1;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.site-tab.is-active:hover {
+  background: var(--bg);
+}
+
+/* Flared "shoulders" at bottom-outer corners — bar curves smoothly into tab */
+.site-tab.is-active::before,
+.site-tab.is-active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+
+.site-tab.is-active::before {
+  left: -14px;
+  background: radial-gradient(circle at 0 0, transparent 14px, var(--bg) 14px);
+}
+
+.site-tab.is-active::after {
+  right: -14px;
+  background: radial-gradient(circle at 100% 0, transparent 14px, var(--bg) 14px);
+}
+
+.site-tab-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent);
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+  color: var(--brand);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  padding: 3px 7px;
+  text-transform: uppercase;
+}

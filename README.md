@@ -1,6 +1,6 @@
 # Binky
 
-A native macOS app that calms a fussy Downloads folder. Binky watches your inbox (defaults to `~/Downloads`), waits for files to finish downloading, then routes them into clear destination folders — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, and Misc.
+A native macOS app that calms a fussy Downloads folder. Binky watches your inbox (defaults to `~/Downloads`), waits for files to finish downloading, then routes them into clear sorted folders — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, and Misc.
 
 Unknown or sketchy extensions do not disappear silently: they land in **Review** first. Optional Finder tags, move summaries, and session history make it easy to verify what happened and undo where possible.
 
@@ -70,7 +70,7 @@ Fussy inbox. Meet Binky.
 
 ## How it works
 
-Binky is built in Swift and SwiftUI with AppKit integration for Mac-native behavior. The organizer pipeline waits for files to stabilize, classifies by routing rules, then moves them safely to target destination folders with review safeguards.
+Binky is built in Swift and SwiftUI with AppKit integration for Mac-native behavior. The organizer pipeline waits for files to stabilize, classifies by routing rules, then moves them safely to target sorted folders with review safeguards.
 
 The app keeps session outcomes so you can see exactly what happened in each run. Optional compatibility code from earlier compression-focused iterations may remain in the bundle, but the shipping product and UX are organizer-led.
 
