@@ -6,6 +6,17 @@ Unknown or sketchy extensions do not disappear silently: they land in **Review**
 
 **Requires macOS 14 Sonoma or later** (Liquid Glass UI on macOS 26 Tahoe).
 
+<table>
+  <tr>
+    <td><img src="site/screenshots/sorting.png" alt="Binky sorting dashboard" width="100%" /></td>
+    <td><img src="site/screenshots/profiles.webp" alt="Binky profiles and rules" width="100%" /></td>
+  </tr>
+  <tr>
+    <td><img src="site/screenshots/sorting-breakdown.webp" alt="Binky sorting breakdown" width="100%" /></td>
+    <td><img src="site/screenshots/review.webp" alt="Binky review queue" width="100%" /></td>
+  </tr>
+</table>
+
 ## Releases
 
 **1.x** is organizer-first: sort now, watch continuously, review uncertain files, and keep a reliable history of move outcomes.
@@ -35,24 +46,6 @@ Hey! I'm [Derek Castelli](https://www.heyderekj.com), a full-time freelance web 
 - **Finder tags (optional)** - apply tags during routing for quick visual scanning
 - **Launch at login** - keep it ready in the background when your Mac boots
 - **Native macOS stack** - SwiftUI + AppKit, no bundled web runtime
-
-## Screenshots
-
-**Sorting dashboard**
-
-![Binky sorting dashboard](site/screenshots/sorting.png)
-
-**Profiles and routing**
-
-![Binky profiles and rules](site/screenshots/profiles.webp)
-
-**Sort breakdown**
-
-![Binky sorting breakdown](site/screenshots/sorting-breakdown.webp)
-
-**Review queue**
-
-![Binky review queue](site/screenshots/review.webp)
 
 ## What others don't do
 
@@ -93,8 +86,48 @@ brew tap heyderekj/binky https://github.com/heyderekj/binky
 brew install --cask binky
 ```
 
+**Gatekeeper:** if macOS blocks the first launch, use **System Settings → Privacy & Security → Open Anyway**, or run:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Binky.app
+```
+
 For local development:
 
 ```bash
 xcodebuild -scheme Binky -configuration Debug test -destination 'platform=macOS'
 ```
+
+## FAQ
+
+**macOS says Binky can't be opened — what do I do?**
+
+That's Gatekeeper. Use **System Settings → Privacy & Security → Open Anyway**, or remove the quarantine flag with the `xattr` command in [Install](#install) above.
+
+**Is it actually free?**
+
+[Open source on GitHub](https://github.com/heyderekj/binky) under MIT. Free.
+
+**Does Binky upload my files?**
+
+No. Sorting stays on your Mac. No accounts baked in.
+
+**Mac only? Which macOS?**
+
+Yes. SwiftUI, native frameworks, no cross-platform runtime. Requires macOS 14 Sonoma or later. On macOS 26 Tahoe, the UI uses Liquid Glass where available.
+
+**Does it move originals or make copies?**
+
+Moves originals. Nothing duplicated, nothing left behind in Downloads. That's why the stable-file gate and the Review folder exist — Binky won't touch a file it isn't sure about.
+
+**What if Binky isn't running when files land?**
+
+The watch folder only acts while Binky is running. Files that arrived while it was off sit untouched — run Sort Now when you're ready and it'll sweep them up.
+
+**Can I set custom routing rules?**
+
+Yep. Match by name, extension, kind, size, or date — then route to any folder you choose. Good for sending client files to client folders, project exports to project folders, receipts to wherever receipts go. Rules can also rename on the way and add Finder tags. They run before the default sorted folders.
+
+**What file types go in which destination?**
+
+Images (jpg, png, gif, webp, svg, heic…), PDFs, Media (mp4, mov, mp3, m4a…), Documents (doc, txt, md, xls…), Archives (zip, rar, 7z, tar…), Apps (dmg, pkg, app), Screenshots (matched by name pattern), Misc (everything else). Unknowns or ambiguous types go to Review.
