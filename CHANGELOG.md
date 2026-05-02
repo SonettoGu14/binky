@@ -4,6 +4,19 @@
 
 _(Nothing yet.)_
 
+## 1.2.0 — 2026-05-02
+
+### Added
+
+- **Sort performance**: skip stability polling for obviously settled files; bounded parallel pipeline; cheaper ContentInspector cache keys; image downsample before Vision OCR; reuse duplicate digest for inspection; energy throttle fast path on small batches; watch debounce with 1.5s max burst window.
+- **Routing rules**: per-rule actions (move, Trash, rename in place, zip to destination); dry-run preview matches the live sort path; optional **Re-sort watched inboxes when rules change**.
+- **Watch**: **Also watch inside immediate subfolders (one level)** for sweep, preview, and `topLevelInboxFiles`.
+- **Organizer**: inline sort preview under the inbox card; clearer CTAs on the glass activity pane (prominent **Tidy here…** / **Open Summary…**).
+
+### Fixed
+
+- **Contrast**: Review banner and activity rows no longer use washed-out bordered buttons on `.ultraThinMaterial`.
+
 ## 1.1.1 — 2026-05-01
 
 ### Fixed

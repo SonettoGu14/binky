@@ -169,6 +169,7 @@ final class BinkyPreferences: ObservableObject {
         set {
             cachedSavedPresets = newValue
             savedPresetsData = (try? JSONEncoder().encode(newValue)) ?? Data()
+            NotificationCenter.default.post(name: .binkyRoutingRulesDidChange, object: nil)
         }
     }
 
@@ -257,6 +258,7 @@ final class BinkyPreferences: ObservableObject {
             objectWillChange.send()
             cachedSortRoutingRules = newValue
             sortRoutingRulesJSONStorage = (try? JSONEncoder().encode(newValue)) ?? Data()
+            NotificationCenter.default.post(name: .binkyRoutingRulesDidChange, object: nil)
         }
     }
 
@@ -300,6 +302,12 @@ final class BinkyPreferences: ObservableObject {
     }
 
     @AppStorage("folderWatch.paused") var folderWatchPaused: Bool = false
+
+    /// Watch immediate subfolders of each inbox root (one level) for sorting and sweep.
+    @AppStorage("watch.recursiveOneLevel") var watchRecursiveOneLevel: Bool = false
+
+    /// When on, saving routing rules triggers a sort across all watched inbox roots (debounced).
+    @AppStorage("sort.autoRunWhenRulesChange") var sortAutoRunWhenRulesChange: Bool = false
 
     func sortExcludeExtensionsNormalized() -> Set<String> {
         sortExcludeExtensionsCSV

@@ -98,15 +98,10 @@ final class OrganizerViewModel: ObservableObject {
             return
         }
         let root = prefs.activeSortSweepRootDirectory()
-        let fm = FileManager.default
-        let urls =
-            (try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles])) ?? []
-        var files: [URL] = []
-        for url in urls {
-            guard let vals = try? url.resourceValues(forKeys: [.isDirectoryKey]),
-                  vals.isDirectory == false else { continue }
-            files.append(url)
-        }
+        let files = DownloadsSortOrchestrator.collectSweepFiles(
+            in: root,
+            recursiveOneLevel: prefs.watchRecursiveOneLevel
+        )
         guard !files.isEmpty else {
             flashTransientStatus(
                 String(localized: "Inbox is quiet. Nothing to sort.", comment: "Organizer transient banner when Sweep finds no files.")
@@ -191,18 +186,13 @@ final class OrganizerViewModel: ObservableObject {
 
     /// Dry-run rows for active sweep root (sidebar Preview).
     func inboxPreviewEntries(prefs: BinkyPreferences) async -> [SortPreviewEntry] {
-        await DownloadsSortOrchestrator.shared.previewSort(
-            files: topLevelSweepFiles(prefs: prefs),
+        let files = DownloadsSortOrchestrator.collectSweepFiles(
+            in: prefs.activeSortSweepRootDirectory(),
+            recursiveOneLevel: prefs.watchRecursiveOneLevel
+        )
+        return await DownloadsSortOrchestrator.shared.previewSort(
+            files: files,
             prefs: prefs
         )
-    }
-
-    private func topLevelSweepFiles(prefs: BinkyPreferences) -> [URL] {
-        let root = prefs.activeSortSweepRootDirectory()
-        let fm = FileManager.default
-        guard let urls = try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]) else {
-            return []
-        }
-        return urls.filter { url in (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == false }
     }
 }

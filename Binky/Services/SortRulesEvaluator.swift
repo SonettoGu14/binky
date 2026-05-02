@@ -53,7 +53,8 @@ enum SortRulesEvaluator {
         static let unknown = ContentRuleMatchInput(hasSignificantOCR: false, isReceiptLike: false)
     }
 
-    static func loadSignals(url: URL) -> FileSignals? {
+    /// - Parameter originHostsOverride: When non-nil, skips a second `com.apple.metadata:kMDItemWhereFroms` read (caller loaded hosts once).
+    static func loadSignals(url: URL, originHostsOverride: [String]? = nil) -> FileSignals? {
         let keys: Set<URLResourceKey> = [
             .fileSizeKey,
             .creationDateKey,
@@ -62,7 +63,7 @@ enum SortRulesEvaluator {
         ]
         guard let v = try? url.resourceValues(forKeys: keys) else { return nil }
         let sz = Int64(v.fileSize ?? 0)
-        let hosts = WhereFromsReader.originHosts(forFileAt: url.standardizedFileURL)
+        let hosts = originHostsOverride ?? WhereFromsReader.originHosts(forFileAt: url.standardizedFileURL)
         return FileSignals(
             ext: url.pathExtension.lowercased(),
             baseName: url.lastPathComponent,

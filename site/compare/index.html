@@ -88,8 +88,8 @@
               <div class="cmp-segmented" role="tablist" aria-label="Compare with">
                 <button type="button" class="cmp-tab is-active" data-org-tab="hazel">Hazel</button>
                 <button type="button" class="cmp-tab" data-org-tab="neatify">Neatify</button>
-                <button type="button" class="cmp-tab" data-org-tab="finder">Finder</button>
                 <button type="button" class="cmp-tab" data-org-tab="refolder">Refolder</button>
+                <button type="button" class="cmp-tab" data-org-tab="finder">Finder</button>
               </div>
             </div>
             <div class="comparison-scroll">
@@ -210,11 +210,11 @@
                       <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.378 1.602a.75.75 0 0 0-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03ZM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 0 0 .372-.648V7.93ZM11.25 22.18v-9l-9-5.25v8.57a.75.75 0 0 0 .372.648l8.628 5.033Z"/></svg>
                       App size
                     </div></td>
-                    <td class="cmp-binky"><span class="cmp-dim">Lean</span></td>
-                    <td data-col="hazel"><span class="cmp-dim">Larger</span></td>
-                    <td data-col="neatify"><span class="cmp-dim">Moderate</span></td>
-                    <td data-col="finder"><span class="cmp-cross">—</span></td>
+                    <td class="cmp-binky"><span class="cmp-dim">9 MB</span></td>
+                    <td data-col="hazel"><span class="cmp-dim">~29 MB</span></td>
+                    <td data-col="neatify"><span class="cmp-dim">~3 MB</span></td>
                     <td data-col="refolder"><span class="cmp-dim">~22 MB</span></td>
+                    <td data-col="finder"><span class="cmp-cross">—</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -314,7 +314,7 @@
   </div>
   <script>
     (function () {
-      var tools = ['hazel', 'neatify', 'finder', 'refolder'];
+      var tools = ['hazel', 'neatify', 'refolder', 'finder'];
       var names = { hazel: 'Hazel', neatify: 'Neatify', finder: 'Finder', refolder: 'Refolder' };
       var table = document.querySelector('.comparison-table--org');
       var nameEl = document.getElementById('cmp-org-name');

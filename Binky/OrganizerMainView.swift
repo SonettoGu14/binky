@@ -15,6 +15,7 @@ struct OrganizerMainView: View {
     @State private var showingCurrentlySortingSheet = false
     @State private var showingSortPreview = false
     @State private var sortPreviewRows: [SortPreviewEntry] = []
+    @State private var showInlineSortPreview = false
     @State private var showingReviewTriage = false
 
     /// Same persistence key as Dinky below-update review strip.
@@ -89,6 +90,7 @@ struct OrganizerMainView: View {
             showingHistorySheet = false
             showingSortPreview = false
             showingCurrentlySortingSheet = false
+            showInlineSortPreview = false
         }
     }
 
@@ -513,7 +515,7 @@ struct OrganizerMainView: View {
                         let rows = await vm.inboxPreviewEntries(prefs: prefs)
                         await MainActor.run {
                             sortPreviewRows = rows
-                            showingSortPreview = true
+                            showInlineSortPreview = true
                         }
                     }
                 } label: {
@@ -532,10 +534,55 @@ struct OrganizerMainView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
             }
+
+            if showInlineSortPreview, !sortPreviewRows.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(sortPreviewRows.prefix(5)) { row in
+                        HStack(spacing: 6) {
+                            Text(row.sourceLastPathComponent)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                            Image(systemName: "arrow.right")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                            Text(inlinePreviewDestinationLabel(for: row))
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                                .foregroundStyle(.secondary)
+                        }
+                        .font(.caption2)
+                    }
+                    if sortPreviewRows.count > 5 {
+                        Text(String.localizedStringWithFormat(
+                            String(localized: "+%lld more in full preview", comment: "Inline sort preview overflow count."),
+                            Int64(sortPreviewRows.count - 5)
+                        ))
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                    }
+                    Button(String(localized: "Open full preview…", comment: "Expand sort preview sheet.")) {
+                        showingSortPreview = true
+                    }
+                    .buttonStyle(.plain)
+                    .font(.caption)
+                    .foregroundStyle(binkyTintColor)
+                }
+                .padding(.top, 4)
+            }
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(.primary.opacity(0.03)))
+    }
+
+    private func inlinePreviewDestinationLabel(for row: SortPreviewEntry) -> String {
+        let p = row.proposedDestinationPath
+        if p == "—" { return p }
+        let trash = String(localized: "Trash", comment: "Sort preview duplicate / trash label.")
+        if p.caseInsensitiveCompare(trash) == .orderedSame || p == trash {
+            return trash
+        }
+        return URL(fileURLWithPath: p).lastPathComponent
     }
 
     private var transientNoticeBanner: some View {
@@ -581,16 +628,16 @@ struct OrganizerMainView: View {
             Button(String(localized: "Tidy here…", comment: "Open in-app Review triage sheet.")) {
                 showingReviewTriage = true
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.borderedProminent)
+            .tint(binkyTintColor)
             .controlSize(.small)
 
             Button(String(localized: "Open Review in Finder", comment: "Reveal Review folder in Finder.")) {
                 openReviewInFinder()
             }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .foregroundStyle(.primary)
-            .tint(.white.opacity(0.32))
+            .buttonStyle(.plain)
+            .font(.caption)
+            .foregroundStyle(binkyTintColor)
         }
         .padding(12)
         .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.primary.opacity(0.06)))
@@ -655,7 +702,8 @@ struct OrganizerMainView: View {
                 Button(String(localized: "Open Summary…", comment: "History row: reopen stored batch completion dialog.")) {
                     vm.presentHistoricalSortOutcome(row.outcome)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.borderedProminent)
+                .tint(binkyTintColor)
                 .controlSize(.small)
 
                 Button(String(localized: "Show in Finder", comment: "Reveal watched inbox in Finder.")) {

@@ -531,6 +531,16 @@ private struct DestinationsTab: View {
             }
 
             Section {
+                Toggle(String(localized: "Re-sort watched inboxes when rules change", comment: "Settings: auto sweep after saving routing rules."), isOn: $prefs.sortAutoRunWhenRulesChange)
+                Text(String(localized: "Quiet pass across every watch root — useful when you tighten a rule and want what’s already there to move.", comment: "Auto re-sort footer."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } header: {
+                Text(String(localized: "After you edit rules", comment: "Settings section."))
+            }
+
+            Section {
                 TextField(String(localized: "Ignored extensions (comma-separated)", comment: "Output settings."), text: $prefs.sortExcludeExtensionsCSV)
                     .textFieldStyle(.roundedBorder)
                 Text(String(localized: "Example: iso, sparsebundle", comment: "Output settings."))
@@ -766,17 +776,24 @@ private func ruleSummaryLine(_ rule: InboxSortRule) -> String {
     let destPart = dest.isEmpty
         ? String(localized: "(no folder)", comment: "Rule summary when destination empty.")
         : dest
+    let actionPart = rule.matchAction == .moveToDestination
+        ? destPart
+        : String.localizedStringWithFormat(
+            String(localized: "%1$@ — %2$@", comment: "Rule summary: action then destination subfolder."),
+            rule.matchAction.localizedTitle,
+            destPart
+        )
     let head = parts.joined(separator: " · ")
     if head.isEmpty {
         return String.localizedStringWithFormat(
             String(localized: "→ %@", comment: "Rule summary when no conditions; arrow to destination."),
-            destPart
+            actionPart
         )
     }
     return String.localizedStringWithFormat(
         String(localized: "%@ → %@", comment: "Rule summary: conditions then arrow destination."),
         head,
-        destPart
+        actionPart
     )
 }
 
@@ -1168,6 +1185,21 @@ struct RuleEditorSheet: View {
                 }
 
                 Section {
+                    Picker(String(localized: "Then", comment: "Rule editor: what happens when rule matches."), selection: binding(\.matchAction)) {
+                        ForEach(SortRuleMatchAction.allCases) { action in
+                            Text(action.localizedTitle).tag(action)
+                        }
+                    }
+                    .accessibilityHint(String(localized: "Move, trash, rename in place, or zip into the destination folder.", comment: "VoiceOver: rule action picker."))
+                } header: {
+                    Text(String(localized: "Then", comment: "Rule editor section title."))
+                } footer: {
+                    Text(String(localized: "Runs before automatic sorted folders. Trash skips the destination path.", comment: "Rule action footer."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Section {
                     TextField(String(localized: "Destination subfolder", comment: "Rule editor."), text: binding(\.destinationRelativePath))
                         .textFieldStyle(.roundedBorder)
                     if DinkyBridge.isInstalled {
@@ -1275,6 +1307,10 @@ struct RuleEditorSheet: View {
                 rule.originDomains.joined(separator: ", ")
             ))
         }
+        lines.append(String.localizedStringWithFormat(
+            String(localized: "Then: %@", comment: "NL preview: rule match action."),
+            rule.matchAction.localizedTitle
+        ))
         let dest = rule.destinationRelativePath.trimmingCharacters(in: .whitespacesAndNewlines)
         lines.append(String.localizedStringWithFormat(
             String(localized: "Goes to: %@", comment: "NL preview field."),
@@ -1858,6 +1894,16 @@ private struct WatchFoldersTab: View {
                 }
             } header: {
                 Text(String(localized: "Watch Folder", comment: "Settings UI."))
+            }
+
+            Section {
+                Toggle(String(localized: "Also watch inside immediate subfolders (one level)", comment: "Settings: shallow recursive watch."), isOn: $prefs.watchRecursiveOneLevel)
+                Text(String(localized: "Files sitting one folder down still count as inbox noise. Deeper nesting stays out of it.", comment: "Recursive watch footer; brand voice."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } header: {
+                Text(String(localized: "Depth", comment: "Watch settings section."))
             }
 
             Section {

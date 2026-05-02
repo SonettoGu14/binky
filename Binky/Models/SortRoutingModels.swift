@@ -136,6 +136,31 @@ struct SortContentMatch: Codable, Equatable, Hashable, Sendable {
     static let disabled = SortContentMatch(kind: .none)
 }
 
+// MARK: - Rule match action
+
+/// What happens when an inbox rule matches (before automatic taxonomy sort).
+enum SortRuleMatchAction: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
+    case moveToDestination
+    case moveToTrash
+    case renameInPlace
+    case zipToDestination
+
+    var id: String { rawValue }
+
+    var localizedTitle: String {
+        switch self {
+        case .moveToDestination:
+            return String(localized: "Move to folder", comment: "Rule action: move to destination path.")
+        case .moveToTrash:
+            return String(localized: "Move to Trash", comment: "Rule action.")
+        case .renameInPlace:
+            return String(localized: "Rename here only", comment: "Rule action: stay in inbox, rename.")
+        case .zipToDestination:
+            return String(localized: "Zip into folder", comment: "Rule action: zip file into destination.")
+        }
+    }
+}
+
 // MARK: - User-defined inbox rule
 
 struct InboxSortRule: Codable, Identifiable, Equatable, Sendable {
@@ -160,6 +185,8 @@ struct InboxSortRule: Codable, Identifiable, Equatable, Sendable {
     var renameStyle: SortRenameStyle
     /// Tokens: {date}, {stem}, {ext}, {n}, {origin}, {ocr}, {vendor}, {amount}
     var renameTemplate: String
+    /// Effect when this rule matches (default: move into ``destinationRelativePath``).
+    var matchAction: SortRuleMatchAction
     /// Finder tags merged when this rule matches (after category defaults and profile custom tags).
     var addedTags: [String]
     /// When ``finderTagPolicy`` is ``SortRuleFinderTagPolicy/replaceCategoryDefault``, replaces the category-default tag layer (comma list → array in UI).
@@ -169,6 +196,7 @@ struct InboxSortRule: Codable, Identifiable, Equatable, Sendable {
     private enum CodingKeys: String, CodingKey {
         case id, isEnabled, name, matchExtensions, nameContains, fileKindFilter
         case minSizeBytes, maxSizeBytes, dateAddedPredicate, destinationRelativePath, renameStyle, renameTemplate
+        case matchAction
         case addedTags
         case finderTagPolicy
         case categoryDefaultReplacementTags
@@ -189,6 +217,7 @@ struct InboxSortRule: Codable, Identifiable, Equatable, Sendable {
         destinationRelativePath = try c.decode(String.self, forKey: .destinationRelativePath)
         renameStyle = try c.decode(SortRenameStyle.self, forKey: .renameStyle)
         renameTemplate = try c.decode(String.self, forKey: .renameTemplate)
+        matchAction = try c.decodeIfPresent(SortRuleMatchAction.self, forKey: .matchAction) ?? .moveToDestination
         addedTags = try c.decodeIfPresent([String].self, forKey: .addedTags) ?? []
         finderTagPolicy = try c.decodeIfPresent(SortRuleFinderTagPolicy.self, forKey: .finderTagPolicy) ?? .additive
         categoryDefaultReplacementTags = try c.decodeIfPresent([String].self, forKey: .categoryDefaultReplacementTags) ?? []
@@ -210,6 +239,7 @@ struct InboxSortRule: Codable, Identifiable, Equatable, Sendable {
         try c.encode(destinationRelativePath, forKey: .destinationRelativePath)
         try c.encode(renameStyle, forKey: .renameStyle)
         try c.encode(renameTemplate, forKey: .renameTemplate)
+        try c.encode(matchAction, forKey: .matchAction)
         try c.encode(addedTags, forKey: .addedTags)
         try c.encode(finderTagPolicy, forKey: .finderTagPolicy)
         try c.encode(categoryDefaultReplacementTags, forKey: .categoryDefaultReplacementTags)
@@ -233,6 +263,7 @@ struct InboxSortRule: Codable, Identifiable, Equatable, Sendable {
             destinationRelativePath: "Misc",
             renameStyle: .none,
             renameTemplate: "{date} {stem}{ext}",
+            matchAction: .moveToDestination,
             addedTags: [],
             finderTagPolicy: .additive,
             categoryDefaultReplacementTags: []
@@ -254,6 +285,7 @@ struct InboxSortRule: Codable, Identifiable, Equatable, Sendable {
         destinationRelativePath: String,
         renameStyle: SortRenameStyle,
         renameTemplate: String,
+        matchAction: SortRuleMatchAction = .moveToDestination,
         addedTags: [String] = [],
         finderTagPolicy: SortRuleFinderTagPolicy = .additive,
         categoryDefaultReplacementTags: [String] = []
@@ -272,6 +304,7 @@ struct InboxSortRule: Codable, Identifiable, Equatable, Sendable {
         self.destinationRelativePath = destinationRelativePath
         self.renameStyle = renameStyle
         self.renameTemplate = renameTemplate
+        self.matchAction = matchAction
         self.addedTags = addedTags
         self.finderTagPolicy = finderTagPolicy
         self.categoryDefaultReplacementTags = categoryDefaultReplacementTags

@@ -51,6 +51,12 @@ struct OrganizerEmptyStateView: View {
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 320)
+
+            Text(String(localized: "Files mid-download wait until they settle.", comment: "Organizer empty state: incomplete download hint."))
+                .font(.caption)
+                .foregroundStyle(.quaternary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 320)
         }
         .padding(.vertical, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

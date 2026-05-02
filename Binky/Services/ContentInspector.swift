@@ -1,6 +1,6 @@
 import AppKit
-import CryptoKit
 import Foundation
+import ImageIO
 import PDFKit
 import UniformTypeIdentifiers
 import Vision
@@ -53,41 +53,53 @@ enum ContentInspector {
     }
 
     /// Full inspection for smart rename + receipt routing.
+    /// - Parameter contentIdentitySHA256: When set (e.g. from duplicate-detection digest), used as cache key so the file is not hashed again.
     static func inspect(
         for url: URL,
         signals: SortRulesEvaluator.FileSignals,
-        snapshot: SortPreferencesSnapshot
+        snapshot: SortPreferencesSnapshot,
+        contentIdentitySHA256: String? = nil
     ) async -> ContentInspectionResult {
-        await inspect(url: url, signals: signals, snapshot: snapshot)
+        await inspect(url: url, signals: signals, snapshot: snapshot, contentIdentitySHA256: contentIdentitySHA256)
     }
 
     private static func inspect(
         url: URL,
         signals: SortRulesEvaluator.FileSignals,
-        snapshot: SortPreferencesSnapshot
+        snapshot: SortPreferencesSnapshot,
+        contentIdentitySHA256: String? = nil
     ) async -> ContentInspectionResult {
         if EnergyConditions.shared.shouldPauseFully {
             return emptyInspection
         }
 
-        guard let digest = quickSHA256(url: url) else { return emptyInspection }
-        let cacheKey = digest as NSString
-        if let hit = cachedResult(for: cacheKey) {
+        let cacheKeyNSString = (cacheKeyString(path: url.path, signals: signals, contentIdentitySHA256: contentIdentitySHA256) as NSString)
+        if let hit = cachedResult(for: cacheKeyNSString) {
             return hit
         }
 
         let ext = signals.ext
+        let originHosts = signals.originHosts
         let result: ContentInspectionResult
         if ext == "pdf" {
-            result = inspectPDF(at: url, snapshot: snapshot)
+            result = inspectPDF(at: url, snapshot: snapshot, originHosts: originHosts)
         } else if isImageExtension(ext) {
-            result = await inspectImage(at: url, snapshot: snapshot)
+            result = await inspectImage(at: url, snapshot: snapshot, originHosts: originHosts)
         } else {
             result = emptyInspection
         }
 
-        cacheResult(result, for: cacheKey)
+        cacheResult(result, for: cacheKeyNSString)
         return result
+    }
+
+    /// In-process cache key: full SHA-256 when available, else path + size + mtime (no full-file read).
+    private static func cacheKeyString(path: String, signals: SortRulesEvaluator.FileSignals, contentIdentitySHA256: String?) -> String {
+        if let contentIdentitySHA256, !contentIdentitySHA256.isEmpty {
+            return "sha256:\(contentIdentitySHA256)"
+        }
+        let m = signals.modificationDate?.timeIntervalSince1970 ?? 0
+        return "\(path)|\(signals.byteSize)|\(m)"
     }
 
     // MARK: - Smart screenshot rename (post-move)
@@ -96,14 +108,17 @@ enum ContentInspector {
     static func preferredSmartScreenshotName(
         fileURL: URL,
         naturalCategory: FileSortCategory,
-        snapshot: SortPreferencesSnapshot
+        snapshot: SortPreferencesSnapshot,
+        signals: SortRulesEvaluator.FileSignals? = nil,
+        contentIdentitySHA256: String? = nil
     ) async -> String? {
         guard snapshot.sortSmartScreenshotNamesEnabled else { return nil }
         guard naturalCategory == .screenshots else { return nil }
         guard isImageExtension(fileURL.pathExtension.lowercased()) else { return nil }
         if EnergyConditions.shared.shouldPauseFully { return nil }
 
-        let signals = SortRulesEvaluator.loadSignals(url: fileURL)
+        let sig = signals
+            ?? SortRulesEvaluator.loadSignals(url: fileURL)
             ?? SortRulesEvaluator.FileSignals(
                 ext: fileURL.pathExtension.lowercased(),
                 baseName: fileURL.lastPathComponent,
@@ -113,7 +128,7 @@ enum ContentInspector {
                 modificationDate: nil,
                 originHosts: []
             )
-        let r = await inspect(url: fileURL, signals: signals, snapshot: snapshot)
+        let r = await inspect(url: fileURL, signals: sig, snapshot: snapshot, contentIdentitySHA256: contentIdentitySHA256)
         guard let line = r.dominantOCRLine, wordCount(line) >= 3 else { return nil }
         let slug = slugifyOCRTitle(line, maxLen: 60)
         guard !slug.isEmpty else { return nil }
@@ -129,21 +144,21 @@ enum ContentInspector {
 
     private static func inspectImage(
         at url: URL,
-        snapshot: SortPreferencesSnapshot
+        snapshot: SortPreferencesSnapshot,
+        originHosts: [String]
     ) async -> ContentInspectionResult {
-        guard let img = NSImage(contentsOf: url),
-              let cg = img.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+        guard let cg = cgImageThumbnailForVision(fromFile: url, maxPixelSize: 1600) else {
             return emptyInspection
         }
         let text = await recognizeText(on: cg, accurate: false)
-        let merged = text.count < 3 ? await recognizeText(on: cg, accurate: true) : text
+        let merged = text.isEmpty ? await recognizeText(on: cg, accurate: true) : text
         let dominant = dominantLine(from: merged)
         let ocrStrong = wordCount(merged) >= 3
         var isReceipt = false
         var vendor: String?
         var amount: String?
         if snapshot.sortDetectReceiptsEnabled {
-            let bundle = receiptHeuristic(fullText: merged, originHosts: WhereFromsReader.originHosts(forFileAt: url))
+            let bundle = receiptHeuristic(fullText: merged, originHosts: originHosts)
             isReceipt = bundle.isReceipt
             vendor = bundle.vendor
             amount = bundle.amount
@@ -157,7 +172,19 @@ enum ContentInspector {
         )
     }
 
-    private static func inspectPDF(at url: URL, snapshot: SortPreferencesSnapshot) -> ContentInspectionResult {
+    /// Downsampled bitmap for Vision (avoids decoding full-resolution screenshots).
+    private static func cgImageThumbnailForVision(fromFile url: URL, maxPixelSize: Int) -> CGImage? {
+        guard let src = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceShouldCacheImmediately: false,
+        ]
+        return CGImageSourceCreateThumbnailAtIndex(src, 0, options as CFDictionary)
+    }
+
+    private static func inspectPDF(at url: URL, snapshot: SortPreferencesSnapshot, originHosts: [String]) -> ContentInspectionResult {
         guard let doc = PDFDocument(url: url), doc.pageCount > 0, let page = doc.page(at: 0) else {
             return emptyInspection
         }
@@ -180,7 +207,7 @@ enum ContentInspector {
         var vendor: String?
         var amount: String?
         if snapshot.sortDetectReceiptsEnabled {
-            let bundle = receiptHeuristic(fullText: fullText, originHosts: WhereFromsReader.originHosts(forFileAt: url))
+            let bundle = receiptHeuristic(fullText: fullText, originHosts: originHosts)
             isReceipt = bundle.isReceipt
             vendor = bundle.vendor
             amount = bundle.amount
@@ -253,22 +280,6 @@ enum ContentInspector {
         let images: Set<String> = ["jpg", "jpeg", "png", "gif", "webp", "heic", "heif", "tif", "tiff", "bmp", "avif"]
         if images.contains(ext) { return true }
         return UTType(filenameExtension: ext)?.conforms(to: .image) == true
-    }
-
-    private static func quickSHA256(url: URL) -> String? {
-        guard let fh = try? FileHandle(forReadingFrom: url) else { return nil }
-        defer { try? fh.close() }
-        var hasher = SHA256()
-        do {
-            while true {
-                let chunk = try fh.read(upToCount: 512 * 1024)
-                guard let chunk, !chunk.isEmpty else { break }
-                hasher.update(data: chunk)
-            }
-        } catch {
-            return nil
-        }
-        return hasher.finalize().map { String(format: "%02x", $0) }.joined()
     }
 
     private static func wordCount(_ s: String) -> Int {

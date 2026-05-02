@@ -31,6 +31,9 @@ extension Notification.Name {
     static let binkySortProgressChanged = Notification.Name("binkySortProgressChanged")
     /// Thermal / LPM no longer blocks starting or continuing a held ingest batch.
     static let binkyEnergyHoldReleased = Notification.Name("binkyEnergyHoldReleased")
+
+    /// Posted when global routing rules or preset rules change (for optional auto-sort).
+    static let binkyRoutingRulesDidChange = Notification.Name("binkyRoutingRulesDidChange")
 }
 
 enum S {
