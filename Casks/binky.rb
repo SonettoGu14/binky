@@ -4,7 +4,8 @@ cask "binky" do
   # (a local ad-hoc build can produce a different hash than the signed release artifact).
   sha256 "5ccdef859b5644f8375fc0bde3811d7d6e726e0f3baa62ddfbfcf5cf2df86e25"
 
-  url "https://github.com/heyderekj/binky/releases/download/v#{version}/Binky-#{version}.zip"
+  url "https://github.com/heyderekj/binky/releases/download/v#{version}/Binky-#{version}.zip",
+      verified: "github.com/heyderekj/binky/"
   name "Binky"
   desc "Downloads inbox organizer — sort, route, tag, and review files"
   homepage "https://binkyfiles.com/"
