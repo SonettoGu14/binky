@@ -7,7 +7,7 @@ cask "binky" do
   url "https://github.com/heyderekj/binky/releases/download/v#{version}/Binky-#{version}.zip"
   name "Binky"
   desc "Downloads inbox organizer — sort, route, tag, and review files"
-  homepage "https://binkyfiles.com"
+  homepage "https://binkyfiles.com/"
 
   depends_on macos: ">= :sonoma"
 
