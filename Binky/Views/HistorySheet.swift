@@ -69,6 +69,18 @@ struct HistorySheet: View {
                     Text(record.formats.joined(separator: ", "))
                         .font(.system(size: 10))
                         .foregroundStyle(.tertiary)
+                    if let statsLine = Self.sessionVoiceStatsLine(for: record), !statsLine.isEmpty {
+                        Text(statsLine)
+                            .font(.system(size: 10))
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    if let originLine = Self.originHostsSummary(for: record), !originLine.isEmpty {
+                        Text(originLine)
+                            .font(.system(size: 10))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                    }
                     if let onOpenSessionSummary, record.batchSummaryData != nil {
                         Button(String(localized: "Open Summary…", comment: "History row: reopen stored batch completion dialog.")) {
                             onOpenSessionSummary(record)
@@ -134,5 +146,27 @@ struct HistorySheet: View {
         let mb = Double(bytes) / 1_048_576
         if mb >= 1024 { return String(format: "%.1f GB", mb / 1024) }
         return String(format: "%.1f MB", mb)
+    }
+
+    private static func sessionVoiceStatsLine(for record: SessionRecord) -> String? {
+        guard let data = record.batchSummaryData,
+              let outcome = try? JSONDecoder().decode(SortBatchOutcome.self, from: data) else { return nil }
+        return outcome.voiceSessionStatsLine
+    }
+
+    /// Comma-separated download sources from stored sort batch, when present.
+    private static func originHostsSummary(for record: SessionRecord) -> String? {
+        guard let data = record.batchSummaryData,
+              let outcome = try? JSONDecoder().decode(SortBatchOutcome.self, from: data) else { return nil }
+        let hosts = outcome.entries
+            .compactMap(\.originHost)
+            .filter { !$0.isEmpty }
+        guard !hosts.isEmpty else { return nil }
+        let unique = Array(Set(hosts)).sorted()
+        let preview = unique.prefix(4)
+        let suffix = unique.count > 4 ? "…" : ""
+        return String(localized: "From: ", comment: "History row: where-from prefix.")
+            + preview.joined(separator: ", ")
+            + suffix
     }
 }

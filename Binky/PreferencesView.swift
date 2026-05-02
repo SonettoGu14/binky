@@ -109,6 +109,7 @@ private struct GeneralTab: View {
     // Mirror the live `SMAppService.mainApp` status so the toggle stays in sync if the user changes it
     // from System Settings → General → Login Items while Binky is open.
     @State private var launchAtLoginEnabled: Bool = LaunchAtLoginManager.isEnabled
+    @State private var confirmForgetDuplicateMemory = false
 
     var body: some View {
         Form {
@@ -158,6 +159,23 @@ private struct GeneralTab: View {
                         .foregroundStyle(.secondary)
                 }
 
+                if prefs.assignFinderTagsOnSortEnabled {
+                    DisclosureGroup {
+                        FinderTagDefaultsByCategoryMapEditor(
+                            map: Binding(
+                                get: { prefs.sortFinderTagDefaultsByCategory },
+                                set: { prefs.sortFinderTagDefaultsByCategory = $0 }
+                            )
+                        )
+                    } label: {
+                        Text(String(localized: "Default tags by type", comment: "Settings: Finder tag defaults per sort category."))
+                    }
+                    Text(String(localized: "Leave blank to use Binky’s built-in hint for each type. Profile settings can override these per organizer.", comment: "Settings: Finder tag defaults footer."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
                 Toggle(String(localized: "Show summaries after sorting", comment: "Settings UI."), isOn: Binding(
                     get: { prefs.showBatchSummaryDialog },
                     set: { prefs.showBatchSummaryDialog = $0 }
@@ -167,6 +185,97 @@ private struct GeneralTab: View {
                     .foregroundStyle(.secondary)
             } header: {
                 Text(String(localized: "Behavior", comment: "Settings UI."))
+            }
+
+            Section {
+                Picker(String(localized: "When Binky sees a duplicate file", comment: "Settings: duplicate handling."), selection: $prefs.sortDuplicateModeRaw) {
+                    Text(String(localized: "Do nothing special", comment: "Duplicate mode off.")).tag(SortDuplicateHandlingMode.off.rawValue)
+                    Text(String(localized: "Move to Duplicates folder", comment: "Duplicate mode.")).tag(SortDuplicateHandlingMode.moveToDuplicates.rawValue)
+                    Text(String(localized: "Move to Trash", comment: "Duplicate mode.")).tag(SortDuplicateHandlingMode.moveToTrash.rawValue)
+                }
+                Text(String(localized: "Matches an identical file or a very similar image Binky already sorted.", comment: "Duplicate footer."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(String.localizedStringWithFormat(
+                    String(localized: "Binky remembers %lld files.", comment: "Duplicate fingerprint database count."),
+                    Int64(FileHashStore.shared.storedRecordCount())
+                ))
+                .font(.callout)
+                if prefs.lastSortAlreadyHadCount > 0 {
+                    Text(String.localizedStringWithFormat(
+                        String(localized: "%lld already had in the last sort.", comment: "Last sort duplicate-style count."),
+                        Int64(prefs.lastSortAlreadyHadCount)
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+                Button(String(localized: "Forget everything…", comment: "Clear duplicate memory database.")) {
+                    confirmForgetDuplicateMemory = true
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.red)
+                .confirmationDialog(
+                    String(localized: "Forget remembered files?", comment: "Clear hash store title."),
+                    isPresented: $confirmForgetDuplicateMemory,
+                    titleVisibility: .visible
+                ) {
+                    Button(String(localized: "Forget everything", comment: "Confirm clear duplicate memory."), role: .destructive) {
+                        FileHashStore.shared.clearAllRecords()
+                    }
+                    Button(String(localized: "Keep it", comment: "Cancel clear duplicate memory."), role: .cancel) {}
+                } message: {
+                    Text(String(localized: "This clears Binky’s memory of files it’s seen. Duplicates won’t be recognized until they’re sorted again.", comment: "Clear hash store explanation."))
+                }
+
+                Toggle(String(localized: "Daily digest notification", comment: "Settings."), isOn: $prefs.dailyDigestEnabled)
+                Stepper(value: $prefs.dailyDigestHour, in: 0...23) {
+                    Text(String.localizedStringWithFormat(
+                        String(localized: "Digest hour: %lld", comment: "Settings digest hour."),
+                        Int64(prefs.dailyDigestHour)
+                    ))
+                }
+                Text(String(localized: "One quiet summary of what Binky handled. Requires notification permission.", comment: "Digest footer."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+            } header: {
+                Text(String(localized: "Housekeeping", comment: "Settings section."))
+            }
+
+            Section {
+                Toggle(String(localized: "Play sound when done", comment: "Settings UI."), isOn: Binding(
+                    get: { prefs.playSoundEffects },
+                    set: { prefs.playSoundEffects = $0 }
+                ))
+                Toggle(String(localized: "Notify when done", comment: "Settings UI."), isOn: Binding(
+                    get: { prefs.notifyWhenDone },
+                    set: { newValue in
+                        prefs.notifyWhenDone = newValue
+                        if newValue { requestNotificationAuth() }
+                    }
+                ))
+                Text(String(localized: "To receive notifications during Focus or Do Not Disturb, allow Binky in System Settings → Focus.", comment: "Settings UI."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle(String(localized: "Open watch folder in Finder when done", comment: "Settings UI."), isOn: Binding(
+                    get: { prefs.openFolderWhenDone },
+                    set: { prefs.openFolderWhenDone = $0 }
+                ))
+                Text(String(localized: "Opens your watch folder in Finder after each sort batch completes.", comment: "Settings UI."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text(String(localized: "Notifications", comment: "Settings UI."))
+            } footer: {
+                Button(String(localized: "Notification settings…", comment: "Settings UI.")) {
+                    NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
+                }
+                .buttonStyle(.plain)
+                .font(.caption)
+                .foregroundStyle(binkyTintColor)
             }
 
             Section {
@@ -204,40 +313,6 @@ private struct GeneralTab: View {
                     .fixedSize(horizontal: false, vertical: true)
             } header: {
                 Text(String(localized: "Energy", comment: "Settings: General tab section title."))
-            }
-
-            Section {
-                Toggle(String(localized: "Play sound when done", comment: "Settings UI."), isOn: Binding(
-                    get: { prefs.playSoundEffects },
-                    set: { prefs.playSoundEffects = $0 }
-                ))
-                Toggle(String(localized: "Notify when done", comment: "Settings UI."), isOn: Binding(
-                    get: { prefs.notifyWhenDone },
-                    set: { newValue in
-                        prefs.notifyWhenDone = newValue
-                        if newValue { requestNotificationAuth() }
-                    }
-                ))
-                Text(String(localized: "To receive notifications during Focus or Do Not Disturb, allow Binky in System Settings → Focus.", comment: "Settings UI."))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                Toggle(String(localized: "Open watch folder in Finder when done", comment: "Settings UI."), isOn: Binding(
-                    get: { prefs.openFolderWhenDone },
-                    set: { prefs.openFolderWhenDone = $0 }
-                ))
-                Text(String(localized: "Opens your watch folder in Finder after each sort batch completes.", comment: "Settings UI."))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } header: {
-                Text(String(localized: "Notifications", comment: "Settings UI."))
-            } footer: {
-                Button(String(localized: "Notification settings…", comment: "Settings UI.")) {
-                    NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
-                }
-                .buttonStyle(.plain)
-                .font(.caption)
-                .foregroundStyle(binkyTintColor)
             }
 
             // 5. Privacy & diagnostics
@@ -409,12 +484,42 @@ private struct DestinationsTab: View {
         Form {
 
             Section {
+                Toggle(String(localized: "Smart screenshot names (OCR)", comment: "Settings."), isOn: $prefs.sortSmartScreenshotNamesEnabled)
+                Toggle(String(localized: "Detect receipts and invoices", comment: "Settings."), isOn: $prefs.sortDetectReceiptsEnabled)
+                Text(String(localized: "Receipts use on-device text heuristics. Pauses when Low Power Mode pauses sorting.", comment: "Settings smart sort footer."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } header: {
+                Text(String(localized: "Smart sorting", comment: "Settings section."))
+            }
+
+            Section {
+                Toggle(String(localized: "Archive stale files", comment: "Settings aging."), isOn: $prefs.fileAgingEnabled)
+                if prefs.fileAgingEnabled {
+                    FileAgingRulesList(rules: Binding(
+                        get: { prefs.fileAgingRules },
+                        set: { prefs.fileAgingRules = $0 }
+                    ))
+                }
+            } header: {
+                Text(String(localized: "Stale files", comment: "Settings section: file aging."))
+            } footer: {
+                Text(String(localized: "Checks last opened, last used, and date added. Runs about once a day while Binky is open.", comment: "Aging footer."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
                 Toggle(String(localized: "Custom routing rules", comment: "Output settings."), isOn: $prefs.sortCustomRulesEnabled)
                 if prefs.sortCustomRulesEnabled {
-                    SortRulesListEditor(rules: Binding(
-                        get: { prefs.sortRoutingRules },
-                        set: { prefs.sortRoutingRules = $0 }
-                    ))
+                    SortRulesListEditor(
+                        rules: Binding(
+                            get: { prefs.sortRoutingRules },
+                            set: { prefs.sortRoutingRules = $0 }
+                        ),
+                        enableGlobalCustomRulesOnAdd: true
+                    )
                         .frame(minHeight: 200)
                 }
             } header: {
@@ -443,10 +548,15 @@ private struct DestinationsTab: View {
 
             Section {
                 Button(String(localized: "Preview sort…", comment: "Output settings.")) {
-                    previewRows = DownloadsSortOrchestrator.shared.previewInbox(prefs: prefs)
-                    showingPreview = true
+                    Task {
+                        let rows = await DownloadsSortOrchestrator.shared.previewInbox(prefs: prefs)
+                        await MainActor.run {
+                            previewRows = rows
+                            showingPreview = true
+                        }
+                    }
                 }
-                Text(String(localized: "Shows where top-level inbox files would land. Nothing moves until you sort.", comment: "Output settings."))
+                Text(String(localized: "Shows where files in your watch folder would land. Nothing moves until you sort.", comment: "Output settings."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } header: {
@@ -460,79 +570,433 @@ private struct DestinationsTab: View {
     }
 }
 
-private struct SortRulesListEditor: View {
-    @Binding var rules: [InboxSortRule]
+// MARK: - Inbox aging rules
+
+private struct FileAgingPreviewSheet: View {
+    @EnvironmentObject private var prefs: BinkyPreferences
+    let rule: CategoryAgingRule
+    @Environment(\.dismiss) private var dismiss
+
+    private var rows: [FileAgingPreviewRow] {
+        FileAgingService.shared.previewCandidates(rule: rule, prefs: prefs)
+    }
+
+    private static let rowDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .none
+        return f
+    }()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(String(localized: "What would go", comment: "Aging preview sheet title."))
+                .font(.title2.weight(.semibold))
+            Text(String(localized: "Nothing is moved — this is a dry run.", comment: "Aging preview disclaimer."))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if rows.isEmpty {
+                Text(String(localized: "Nothing old enough to touch yet.", comment: "Aging preview empty."))
+                    .frame(minHeight: 160)
+                    .frame(maxWidth: .infinity)
+                    .foregroundStyle(.tertiary)
+            } else {
+                List(rows) { row in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(row.url.lastPathComponent)
+                            .font(.headline)
+                            .lineLimit(1)
+                        Text(String.localizedStringWithFormat(
+                            String(localized: "Untouched about %lld days · last activity %@", comment: "Aging preview row."),
+                            Int64(row.idleDays),
+                            Self.rowDateFormatter.string(from: row.lastActivity)
+                        ))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        Text(row.actionSummary)
+                            .font(.caption.weight(.medium))
+                    }
+                    .padding(.vertical, 2)
+                }
+                .frame(minHeight: 220)
+            }
+
+            HStack {
+                Spacer()
+                Button(String(localized: "Close", comment: "Dismiss aging preview.")) { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+            }
+        }
+        .padding(22)
+        .frame(minWidth: 440, minHeight: 320)
+    }
+}
+
+private struct FileAgingRulesList: View {
+    @EnvironmentObject private var prefs: BinkyPreferences
+    @Binding var rules: [CategoryAgingRule]
+    @State private var previewingRule: CategoryAgingRule?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if rules.isEmpty {
+                Text(String(localized: "No aging rules yet. Add one per category you want swept.", comment: "Aging rules empty state."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            ForEach($rules) { $rule in
+                agingRuleRow($rule)
+            }
+            Button(String(localized: "Add aging rule", comment: "Aging rules add button.")) {
+                rules.append(CategoryAgingRule.fresh())
+            }
+            .buttonStyle(.bordered)
+        }
+        .sheet(item: $previewingRule) { rule in
+            FileAgingPreviewSheet(rule: rule)
+                .environmentObject(prefs)
+        }
+    }
+
+    @ViewBuilder
+    private func agingRuleRow(_ rule: Binding<CategoryAgingRule>) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Picker(String(localized: "Category", comment: "Aging rule category."), selection: rule.categoryRaw) {
+                ForEach(FileSortCategory.allCases, id: \.rawValue) { cat in
+                    Text(Self.categoryLabel(cat)).tag(cat.rawValue)
+                }
+            }
+            Stepper(value: rule.untouchedDays, in: 1...3650) {
+                Text(String.localizedStringWithFormat(
+                    String(localized: "Untouched %lld days", comment: "Aging rule days."),
+                    Int64(rule.wrappedValue.untouchedDays)
+                ))
+            }
+            Picker(String(localized: "Then", comment: "Aging rule action."), selection: rule.action) {
+                Text(String(localized: "Archive", comment: "Aging action.")).tag(FileAgingAction.archive)
+                Text(String(localized: "Trash", comment: "Aging action.")).tag(FileAgingAction.trash)
+            }
+            .pickerStyle(.segmented)
+            if rule.wrappedValue.action == .archive {
+                TextField(
+                    String(localized: "Archive subfolder", comment: "Aging archive path."),
+                    text: rule.archiveFolderRelative
+                )
+                .textFieldStyle(.roundedBorder)
+            }
+            Button(String(localized: "See what would go", comment: "Aging rule dry-run preview.")) {
+                previewingRule = rule.wrappedValue
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            HStack {
+                Spacer()
+                Button(String(localized: "Remove", comment: "Remove aging rule.")) {
+                    rules.removeAll { $0.id == rule.wrappedValue.id }
+                }
+                .buttonStyle(.borderless)
+            }
+        }
+        .padding(8)
+        .background(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.secondary.opacity(0.25)))
+    }
+
+    private static func categoryLabel(_ category: FileSortCategory) -> String {
+        switch category {
+        case .images: return String(localized: "Images", comment: "Sort category.")
+        case .pdf: return String(localized: "PDF", comment: "Sort category.")
+        case .video: return String(localized: "Video", comment: "Sort category.")
+        case .audio: return String(localized: "Audio", comment: "Sort category.")
+        case .documents: return String(localized: "Documents", comment: "Sort category.")
+        case .archives: return String(localized: "Archives", comment: "Sort category.")
+        case .apps: return String(localized: "Apps / installers", comment: "Sort category.")
+        case .screenshots: return String(localized: "Screenshots", comment: "Sort category.")
+        case .misc: return String(localized: "Misc", comment: "Sort category.")
+        case .review: return String(localized: "Review", comment: "Sort category.")
+        case .duplicates: return String(localized: "Duplicates", comment: "Sort category.")
+        case .receipts: return String(localized: "Receipts", comment: "Sort category.")
+        }
+    }
+}
+
+// MARK: - Routing rules (list + sheet editor)
+
+struct RuleEditorSheetState: Identifiable {
+    var draft: InboxSortRule
+    let isNew: Bool
+    let showDescribeSection: Bool
+    var id: UUID { draft.id }
+}
+
+private func ruleSummaryLine(_ rule: InboxSortRule) -> String {
+    var parts: [String] = []
+    if !rule.matchExtensions.isEmpty {
+        parts.append(rule.matchExtensions.joined(separator: ", "))
+    }
+    if !rule.nameContains.isEmpty {
+        parts.append(
+            String.localizedStringWithFormat(
+                String(localized: "name has “%@”", comment: "Rule summary fragment; filename substring."),
+                rule.nameContains
+            )
+        )
+    }
+    if !rule.originDomains.isEmpty {
+        let shown = rule.originDomains.prefix(2).joined(separator: ", ")
+        let more = rule.originDomains.count > 2 ? String(localized: "…", comment: "Ellipsis for truncated list.") : ""
+        parts.append(
+            String.localizedStringWithFormat(
+                String(localized: "from %@%@", comment: "Rule summary fragment; origin domains."),
+                shown,
+                more
+            )
+        )
+    }
+    if rule.fileKindFilter != .any {
+        parts.append(rule.fileKindFilter.localizedTitle)
+    }
+    if rule.contentMatch.kind != .none {
+        parts.append(rule.contentMatch.kind.localizedTitle)
+    }
+    let dest = rule.destinationRelativePath.trimmingCharacters(in: .whitespacesAndNewlines)
+    let destPart = dest.isEmpty
+        ? String(localized: "(no folder)", comment: "Rule summary when destination empty.")
+        : dest
+    let head = parts.joined(separator: " · ")
+    if head.isEmpty {
+        return String.localizedStringWithFormat(
+            String(localized: "→ %@", comment: "Rule summary when no conditions; arrow to destination."),
+            destPart
+        )
+    }
+    return String.localizedStringWithFormat(
+        String(localized: "%@ → %@", comment: "Rule summary: conditions then arrow destination."),
+        head,
+        destPart
+    )
+}
+
+private struct SortRulesListEditor: View {
+    @EnvironmentObject private var prefs: BinkyPreferences
+    @Binding var rules: [InboxSortRule]
+    var enableGlobalCustomRulesOnAdd: Bool = false
+    @State private var editorSheet: RuleEditorSheetState?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if rules.isEmpty {
+                Text(String(localized: "No rules yet. Use the buttons below.", comment: "Routing rules empty hint."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             List {
-                ForEach(Array(rules.enumerated()), id: \.element.id) { index, _ in
-                    SortRuleEditor(rules: $rules, ruleIndex: index)
+                ForEach(Array(rules.enumerated()), id: \.element.id) { _, rule in
+                    ruleRow(rule: rule)
                 }
                 .onMove { source, destination in
                     rules.move(fromOffsets: source, toOffset: destination)
                 }
-                .onDelete { offsets in
-                    rules.remove(atOffsets: offsets)
-                }
             }
             .frame(minHeight: 160)
-            HStack {
-                Button(String(localized: "Add rule", comment: "Routing rules.")) {
-                    rules.append(InboxSortRule.fresh(order: rules.count + 1))
+            HStack(spacing: 12) {
+                Button(String(localized: "Describe a rule…", comment: "Routing rules: add via natural language.")) {
+                    let next = rules.count + 1
+                    editorSheet = RuleEditorSheetState(
+                        draft: InboxSortRule.fresh(order: next),
+                        isNew: true,
+                        showDescribeSection: true
+                    )
                 }
                 .buttonStyle(.bordered)
-                Spacer()
+                Button(String(localized: "Add manually", comment: "Routing rules: add blank rule.")) {
+                    let next = rules.count + 1
+                    editorSheet = RuleEditorSheetState(
+                        draft: InboxSortRule.fresh(order: next),
+                        isNew: true,
+                        showDescribeSection: false
+                    )
+                }
+                .buttonStyle(.bordered)
+                Spacer(minLength: 0)
+            }
+        }
+        .sheet(item: $editorSheet) { state in
+            RuleEditorSheet(
+                state: state,
+                onCancel: { editorSheet = nil },
+                onSave: { saved in
+                    if state.isNew {
+                        rules.append(saved)
+                        if enableGlobalCustomRulesOnAdd {
+                            prefs.sortCustomRulesEnabled = true
+                        }
+                    } else if let idx = rules.firstIndex(where: { $0.id == saved.id }) {
+                        rules[idx] = saved
+                    }
+                    editorSheet = nil
+                }
+            )
+            .environmentObject(prefs)
+        }
+    }
+
+    private func isEnabledBinding(for ruleID: UUID) -> Binding<Bool> {
+        Binding(
+            get: {
+                rules.first(where: { $0.id == ruleID })?.isEnabled ?? false
+            },
+            set: { newVal in
+                guard let idx = rules.firstIndex(where: { $0.id == ruleID }) else { return }
+                var c = rules
+                c[idx].isEnabled = newVal
+                rules = c
+            }
+        )
+    }
+
+    @ViewBuilder
+    private func ruleRow(rule: InboxSortRule) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Toggle(
+                String(),
+                isOn: isEnabledBinding(for: rule.id)
+            )
+            .toggleStyle(.checkbox)
+            .labelsHidden()
+            .accessibilityLabel(String(localized: "Enabled", comment: "Routing rule list toggle."))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(rule.name)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.primary)
+                Text(ruleSummaryLine(rule))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
+                    .multilineTextAlignment(.leading)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                editorSheet = RuleEditorSheetState(draft: rule, isNew: false, showDescribeSection: false)
+            }
+        }
+        .padding(.vertical, 2)
+        .contextMenu {
+            Button(String(localized: "Edit…", comment: "Routing rule context menu.")) {
+                editorSheet = RuleEditorSheetState(draft: rule, isNew: false, showDescribeSection: false)
+            }
+            Button(String(localized: "Delete", comment: "Routing rule context menu."), role: .destructive) {
+                rules.removeAll { $0.id == rule.id }
             }
         }
     }
 }
 
-private struct SortRuleEditor: View {
+struct RuleEditorSheet: View {
     @EnvironmentObject private var prefs: BinkyPreferences
-    @Binding var rules: [InboxSortRule]
-    let ruleIndex: Int
+    @State private var draft: InboxSortRule
+    private let showDescribeSection: Bool
+    private let isNew: Bool
+    private let onCancel: () -> Void
+    private let onSave: (InboxSortRule) -> Void
 
-    private var noDateAddedPredicateKind: SortDateAddedPredicateKind {
-        SortDateAddedPredicateKind(rawValue: "none") ?? .olderThanDays
+    @State private var nlPhrase: String = ""
+    @State private var nlWorking: Bool = false
+    @State private var nlParsedDraft: InboxSortRule?
+    @FocusState private var nlFieldFocused: Bool
+
+    init(state: RuleEditorSheetState, onCancel: @escaping () -> Void, onSave: @escaping (InboxSortRule) -> Void) {
+        _draft = State(initialValue: state.draft)
+        showDescribeSection = state.showDescribeSection
+        isNew = state.isNew
+        self.onCancel = onCancel
+        self.onSave = onSave
     }
 
-    private func binding<T>(_ keyPath: WritableKeyPath<InboxSortRule, T>) -> Binding<T> {
-        Binding(
-            get: { rules[ruleIndex][keyPath: keyPath] },
-            set: { newVal in
-                var copy = rules
-                copy[ruleIndex][keyPath: keyPath] = newVal
-                rules = copy
-            }
-        )
+    private var ignoreDatePredicateKind: SortDateAddedPredicateKind {
+        SortDateAddedPredicateKind(rawValue: "none") ?? .olderThanDays
     }
 
     private var extensionsBinding: Binding<String> {
         Binding(
-            get: { rules[ruleIndex].matchExtensions.joined(separator: ", ") },
+            get: { draft.matchExtensions.joined(separator: ", ") },
             set: { newVal in
-                var copy = rules
+                var c = draft
                 let parts = newVal.split(separator: ",").map { chunk in
                     String(chunk).trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                         .replacingOccurrences(of: ".", with: "")
                 }.filter { !$0.isEmpty }
-                copy[ruleIndex].matchExtensions = parts
-                rules = copy
+                c.matchExtensions = parts
+                draft = c
             }
         )
     }
 
     private var addedTagsBinding: Binding<String> {
         Binding(
-            get: { rules[ruleIndex].addedTags.joined(separator: ", ") },
+            get: { draft.addedTags.joined(separator: ", ") },
             set: { newVal in
-                var copy = rules
+                var c = draft
                 let parts = newVal.split(separator: ",").map { chunk in
                     String(chunk).trimmingCharacters(in: .whitespacesAndNewlines)
                 }.filter { !$0.isEmpty }
-                copy[ruleIndex].addedTags = parts
-                rules = copy
+                c.addedTags = parts
+                draft = c
+            }
+        )
+    }
+
+    private var categoryDefaultReplacementTagsBinding: Binding<String> {
+        Binding(
+            get: { draft.categoryDefaultReplacementTags.joined(separator: ", ") },
+            set: { newVal in
+                var c = draft
+                let parts = newVal.split(separator: ",").map { chunk in
+                    String(chunk).trimmingCharacters(in: .whitespacesAndNewlines)
+                }.filter { !$0.isEmpty }
+                c.categoryDefaultReplacementTags = parts
+                draft = c
+            }
+        )
+    }
+
+    private var originDomainsBinding: Binding<String> {
+        Binding(
+            get: { draft.originDomains.joined(separator: "\n") },
+            set: { newVal in
+                var c = draft
+                let lines = newVal.split(whereSeparator: \.isNewline).map {
+                    String($0).trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                }.filter { !$0.isEmpty }
+                c.originDomains = lines
+                draft = c
+            }
+        )
+    }
+
+    private var contentMatchKindBinding: Binding<SortContentMatchKind> {
+        Binding(
+            get: { draft.contentMatch.kind },
+            set: { newKind in
+                var c = draft
+                c.contentMatch = SortContentMatch(kind: newKind)
+                draft = c
+            }
+        )
+    }
+
+    private func binding<T>(_ keyPath: WritableKeyPath<InboxSortRule, T>) -> Binding<T> {
+        Binding(
+            get: { draft[keyPath: keyPath] },
+            set: { newVal in
+                var c = draft
+                c[keyPath: keyPath] = newVal
+                draft = c
             }
         )
     }
@@ -540,14 +1004,14 @@ private struct SortRuleEditor: View {
     private var minSizeBinding: Binding<String> {
         Binding(
             get: {
-                if let b = rules[ruleIndex].minSizeBytes { return "\(b)" }
+                if let b = draft.minSizeBytes { return "\(b)" }
                 return ""
             },
             set: { raw in
-                var copy = rules
+                var c = draft
                 let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-                copy[ruleIndex].minSizeBytes = trimmed.isEmpty ? nil : Int64(trimmed)
-                rules = copy
+                c.minSizeBytes = trimmed.isEmpty ? nil : Int64(trimmed)
+                draft = c
             }
         )
     }
@@ -555,60 +1019,130 @@ private struct SortRuleEditor: View {
     private var maxSizeBinding: Binding<String> {
         Binding(
             get: {
-                if let b = rules[ruleIndex].maxSizeBytes { return "\(b)" }
+                if let b = draft.maxSizeBytes { return "\(b)" }
                 return ""
             },
             set: { raw in
-                var copy = rules
+                var c = draft
                 let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-                copy[ruleIndex].maxSizeBytes = trimmed.isEmpty ? nil : Int64(trimmed)
-                rules = copy
+                c.maxSizeBytes = trimmed.isEmpty ? nil : Int64(trimmed)
+                draft = c
             }
         )
     }
 
     private var dateKindBinding: Binding<SortDateAddedPredicateKind> {
         Binding(
-            get: { rules[ruleIndex].dateAddedPredicate?.kind ?? noDateAddedPredicateKind },
+            get: { draft.dateAddedPredicate?.kind ?? ignoreDatePredicateKind },
             set: { newKind in
-                var copy = rules
-                if newKind == noDateAddedPredicateKind {
-                    copy[ruleIndex].dateAddedPredicate = nil
+                var c = draft
+                if newKind == ignoreDatePredicateKind {
+                    c.dateAddedPredicate = nil
                 } else {
-                    let days = copy[ruleIndex].dateAddedPredicate?.days ?? 7
-                    copy[ruleIndex].dateAddedPredicate = SortDateAddedPredicate(kind: newKind, days: max(0, days))
+                    let days = c.dateAddedPredicate?.days ?? 7
+                    c.dateAddedPredicate = SortDateAddedPredicate(kind: newKind, days: max(0, days))
                 }
-                rules = copy
+                draft = c
             }
         )
     }
 
     private var dateDaysBinding: Binding<Int> {
         Binding(
-            get: { rules[ruleIndex].dateAddedPredicate?.days ?? 7 },
+            get: { draft.dateAddedPredicate?.days ?? 7 },
             set: { newDays in
-                var copy = rules
-                let kind = copy[ruleIndex].dateAddedPredicate?.kind ?? SortDateAddedPredicateKind.olderThanDays
-                guard kind != noDateAddedPredicateKind else { return }
-                copy[ruleIndex].dateAddedPredicate = SortDateAddedPredicate(kind: kind, days: max(0, newDays))
-                rules = copy
+                var c = draft
+                let kind = c.dateAddedPredicate?.kind ?? SortDateAddedPredicateKind.olderThanDays
+                guard kind != ignoreDatePredicateKind else { return }
+                c.dateAddedPredicate = SortDateAddedPredicate(kind: kind, days: max(0, newDays))
+                draft = c
             }
         )
     }
 
     var body: some View {
-        Group {
-            if rules.indices.contains(ruleIndex) {
-                DisclosureGroup {
+        NavigationStack {
+            Form {
+                Section {
                     Toggle(String(localized: "Enabled", comment: "Rule editor."), isOn: binding(\.isEnabled))
                     TextField(String(localized: "Rule name", comment: "Rule editor."), text: binding(\.name))
+                } header: {
+                    Text(String(localized: "Rule", comment: "Rule editor sheet section."))
+                }
+
+                if showDescribeSection {
+                    Section {
+                        TextField(
+                            String(localized: "Describe a rule (e.g. from figma.com to Design/Figma)", comment: "NL rule placeholder."),
+                            text: $nlPhrase
+                        )
+                        .textFieldStyle(.roundedBorder)
+                        .focused($nlFieldFocused)
+                        HStack(spacing: 12) {
+                            Button(String(localized: "Generate", comment: "Apply natural language to rule fields.")) {
+                                generateFromPhrase()
+                            }
+                            .disabled(nlPhrase.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || nlWorking)
+                            if nlWorking {
+                                ProgressView()
+                                    .controlSize(.small)
+                            }
+                            Spacer(minLength: 0)
+                        }
+                        if #unavailable(macOS 26.0) {
+                            Text(String(localized: "On macOS 26, Generate can use on-device models when available. Earlier macOS still fills the form with phrase heuristics.", comment: "NL availability hint in rule sheet."))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        if let pending = nlParsedDraft {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text(String(localized: "Here’s what Binky heard.", comment: "NL rule parse preview header."))
+                                    .font(.subheadline.weight(.semibold))
+                                Text(RuleEditorSheet.nlPreviewDetailLines(pending))
+                                    .font(.callout)
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                HStack(spacing: 12) {
+                                    Button(String(localized: "Looks right. Save it.", comment: "Apply NL parse to editor form.")) {
+                                        applyNLProposed(pending)
+                                    }
+                                    .keyboardShortcut(.defaultAction)
+                                    Button(String(localized: "Not quite. Try again.", comment: "Dismiss NL parse preview.")) {
+                                        nlParsedDraft = nil
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    } header: {
+                        Text(String(localized: "Describe", comment: "Rule editor sheet: NL section."))
+                    } footer: {
+                        Text(String(localized: "Fills the sections below. You can edit every field before saving.", comment: "Rule editor NL footer."))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Section {
                     TextField(String(localized: "Extensions (comma-separated, empty = any)", comment: "Rule editor."), text: extensionsBinding)
                         .textFieldStyle(.roundedBorder)
                     TextField(String(localized: "Filename contains (empty = any)", comment: "Rule editor."), text: binding(\.nameContains))
                         .textFieldStyle(.roundedBorder)
-                    Picker(String(localized: "Kind", comment: "Rule editor."), selection: binding(\.fileKindFilter)) {
+                    Text(String(localized: "Downloaded from — one host per line (*.stripe.com, figma.com)", comment: "Rule editor where-froms."))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    TextEditor(text: originDomainsBinding)
+                        .frame(minHeight: 52)
+                        .font(.system(.body, design: .monospaced))
+                    Picker(String(localized: "File kind", comment: "Rule editor."), selection: binding(\.fileKindFilter)) {
                         ForEach(SortFileKindFilter.allCases) { filter in
                             Text(filter.localizedTitle).tag(filter)
+                        }
+                    }
+                    Picker(String(localized: "Content match", comment: "Rule editor."), selection: contentMatchKindBinding) {
+                        ForEach(SortContentMatchKind.allCases) { kind in
+                            Text(kind.localizedTitle).tag(kind)
                         }
                     }
                     HStack {
@@ -618,21 +1152,26 @@ private struct SortRuleEditor: View {
                             .textFieldStyle(.roundedBorder)
                     }
                     Picker(String(localized: "Date added", comment: "Rule editor."), selection: dateKindBinding) {
-                        Text(String(localized: "Ignore", comment: "Rule editor.")).tag(noDateAddedPredicateKind)
+                        Text(String(localized: "Ignore", comment: "Rule editor.")).tag(ignoreDatePredicateKind)
                         Text(String(localized: "Added within last … days", comment: "Rule editor.")).tag(SortDateAddedPredicateKind.newerThanDays)
                         Text(String(localized: "Added more than … days ago", comment: "Rule editor.")).tag(SortDateAddedPredicateKind.olderThanDays)
                     }
-                    if let predicate = rules[ruleIndex].dateAddedPredicate,
-                       predicate.kind != noDateAddedPredicateKind {
+                    if let predicate = draft.dateAddedPredicate,
+                       predicate.kind != ignoreDatePredicateKind {
                         Stepper(value: dateDaysBinding, in: 0...3650) {
                             Text(String.localizedStringWithFormat(String(localized: "Days: %lld", comment: "Rule editor."), Int64(dateDaysBinding.wrappedValue)))
                         }
                     }
-                    TextField(String(localized: "Sorted folder (under inbox)", comment: "Rule editor."), text: binding(\.destinationRelativePath))
+                } header: {
+                    Text(String(localized: "When this matches", comment: "Rule editor sheet section."))
+                }
+
+                Section {
+                    TextField(String(localized: "Destination subfolder", comment: "Rule editor."), text: binding(\.destinationRelativePath))
                         .textFieldStyle(.roundedBorder)
                     if DinkyBridge.isInstalled {
                         Button(String(localized: "Watch in Dinky →", comment: "Routing rule: open destination in Dinky.")) {
-                            let trimmed = rules[ruleIndex].destinationRelativePath.trimmingCharacters(in: .whitespacesAndNewlines)
+                            let trimmed = draft.destinationRelativePath.trimmingCharacters(in: .whitespacesAndNewlines)
                             let root = prefs.downloadsSortRootDirectory()
                             let folder = trimmed.isEmpty ? root : root.appendingPathComponent(trimmed, isDirectory: true)
                             _ = DinkyBridge.openFolder(folder)
@@ -642,30 +1181,115 @@ private struct SortRuleEditor: View {
                         .foregroundStyle(binkyTintColor)
                         .accessibilityLabel(String(localized: "Open sorted folder in Dinky", comment: "VoiceOver routing rule helper."))
                     }
+                } header: {
+                    Text(String(localized: "Then move to", comment: "Rule editor sheet section."))
+                }
+
+                Section {
                     Picker(String(localized: "Rename", comment: "Rule editor."), selection: binding(\.renameStyle)) {
                         ForEach(SortRenameStyle.allCases) { style in
                             Text(style.localizedTitle).tag(style)
                         }
                     }
-                    if rules[ruleIndex].renameStyle == .template {
+                    if draft.renameStyle == .template {
                         TextField("{date} {stem}{ext}", text: binding(\.renameTemplate))
                             .textFieldStyle(.roundedBorder)
-                        Text(String(localized: "Tokens: {date}, {stem}, {ext}, {n}", comment: "Rule editor rename hint."))
+                        Text(String(localized: "Tokens: {date}, {stem}, {ext}, {n}, {origin}, {ocr}, {vendor}, {amount}", comment: "Rule editor rename hint."))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
+                } header: {
+                    Text(String(localized: "Then rename", comment: "Rule editor sheet section."))
+                }
+
+                Section {
                     TextField(String(localized: "Tags on match (comma-separated)", comment: "Rule editor."), text: addedTagsBinding)
                         .textFieldStyle(.roundedBorder)
-                } label: {
-                    Text(rules[ruleIndex].name)
-                        .font(.body.weight(.medium))
+                    Picker(String(localized: "Category tags when this rule matches", comment: "Rule editor: Finder tag policy."), selection: binding(\.finderTagPolicy)) {
+                        Text(String(localized: "Use defaults for file type", comment: "Rule editor: additive Finder tag policy.")).tag(SortRuleFinderTagPolicy.additive)
+                        Text(String(localized: "Replace type defaults", comment: "Rule editor: replace category Finder tags.")).tag(SortRuleFinderTagPolicy.replaceCategoryDefault)
+                    }
+                    if draft.finderTagPolicy == .replaceCategoryDefault {
+                        TextField(String(localized: "Replacement tags (comma-separated)", comment: "Rule editor: tags that replace category defaults."), text: categoryDefaultReplacementTagsBinding)
+                            .textFieldStyle(.roundedBorder)
+                        Text(String(localized: "Replaces only the type-based tags. Profile tags and “Tags on match” still apply after.", comment: "Rule editor: replace tags hint."))
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                } header: {
+                    Text(String(localized: "Tag the file", comment: "Rule editor sheet section."))
                 }
-                .accessibilityHint(String(localized: "Shows conditions and sorted folders for this rule.", comment: "VoiceOver DisclosureGroup routing rule."))
+            }
+            .formStyle(.grouped)
+            .navigationTitle(
+                isNew
+                    ? String(localized: "New rule", comment: "Rule editor sheet title.")
+                    : String(localized: "Edit rule", comment: "Rule editor sheet title.")
+            )
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(String(localized: "Cancel", comment: "Rule editor sheet.")) { onCancel() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(String(localized: "Save", comment: "Rule editor sheet.")) { onSave(draft) }
+                }
+            }
+        }
+        .frame(minWidth: 560, minHeight: 520)
+        .onAppear {
+            if showDescribeSection {
+                nlFieldFocused = true
             }
         }
     }
-}
 
+    private func generateFromPhrase() {
+        Task {
+            nlWorking = true
+            defer { nlWorking = false }
+            let built = await RuleSynthesizer.synthesize(from: nlPhrase, order: 1)
+            await MainActor.run {
+                nlParsedDraft = built
+            }
+        }
+    }
+
+    private func applyNLProposed(_ proposed: InboxSortRule) {
+        var merged = proposed
+        merged.id = draft.id
+        draft = merged
+        nlParsedDraft = nil
+        nlPhrase = ""
+    }
+
+    private static func nlPreviewDetailLines(_ rule: InboxSortRule) -> String {
+        var lines: [String] = []
+        lines.append(String.localizedStringWithFormat(String(localized: "Name: %@", comment: "NL preview field."), rule.name))
+        if rule.originDomains.isEmpty {
+            lines.append(String(localized: "From: any", comment: "NL preview field."))
+        } else {
+            lines.append(String.localizedStringWithFormat(
+                String(localized: "From: %@", comment: "NL preview field."),
+                rule.originDomains.joined(separator: ", ")
+            ))
+        }
+        let dest = rule.destinationRelativePath.trimmingCharacters(in: .whitespacesAndNewlines)
+        lines.append(String.localizedStringWithFormat(
+            String(localized: "Goes to: %@", comment: "NL preview field."),
+            dest.isEmpty ? String(localized: "(not set)", comment: "NL preview empty destination.") : dest
+        ))
+        lines.append(String.localizedStringWithFormat(
+            String(localized: "File kind: %@", comment: "NL preview field."),
+            rule.fileKindFilter.localizedTitle
+        ))
+        lines.append(String.localizedStringWithFormat(
+            String(localized: "Content: %@", comment: "NL preview field."),
+            rule.contentMatch.kind.localizedTitle
+        ))
+        return lines.joined(separator: "\n")
+    }
+}
 // MARK: - Profiles (organizer)
 
 private struct ProfilesOrganizerTab: View {
@@ -782,6 +1406,14 @@ private struct ProfilesOrganizerTab: View {
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+                }
+
+                Section(String(localized: "Default tags by type", comment: "Profile editor: per-category Finder tag overrides.")) {
+                    Text(String(localized: "Overrides global defaults for files sorted under this profile. Leave blank to inherit.", comment: "Profile editor: per-type tag hint."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    FinderTagDefaultsByCategoryMapEditor(map: finderTagDefaultsBinding(presetIndex: idx))
                 }
 
                 Section(String(localized: "Custom tags", comment: "Profile editor section: custom Finder tags.")) {
@@ -1065,6 +1697,17 @@ private struct ProfilesOrganizerTab: View {
             set: { newVal in
                 var copy = prefs.savedPresets
                 copy[presetIndex].inboxSortRules = newVal
+                prefs.savedPresets = copy
+            }
+        )
+    }
+
+    private func finderTagDefaultsBinding(presetIndex: Int) -> Binding<[String: [String]]> {
+        Binding(
+            get: { prefs.savedPresets[presetIndex].finderTagDefaultsByCategory },
+            set: { newVal in
+                var copy = prefs.savedPresets
+                copy[presetIndex].finderTagDefaultsByCategory = newVal
                 prefs.savedPresets = copy
             }
         )
@@ -1469,6 +2112,84 @@ private struct ShortcutsTab: View {
                 }
             }
         )
+    }
+}
+
+/// Comma-separated tags per ``FileSortCategory`` (persisted as `[rawValue: [tags]]`).
+private struct FinderTagDefaultsByCategoryMapEditor: View {
+    @Binding var map: [String: [String]]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(FileSortCategory.allCases, id: \.rawValue) { category in
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(Self.rowTitle(for: category))
+                        .font(.subheadline.weight(.medium))
+                    TextField(
+                        String(localized: "Tags, comma-separated", comment: "Placeholder for per-type Finder tag list."),
+                        text: binding(for: category)
+                    )
+                    .textFieldStyle(.roundedBorder)
+                    Text(String.localizedStringWithFormat(
+                        String(localized: "Built-in hint: %@", comment: "Settings: shows default Finder tag hint for a sort type."),
+                        Self.builtInHint(for: category)
+                    ))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private func binding(for category: FileSortCategory) -> Binding<String> {
+        Binding(
+            get: { map[category.rawValue]?.joined(separator: ", ") ?? "" },
+            set: { newVal in
+                var copy = map
+                let parts = newVal.split(separator: ",").map { chunk in
+                    String(chunk).trimmingCharacters(in: .whitespacesAndNewlines)
+                }.filter { !$0.isEmpty }
+                if parts.isEmpty {
+                    copy.removeValue(forKey: category.rawValue)
+                } else {
+                    copy[category.rawValue] = parts
+                }
+                map = copy
+            }
+        )
+    }
+
+    private static func builtInHint(for category: FileSortCategory) -> String {
+        category.semanticTagHint
+    }
+
+    private static func rowTitle(for category: FileSortCategory) -> String {
+        switch category {
+        case .images:
+            return String(localized: "Images", comment: "Sort category label for Finder tag defaults.")
+        case .pdf:
+            return String(localized: "PDF", comment: "Sort category label for Finder tag defaults.")
+        case .video:
+            return String(localized: "Video", comment: "Sort category label for Finder tag defaults.")
+        case .audio:
+            return String(localized: "Audio", comment: "Sort category label for Finder tag defaults.")
+        case .documents:
+            return String(localized: "Documents", comment: "Sort category label for Finder tag defaults.")
+        case .archives:
+            return String(localized: "Archives", comment: "Sort category label for Finder tag defaults.")
+        case .apps:
+            return String(localized: "Apps / installers", comment: "Sort category label for Finder tag defaults.")
+        case .screenshots:
+            return String(localized: "Screenshots", comment: "Sort category label for Finder tag defaults.")
+        case .misc:
+            return String(localized: "Misc", comment: "Sort category label for Finder tag defaults.")
+        case .review:
+            return String(localized: "Review", comment: "Sort category label for Finder tag defaults.")
+        case .duplicates:
+            return String(localized: "Duplicates", comment: "Sort category label for Finder tag defaults.")
+        case .receipts:
+            return String(localized: "Receipts", comment: "Sort category label for Finder tag defaults.")
+        }
     }
 }
 

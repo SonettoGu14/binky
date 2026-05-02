@@ -18,19 +18,25 @@
 		AG000001000000000000001 /* View+AdaptiveGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = AG100001000000000000001 /* View+AdaptiveGlass.swift */; };
 		AI000001000000000000001 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = AI100001000000000000001 /* AppIcon.icon */; };
 		ASH00001000000000000001 /* BinkyAppShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = ASH10001000000000000001 /* BinkyAppShortcuts.swift */; };
-		CP000001000000000000001 /* CompressionPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = CP100001000000000000001 /* CompressionPreset.swift */; };
+		CNTINS00001BR000001 /* ContentInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CNTINS10001FR000001 /* ContentInspector.swift */; };
+		DIGEST00001BR000001 /* SortDigestScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DIGEST10001FR000001 /* SortDigestScheduler.swift */; };
+		FILHS00001BR000001 /* FileHashStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FILHS10001FR000001 /* FileHashStore.swift */; };
+		FILEAG00001BR000001 /* FileAgingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FILEAG10001FR000001 /* FileAgingService.swift */; };
 		DD000003000000000000003 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD000002000000000000002 /* AppDelegate.swift */; };
 		DR000001000000000000001 /* DiagnosticsReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DR100001000000000000001 /* DiagnosticsReporter.swift */; };
 		ENRG20000100000000000001 /* EnergyConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = ENRG10000100000000000001 /* EnergyConditions.swift */; };
 		BAC00200000000000000001 /* BinkyActivationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC00100000000000000001 /* BinkyActivationPolicy.swift */; };
 		BMBC0020000000000000001 /* BinkyMenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BMBC0010000000000000001 /* BinkyMenuBarController.swift */; };
+		CP000001000000000000001 /* CompressionPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = CP100001000000000000001 /* CompressionPreset.swift */; };
 		DST00009900000000000001 /* DownloadSortServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = DST10009900000000000001 /* DownloadSortServices.swift */; };
+		FTCMP200001BK000001 /* FinderTagComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = FTCMP100001FR000001 /* FinderTagComposition.swift */; };
 		DNKBLD1000010000000001 /* DinkyBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DNKBRG1000010000000001 /* DinkyBridge.swift */; };
 		NTEXP002000000000000001 /* NewTagExpiry.swift in Sources */ = {isa = PBXBuildFile; fileRef = NTEXP102000000000000001 /* NewTagExpiry.swift */; };
 		SREM0020000000000000001 /* SortRoutingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = SREM0010000000000000001 /* SortRoutingModels.swift */; };
 		SREV0020000000000000001 /* SortRulesEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = SREV0010000000000000001 /* SortRulesEvaluator.swift */; };
 		SPSH0020000000000000001 /* SortPreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = SPSH0010000000000000001 /* SortPreviewSheet.swift */; };
 		FW000001000000000000001 /* FolderWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = FW100001000000000000001 /* FolderWatcher.swift */; };
+		WR000001000000000000001 /* WatchRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = WR100001000000000000001 /* WatchRegistry.swift */; };
 		GH000001000000000000001 /* GlobalHotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = GH100001000000000000001 /* GlobalHotkeyManager.swift */; };
 		HM000001000000000000001 /* Help.md in Resources */ = {isa = PBXBuildFile; fileRef = HMVGRP00000000000000001 /* Help.md */; };
 		HS000001000000000000001 /* HistorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = HS100001000000000000001 /* HistorySheet.swift */; };
@@ -43,6 +49,7 @@
 		ORGMAIN001000000000000001 /* OrganizerMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ORGMAIN100001000000000001 /* OrganizerMainView.swift */; };
 		ORGVM00000100000000000001 /* OrganizerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ORGVM10000100000000000001 /* OrganizerViewModel.swift */; };
 		RB000001000000000000001 /* ReviewPromptBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = RB100001000000000000001 /* ReviewPromptBanner.swift */; };
+		RSYNTH00001BR000001 /* RuleSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = RSYNTH10001FR000001 /* RuleSynthesizer.swift */; };
 		SC000001000000000000001 /* SettingsChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = SC100001000000000000001 /* SettingsChrome.swift */; };
 		SH000001000000000000001 /* ShortcutRecorderField.swift in Sources */ = {isa = PBXBuildFile; fileRef = SH100001000000000000001 /* ShortcutRecorderField.swift */; };
 		SR000001000000000000001 /* SessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = SR100001000000000000001 /* SessionRecord.swift */; };
@@ -50,11 +57,15 @@
 		SSR000001000000000000001 /* SummaryStatRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = SSR100001000000000000001 /* SummaryStatRow.swift */; };
 		UB000001000000000000001 /* UpdateBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = UB100001000000000000001 /* UpdateBanner.swift */; };
 		UC000001000000000000001 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = UC100001000000000000001 /* UpdateChecker.swift */; };
-		WR000001000000000000001 /* WatchRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = WR100001000000000000001 /* WatchRegistry.swift */; };
+		WFREAD00001BR000001 /* WhereFromsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = WFREAD10001FR000001 /* WhereFromsReader.swift */; };
 		XTBLD00000000000000002 /* DownloadSortClassificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = XTREF00000000000000002 /* DownloadSortClassificationTests.swift */; };
+		WFTSTBLD000000000000001 /* WhereFromsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WFTSTREF000000000000001 /* WhereFromsTests.swift */; };
+		FTTST200001BK000001 /* FinderTagCompositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FTTST100001FR000001 /* FinderTagCompositionTests.swift */; };
 		SPTKR200001BK000002 /* SortProgressTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = SPTKR100001FR000001 /* SortProgressTracker.swift */; };
 		BBAR200001BK000002 /* BinkySortProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBAR100001FR000001 /* BinkySortProgressBar.swift */; };
 		CURS200001BK000002 /* CurrentlySortingSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CURS100001FR000001 /* CurrentlySortingSheet.swift */; };
+		SRTVC00001BR000001 /* SortVoiceCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRTVC10001FR000001 /* SortVoiceCopy.swift */; };
+		RVTRI00001BR000001 /* ReviewFolderTriageSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = RVTRI10001FR000001 /* ReviewFolderTriageSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,22 +90,29 @@
 		AG100001000000000000001 /* View+AdaptiveGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+AdaptiveGlass.swift"; sourceTree = "<group>"; };
 		AI100001000000000000001 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		ASH10001000000000000001 /* BinkyAppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyAppShortcuts.swift; sourceTree = "<group>"; };
+		CNTINS10001FR000001 /* ContentInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentInspector.swift; sourceTree = "<group>"; };
 		CP100001000000000000001 /* CompressionPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionPreset.swift; sourceTree = "<group>"; };
+		DIGEST10001FR000001 /* SortDigestScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortDigestScheduler.swift; sourceTree = "<group>"; };
 		DD000001000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DD000002000000000000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DR100001000000000000001 /* DiagnosticsReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsReporter.swift; sourceTree = "<group>"; };
 		ENRG10000100000000000001 /* EnergyConditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyConditions.swift; sourceTree = "<group>"; };
 		DST10009900000000000001 /* DownloadSortServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSortServices.swift; sourceTree = "<group>"; };
+		FTCMP100001FR000001 /* FinderTagComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderTagComposition.swift; sourceTree = "<group>"; };
 		DNKBRG1000010000000001 /* DinkyBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinkyBridge.swift; sourceTree = "<group>"; };
 		NTEXP102000000000000001 /* NewTagExpiry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTagExpiry.swift; sourceTree = "<group>"; };
 		BAC00100000000000000001 /* BinkyActivationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyActivationPolicy.swift; sourceTree = "<group>"; };
 		BMBC0010000000000000001 /* BinkyMenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyMenuBarController.swift; sourceTree = "<group>"; };
 		SREM0010000000000000001 /* SortRoutingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortRoutingModels.swift; sourceTree = "<group>"; };
 		SREV0010000000000000001 /* SortRulesEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortRulesEvaluator.swift; sourceTree = "<group>"; };
+		SRTVC10001FR000001 /* SortVoiceCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortVoiceCopy.swift; sourceTree = "<group>"; };
+		RVTRI10001FR000001 /* ReviewFolderTriageSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewFolderTriageSheet.swift; sourceTree = "<group>"; };
 		SPSH0010000000000000001 /* SortPreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortPreviewSheet.swift; sourceTree = "<group>"; };
 		E71A34AFC5CA41FDACAEE19D /* Preview Content/Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Content/Preview Assets.xcassets"; sourceTree = "<group>"; };
 		F5D3DAE858994431BC84C13F /* BinkyPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkyPreferences.swift; sourceTree = "<group>"; };
 		F68BBF685BAD4911BEC725DB /* Binky.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Binky.entitlements; sourceTree = "<group>"; };
+		FILEAG10001FR000001 /* FileAgingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileAgingService.swift; sourceTree = "<group>"; };
+		FILHS10001FR000001 /* FileHashStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHashStore.swift; sourceTree = "<group>"; };
 		FW100001000000000000001 /* FolderWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderWatcher.swift; sourceTree = "<group>"; };
 		GH100001000000000000001 /* GlobalHotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalHotkeyManager.swift; sourceTree = "<group>"; };
 		HMDE0000000000000000001 /* Help.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Help.md; path = de.lproj/Help.md; sourceTree = "<group>"; };
@@ -120,6 +138,7 @@
 		ORGMAIN100001000000000001 /* OrganizerMainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerMainView.swift; sourceTree = "<group>"; };
 		ORGVM10000100000000000001 /* OrganizerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizerViewModel.swift; sourceTree = "<group>"; };
 		RB100001000000000000001 /* ReviewPromptBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPromptBanner.swift; sourceTree = "<group>"; };
+		RSYNTH10001FR000001 /* RuleSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleSynthesizer.swift; sourceTree = "<group>"; };
 		SC100001000000000000001 /* SettingsChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsChrome.swift; sourceTree = "<group>"; };
 		SH100001000000000000001 /* ShortcutRecorderField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderField.swift; sourceTree = "<group>"; };
 		SR100001000000000000001 /* SessionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRecord.swift; sourceTree = "<group>"; };
@@ -127,9 +146,12 @@
 		SSR100001000000000000001 /* SummaryStatRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryStatRow.swift; sourceTree = "<group>"; };
 		UB100001000000000000001 /* UpdateBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateBanner.swift; sourceTree = "<group>"; };
 		UC100001000000000000001 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
+		WFREAD10001FR000001 /* WhereFromsReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhereFromsReader.swift; sourceTree = "<group>"; };
 		WR100001000000000000001 /* WatchRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRegistry.swift; sourceTree = "<group>"; };
 		XTPRD00000000000000001 /* BinkyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BinkyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		XTREF00000000000000002 /* DownloadSortClassificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSortClassificationTests.swift; sourceTree = "<group>"; };
+		WFTSTREF000000000000001 /* WhereFromsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhereFromsTests.swift; sourceTree = "<group>"; };
+		FTTST100001FR000001 /* FinderTagCompositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderTagCompositionTests.swift; sourceTree = "<group>"; };
 		SPTKR100001FR000001 /* SortProgressTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortProgressTracker.swift; sourceTree = "<group>"; };
 		BBAR100001FR000001 /* BinkySortProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkySortProgressBar.swift; sourceTree = "<group>"; };
 		CURS100001FR000001 /* CurrentlySortingSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentlySortingSheet.swift; sourceTree = "<group>"; };
@@ -177,6 +199,7 @@
 				SC100001000000000000001 /* SettingsChrome.swift */,
 				UB100001000000000000001 /* UpdateBanner.swift */,
 				RB100001000000000000001 /* ReviewPromptBanner.swift */,
+				RVTRI10001FR000001 /* ReviewFolderTriageSheet.swift */,
 				HS100001000000000000001 /* HistorySheet.swift */,
 				HW100001000000000000001 /* HelpWindow.swift */,
 				SH100001000000000000001 /* ShortcutRecorderField.swift */,
@@ -266,20 +289,28 @@
 		SV100001000000000000001 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				CNTINS10001FR000001 /* ContentInspector.swift */,
+				DIGEST10001FR000001 /* SortDigestScheduler.swift */,
+				DR100001000000000000001 /* DiagnosticsReporter.swift */,
+				ENRG10000100000000000001 /* EnergyConditions.swift */,
+				FILEAG10001FR000001 /* FileAgingService.swift */,
+				FILHS10001FR000001 /* FileHashStore.swift */,
+				RSYNTH10001FR000001 /* RuleSynthesizer.swift */,
 				SPTKR100001FR000001 /* SortProgressTracker.swift */,
 				UC100001000000000000001 /* UpdateChecker.swift */,
+				WFREAD10001FR000001 /* WhereFromsReader.swift */,
 				LL100001000000000000001 /* LaunchAtLoginManager.swift */,
 				BAC00100000000000000001 /* BinkyActivationPolicy.swift */,
 				BMBC0010000000000000001 /* BinkyMenuBarController.swift */,
 				FW100001000000000000001 /* FolderWatcher.swift */,
 				SREV0010000000000000001 /* SortRulesEvaluator.swift */,
+				SRTVC10001FR000001 /* SortVoiceCopy.swift */,
 				DST10009900000000000001 /* DownloadSortServices.swift */,
+				FTCMP100001FR000001 /* FinderTagComposition.swift */,
 				DNKBRG1000010000000001 /* DinkyBridge.swift */,
 				NTEXP102000000000000001 /* NewTagExpiry.swift */,
 				WR100001000000000000001 /* WatchRegistry.swift */,
 				GH100001000000000000001 /* GlobalHotkeyManager.swift */,
-				DR100001000000000000001 /* DiagnosticsReporter.swift */,
-				ENRG10000100000000000001 /* EnergyConditions.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -288,6 +319,8 @@
 			isa = PBXGroup;
 			children = (
 				XTREF00000000000000002 /* DownloadSortClassificationTests.swift */,
+				WFTSTREF000000000000001 /* WhereFromsTests.swift */,
+				FTTST100001FR000001 /* FinderTagCompositionTests.swift */,
 			);
 			path = BinkyTests;
 			sourceTree = "<group>";
@@ -401,6 +434,7 @@
 			files = (
 				AA000001000000000000001 /* BinkyApp.swift in Sources */,
 				DD000003000000000000003 /* AppDelegate.swift in Sources */,
+				DIGEST00001BR000001 /* SortDigestScheduler.swift in Sources */,
 				AA000002000000000000002 /* ContentView.swift in Sources */,
 				ORGVM00000100000000000001 /* OrganizerViewModel.swift in Sources */,
 				ORGMAIN001000000000000001 /* OrganizerMainView.swift in Sources */,
@@ -412,11 +446,13 @@
 				AA000009000000000000009 /* DropZoneView.swift in Sources */,
 				SSR000001000000000000001 /* SummaryStatRow.swift in Sources */,
 				BBAR200001BK000002 /* BinkySortProgressBar.swift in Sources */,
+				CNTINS00001BR000001 /* ContentInspector.swift in Sources */,
 				CURS200001BK000002 /* CurrentlySortingSheet.swift in Sources */,
 				SC000001000000000000001 /* SettingsChrome.swift in Sources */,
 				UC000001000000000000001 /* UpdateChecker.swift in Sources */,
 				UB000001000000000000001 /* UpdateBanner.swift in Sources */,
 				RB000001000000000000001 /* ReviewPromptBanner.swift in Sources */,
+				RSYNTH00001BR000001 /* RuleSynthesizer.swift in Sources */,
 				AG000001000000000000001 /* View+AdaptiveGlass.swift in Sources */,
 				LL000001000000000000001 /* LaunchAtLoginManager.swift in Sources */,
 				FW000001000000000000001 /* FolderWatcher.swift in Sources */,
@@ -424,8 +460,11 @@
 				BMBC0020000000000000001 /* BinkyMenuBarController.swift in Sources */,
 				SPTKR200001BK000002 /* SortProgressTracker.swift in Sources */,
 				DST00009900000000000001 /* DownloadSortServices.swift in Sources */,
+				FTCMP200001BK000001 /* FinderTagComposition.swift in Sources */,
 				DNKBLD1000010000000001 /* DinkyBridge.swift in Sources */,
 				SREM0020000000000000001 /* SortRoutingModels.swift in Sources */,
+				RVTRI00001BR000001 /* ReviewFolderTriageSheet.swift in Sources */,
+				SRTVC00001BR000001 /* SortVoiceCopy.swift in Sources */,
 				SREV0020000000000000001 /* SortRulesEvaluator.swift in Sources */,
 				SPSH0020000000000000001 /* SortPreviewSheet.swift in Sources */,
 				HS000001000000000000001 /* HistorySheet.swift in Sources */,
@@ -433,6 +472,7 @@
 				SR000001000000000000001 /* SessionRecord.swift in Sources */,
 				ASH00001000000000000001 /* BinkyAppShortcuts.swift in Sources */,
 				NTEXP002000000000000001 /* NewTagExpiry.swift in Sources */,
+				WFREAD00001BR000001 /* WhereFromsReader.swift in Sources */,
 				WR000001000000000000001 /* WatchRegistry.swift in Sources */,
 				HW000001000000000000001 /* HelpWindow.swift in Sources */,
 				KS000001000000000000001 /* CustomShortcut.swift in Sources */,
@@ -440,6 +480,8 @@
 				GH000001000000000000001 /* GlobalHotkeyManager.swift in Sources */,
 				DR000001000000000000001 /* DiagnosticsReporter.swift in Sources */,
 				ENRG20000100000000000001 /* EnergyConditions.swift in Sources */,
+				FILEAG00001BR000001 /* FileAgingService.swift in Sources */,
+				FILHS00001BR000001 /* FileHashStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -448,6 +490,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				XTBLD00000000000000002 /* DownloadSortClassificationTests.swift in Sources */,
+				WFTSTBLD000000000000001 /* WhereFromsTests.swift in Sources */,
+				FTTST200001BK000001 /* FinderTagCompositionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -604,6 +648,7 @@
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;

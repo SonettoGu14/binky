@@ -11,6 +11,8 @@ struct CompressionPreset: Codable, Identifiable, Equatable, Sendable {
     var watchFolderBookmark: Data
 
     var customFinderTags: [String]
+    /// Optional per-`FileSortCategory` default Finder tags (keys = category raw values). Empty map = use globals / built-ins.
+    var finderTagDefaultsByCategory: [String: [String]]
     var inboxSortRules: [InboxSortRule]
     var newTagExpiryDays: Int
     var postSortShortcutName: String
@@ -25,6 +27,7 @@ struct CompressionPreset: Codable, Identifiable, Equatable, Sendable {
         self.watchFolderPath = ""
         self.watchFolderBookmark = Data()
         self.customFinderTags = []
+        self.finderTagDefaultsByCategory = [:]
         self.inboxSortRules = []
         self.newTagExpiryDays = 0
         self.postSortShortcutName = ""
@@ -39,6 +42,7 @@ struct CompressionPreset: Codable, Identifiable, Equatable, Sendable {
         self.watchFolderPath = source.watchFolderPath
         self.watchFolderBookmark = source.watchFolderBookmark
         self.customFinderTags = source.customFinderTags
+        self.finderTagDefaultsByCategory = source.finderTagDefaultsByCategory
         self.inboxSortRules = source.inboxSortRules
         self.newTagExpiryDays = source.newTagExpiryDays
         self.postSortShortcutName = source.postSortShortcutName
@@ -58,6 +62,7 @@ struct CompressionPreset: Codable, Identifiable, Equatable, Sendable {
         watchFolderBookmark = try c.decodeIfPresent(Data.self, forKey: .watchFolderBookmark) ?? Data()
 
         customFinderTags = try c.decodeIfPresent([String].self, forKey: .customFinderTags) ?? []
+        finderTagDefaultsByCategory = try c.decodeIfPresent([String: [String]].self, forKey: .finderTagDefaultsByCategory) ?? [:]
         inboxSortRules = try c.decodeIfPresent([InboxSortRule].self, forKey: .inboxSortRules) ?? []
         newTagExpiryDays = try c.decodeIfPresent(Int.self, forKey: .newTagExpiryDays) ?? 0
         postSortShortcutName = try c.decodeIfPresent(String.self, forKey: .postSortShortcutName) ?? ""
@@ -66,7 +71,7 @@ struct CompressionPreset: Codable, Identifiable, Equatable, Sendable {
     private enum CodingKeys: String, CodingKey {
         case id, name, createdAt
         case watchFolderEnabled, watchFolderModeRaw, watchFolderPath, watchFolderBookmark
-        case customFinderTags, inboxSortRules, newTagExpiryDays, postSortShortcutName
+        case customFinderTags, finderTagDefaultsByCategory, inboxSortRules, newTagExpiryDays, postSortShortcutName
     }
 
     /// Finder-style unique profile name among existing names.

@@ -69,6 +69,8 @@ final class OrganizerViewModel: ObservableObject {
         if prefs.notifyWhenDone {
             postSortSortOnlyNotification(outcome: outcome)
         }
+        prefs.lastSortAlreadyHadCount = outcome.alreadyHadCount
+        SortDailyDigestAccumulator.shared.record(outcome: outcome)
         pendingSortOutcome = prefs.showBatchSummaryDialog ? outcome : nil
     }
 
@@ -188,8 +190,8 @@ final class OrganizerViewModel: ObservableObject {
     }
 
     /// Dry-run rows for active sweep root (sidebar Preview).
-    func inboxPreviewEntries(prefs: BinkyPreferences) -> [SortPreviewEntry] {
-        DownloadsSortOrchestrator.shared.previewSort(
+    func inboxPreviewEntries(prefs: BinkyPreferences) async -> [SortPreviewEntry] {
+        await DownloadsSortOrchestrator.shared.previewSort(
             files: topLevelSweepFiles(prefs: prefs),
             prefs: prefs
         )

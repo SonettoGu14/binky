@@ -19,6 +19,18 @@ struct ContentView: View {
             .environmentObject(updater)
             .onAppear {
                 BinkyMenuBarController.shared.refresh()
+                SortDigestScheduler.reschedule(prefs: prefs)
+                FileAgingService.shared.restartTimer(prefs: prefs)
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+            }
+            .onChange(of: prefs.dailyDigestEnabled) { _, _ in
+                SortDigestScheduler.reschedule(prefs: prefs)
+            }
+            .onChange(of: prefs.dailyDigestHour) { _, _ in
+                SortDigestScheduler.reschedule(prefs: prefs)
+            }
+            .onChange(of: prefs.fileAgingEnabled) { _, _ in
+                FileAgingService.shared.restartTimer(prefs: prefs)
             }
             .onChange(of: prefs.showMenuBarIcon) { _, _ in
                 BinkyMenuBarController.shared.refresh()

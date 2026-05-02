@@ -41,6 +41,16 @@ enum SortRulesEvaluator {
         let addedToDirectoryDate: Date?
         let creationDate: Date?
         let modificationDate: Date?
+        /// Hosts from `kMDItemWhereFroms` (lowercased).
+        let originHosts: [String]
+    }
+
+    /// Result of content inspection for routing rules (OCR / receipt).
+    struct ContentRuleMatchInput: Equatable, Sendable {
+        var hasSignificantOCR: Bool
+        var isReceiptLike: Bool
+
+        static let unknown = ContentRuleMatchInput(hasSignificantOCR: false, isReceiptLike: false)
     }
 
     static func loadSignals(url: URL) -> FileSignals? {
@@ -52,13 +62,15 @@ enum SortRulesEvaluator {
         ]
         guard let v = try? url.resourceValues(forKeys: keys) else { return nil }
         let sz = Int64(v.fileSize ?? 0)
+        let hosts = WhereFromsReader.originHosts(forFileAt: url.standardizedFileURL)
         return FileSignals(
             ext: url.pathExtension.lowercased(),
             baseName: url.lastPathComponent,
             byteSize: sz,
             addedToDirectoryDate: v.addedToDirectoryDate,
             creationDate: v.creationDate,
-            modificationDate: v.contentModificationDate
+            modificationDate: v.contentModificationDate,
+            originHosts: hosts
         )
     }
 
@@ -97,7 +109,7 @@ enum SortRulesEvaluator {
 
     // MARK: - Rule match
 
-    static func ruleMatches(_ rule: InboxSortRule, signals: FileSignals) -> Bool {
+    static func ruleMatches(_ rule: InboxSortRule, signals: FileSignals, content: ContentRuleMatchInput? = nil) -> Bool {
         guard rule.isEnabled else { return false }
         if !rule.matchExtensions.isEmpty {
             guard rule.matchExtensions.contains(signals.ext) else { return false }
@@ -110,7 +122,27 @@ enum SortRulesEvaluator {
         if let minB = rule.minSizeBytes, signals.byteSize < minB { return false }
         if let maxB = rule.maxSizeBytes, signals.byteSize > maxB { return false }
         guard matchesDatePredicate(rule.dateAddedPredicate, signals: signals) else { return false }
+
+        let originPatterns = rule.originDomains
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+            .filter { !$0.isEmpty }
+        if !originPatterns.isEmpty {
+            guard WhereFromsReader.matchesAnyOriginPattern(originPatterns, hosts: signals.originHosts) else { return false }
+        }
+
+        guard matchesContentPredicate(rule, content: content) else { return false }
         return true
+    }
+
+    private static func matchesContentPredicate(_ rule: InboxSortRule, content: ContentRuleMatchInput?) -> Bool {
+        switch rule.contentMatch.kind {
+        case .none:
+            return true
+        case .ocrText:
+            return content?.hasSignificantOCR == true
+        case .receipt:
+            return content?.isReceiptLike == true
+        }
     }
 
     private static func matchesDatePredicate(_ raw: SortDateAddedPredicate?, signals: FileSignals) -> Bool {
@@ -134,12 +166,28 @@ enum SortRulesEvaluator {
         }
     }
 
-    /// First matching enabled rule, or nil (caller falls back to taxonomy sort).
-    static func firstMatchingRule(in rules: [InboxSortRule], signals: FileSignals) -> InboxSortRule? {
+    /// True when any enabled rule needs OCR or receipt matching.
+    static func anyRuleRequiresContentInspection(_ rules: [InboxSortRule]) -> Bool {
+        rules.contains { $0.isEnabled && $0.contentMatch.kind != .none }
+    }
+    static func firstMatchingRule(in rules: [InboxSortRule], signals: FileSignals, content: ContentRuleMatchInput? = nil) -> InboxSortRule? {
         for r in rules where r.isEnabled {
-            if ruleMatches(r, signals: signals) { return r }
+            if ruleMatches(r, signals: signals, content: content) { return r }
         }
         return nil
+    }
+
+    /// Slug for `{ocr}` / template tokens (safe filename fragment).
+    static func slugifyForRenameToken(from raw: String, maxLen: Int) -> String {
+        let allowed = CharacterSet.alphanumerics.union(.whitespaces)
+        let cleaned = String(raw.unicodeScalars.filter { allowed.contains($0) })
+        let parts = cleaned.split(whereSeparator: \.isWhitespace).filter { !$0.isEmpty }
+        guard !parts.isEmpty else { return "" }
+        var out = parts.joined(separator: "-")
+        if out.count > maxLen {
+            out = String(out.prefix(maxLen)).trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+        }
+        return out
     }
 
     // MARK: - Rename
@@ -150,14 +198,39 @@ enum SortRulesEvaluator {
         return f
     }()
 
-    static func renamedFilename(originalURL: URL, rule: InboxSortRule?, renameCounter: Int) -> String {
+    static func renamedFilename(
+        originalURL: URL,
+        rule: InboxSortRule?,
+        renameCounter: Int,
+        originHost: String? = nil,
+        ocrSlug: String? = nil,
+        vendorSlug: String? = nil,
+        amountSlug: String? = nil
+    ) -> String {
         let stem = originalURL.deletingPathExtension().lastPathComponent
         let ext = originalURL.pathExtension
         let dotExt = ext.isEmpty ? "" : ".\(ext)"
         let dateStr = isoDateFormatter.string(from: Date())
+        let originLabel = WhereFromsReader.sanitizedOriginLabel(forHost: originHost ?? originalURL.host)
 
         guard let rule else {
             return originalURL.lastPathComponent
+        }
+
+        func applyTemplateTokens(_ tpl: String) -> String {
+            let ocr = (ocrSlug ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let ven = (vendorSlug ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let amt = (amountSlug ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            return tpl
+                .replacingOccurrences(of: "{date}", with: dateStr)
+                .replacingOccurrences(of: "{stem}", with: stem)
+                .replacingOccurrences(of: "{ext}", with: dotExt)
+                .replacingOccurrences(of: "{n}", with: "\(renameCounter)")
+                .replacingOccurrences(of: "{counter}", with: "\(renameCounter)")
+                .replacingOccurrences(of: "{origin}", with: originLabel.isEmpty ? "unknown-origin" : originLabel)
+                .replacingOccurrences(of: "{ocr}", with: ocr.isEmpty ? stem : ocr)
+                .replacingOccurrences(of: "{vendor}", with: ven.isEmpty ? "vendor" : ven)
+                .replacingOccurrences(of: "{amount}", with: amt.isEmpty ? "amount" : amt)
         }
 
         switch rule.renameStyle {
@@ -168,12 +241,7 @@ enum SortRulesEvaluator {
         case .template:
             let tpl = rule.renameTemplate.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !tpl.isEmpty else { return originalURL.lastPathComponent }
-            return tpl
-                .replacingOccurrences(of: "{date}", with: dateStr)
-                .replacingOccurrences(of: "{stem}", with: stem)
-                .replacingOccurrences(of: "{ext}", with: dotExt)
-                .replacingOccurrences(of: "{n}", with: "\(renameCounter)")
-                .replacingOccurrences(of: "{counter}", with: "\(renameCounter)")
+            return applyTemplateTokens(tpl)
         }
     }
 

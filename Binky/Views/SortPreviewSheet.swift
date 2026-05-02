@@ -32,11 +32,19 @@ struct SortPreviewSheet: View {
                 }
                 .width(min: 180, ideal: 260)
 
-                TableColumn(String(localized: "Summary", comment: "Sort preview table.")) { row in
-                    Text(row.summary)
+                TableColumn(String(localized: "Why", comment: "Sort preview table: plain-language reason.")) { row in
+                    Text(row.whyLine)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(3)
+                }
+                .width(min: 160, ideal: 220)
+
+                TableColumn(String(localized: "Summary", comment: "Sort preview table.")) { row in
+                    Text(row.summary)
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(2)
                 }
             }
             .frame(minHeight: 220)
@@ -53,6 +61,6 @@ struct SortPreviewSheet: View {
             }
         }
         .padding(22)
-        .frame(minWidth: 560, minHeight: 360)
+        .frame(minWidth: 720, minHeight: 360)
     }
 }

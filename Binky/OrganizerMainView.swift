@@ -15,6 +15,7 @@ struct OrganizerMainView: View {
     @State private var showingCurrentlySortingSheet = false
     @State private var showingSortPreview = false
     @State private var sortPreviewRows: [SortPreviewEntry] = []
+    @State private var showingReviewTriage = false
 
     /// Same persistence key as Dinky below-update review strip.
     @AppStorage("reviewPromptBelowUpdateDismissed") private var reviewPromptBelowUpdateDismissed = false
@@ -65,6 +66,10 @@ struct OrganizerMainView: View {
         }
         .sheet(isPresented: $showingSortPreview) {
             SortPreviewSheet(rows: sortPreviewRows)
+        }
+        .sheet(isPresented: $showingReviewTriage) {
+            ReviewFolderTriageSheet()
+                .environmentObject(prefs)
         }
         .sheet(item: $vm.pendingSortOutcome) { outcome in
             SortOutcomeSheet(
@@ -504,8 +509,13 @@ struct OrganizerMainView: View {
 
             HStack(spacing: 10) {
                 Button {
-                    sortPreviewRows = vm.inboxPreviewEntries(prefs: prefs)
-                    showingSortPreview = true
+                    Task {
+                        let rows = await vm.inboxPreviewEntries(prefs: prefs)
+                        await MainActor.run {
+                            sortPreviewRows = rows
+                            showingSortPreview = true
+                        }
+                    }
                 } label: {
                     Text(String(localized: "Preview…", comment: "Dry-run sort sorted folders."))
                 }
@@ -568,6 +578,12 @@ struct OrganizerMainView: View {
                 .foregroundStyle(.secondary)
             }
             Spacer(minLength: 0)
+            Button(String(localized: "Tidy here…", comment: "Open in-app Review triage sheet.")) {
+                showingReviewTriage = true
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+
             Button(String(localized: "Open Review in Finder", comment: "Reveal Review folder in Finder.")) {
                 openReviewInFinder()
             }
@@ -630,6 +646,8 @@ struct OrganizerMainView: View {
                 Text(countSummary(for: row.outcome))
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                sessionSignalChips(for: row.outcome)
+                reviewOriginChipsView(for: row.outcome)
             }
             Spacer(minLength: 0)
 
@@ -650,6 +668,89 @@ struct OrganizerMainView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 12)
+    }
+
+    @ViewBuilder
+    private func sessionSignalChips(for outcome: SortBatchOutcome) -> some View {
+        let labels = sessionSignalChipLabels(for: outcome)
+        if labels.isEmpty {
+            EmptyView()
+        } else {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(Array(labels.enumerated()), id: \.offset) { _, label in
+                        Text(label)
+                            .font(.caption2.weight(.medium))
+                            .lineLimit(1)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill(Color.primary.opacity(0.06))
+                            )
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(String(localized: "Session summary chips", comment: "VoiceOver: chips for sort session highlights."))
+        }
+    }
+
+    private func sessionSignalChipLabels(for outcome: SortBatchOutcome) -> [String] {
+        var out: [String] = []
+        if outcome.alreadyHadCount > 0 {
+            out.append(String.localizedStringWithFormat(
+                String(localized: "%lld already had", comment: "Activity row chip; duplicate handling."),
+                Int64(outcome.alreadyHadCount)
+            ))
+        }
+        if outcome.receiptFiledCount > 0 {
+            out.append(String.localizedStringWithFormat(
+                String(localized: "%lld receipts filed", comment: "Activity row chip."),
+                Int64(outcome.receiptFiledCount)
+            ))
+        }
+        if outcome.reviewQueuedCount > 0 {
+            out.append(String.localizedStringWithFormat(
+                String(localized: "%lld in review", comment: "Activity row chip."),
+                Int64(outcome.reviewQueuedCount)
+            ))
+        }
+        return out
+    }
+
+    @ViewBuilder
+    private func reviewOriginChipsView(for outcome: SortBatchOutcome) -> some View {
+        let hosts = Self.sortedUniqueReviewOriginHosts(in: outcome)
+        if !hosts.isEmpty {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(hosts, id: \.self) { host in
+                        Text(host)
+                            .font(.caption2.weight(.medium))
+                            .lineLimit(1)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill(Color.primary.opacity(0.06))
+                            )
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(String(localized: "Sources for Review items", comment: "VoiceOver: where-from host chips."))
+        }
+    }
+
+    private static func sortedUniqueReviewOriginHosts(in outcome: SortBatchOutcome) -> [String] {
+        let hosts = outcome.entries
+            .filter { $0.disposition == .moved && $0.category == .review }
+            .compactMap(\.originHost)
+            .filter { !$0.isEmpty }
+        return Array(Set(hosts)).sorted()
     }
 
     // MARK: - Models / derived state

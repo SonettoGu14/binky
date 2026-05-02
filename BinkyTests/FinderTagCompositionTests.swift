@@ -1,0 +1,107 @@
+import XCTest
+@testable import Binky
+
+final class FinderTagCompositionTests: XCTestCase {
+
+    func testBuiltInWhenMapsEmpty() {
+        let tags = FinderTagComposer.compose(
+            naturalCategory: .pdf,
+            globalDefaults: [:],
+            preset: nil,
+            matchedRule: nil,
+            appendNewSemanticTag: true
+        )
+        XCTAssertEqual(tags, ["Receipt", "New"])
+    }
+
+    func testGlobalOverridesBuiltIn() {
+        let tags = FinderTagComposer.compose(
+            naturalCategory: .pdf,
+            globalDefaults: ["pdf": ["Invoice", "Tax"]],
+            preset: nil,
+            matchedRule: nil,
+            appendNewSemanticTag: false
+        )
+        XCTAssertEqual(tags, ["Invoice", "Tax"])
+    }
+
+    func testPresetOverridesGlobal() {
+        var preset = CompressionPreset(name: "T")
+        preset.finderTagDefaultsByCategory = ["images": ["Client"]]
+        let tags = FinderTagComposer.compose(
+            naturalCategory: .images,
+            globalDefaults: ["images": ["Global"]],
+            preset: preset,
+            matchedRule: nil,
+            appendNewSemanticTag: false
+        )
+        XCTAssertEqual(tags, ["Client"])
+    }
+
+    func testExplicitEmptyCategoryMapMeansNoCategoryTags() {
+        var preset = CompressionPreset(name: "T")
+        preset.finderTagDefaultsByCategory = ["pdf": []]
+        let tags = FinderTagComposer.compose(
+            naturalCategory: .pdf,
+            globalDefaults: ["pdf": ["Ignored"]],
+            preset: preset,
+            matchedRule: nil,
+            appendNewSemanticTag: false
+        )
+        XCTAssertEqual(tags, [])
+    }
+
+    func testReplaceCategoryDefaultPolicy() {
+        var preset = CompressionPreset(name: "T")
+        preset.customFinderTags = ["Profile"]
+        let rule = InboxSortRule(
+            id: UUID(),
+            isEnabled: true,
+            name: "R",
+            matchExtensions: [],
+            nameContains: "",
+            fileKindFilter: .any,
+            minSizeBytes: nil,
+            maxSizeBytes: nil,
+            dateAddedPredicate: nil,
+            destinationRelativePath: "X",
+            renameStyle: .none,
+            renameTemplate: "{date}",
+            addedTags: ["Extra"],
+            finderTagPolicy: .replaceCategoryDefault,
+            categoryDefaultReplacementTags: ["FolderA"]
+        )
+        let tags = FinderTagComposer.compose(
+            naturalCategory: .pdf,
+            globalDefaults: ["pdf": ["Ignored"]],
+            preset: preset,
+            matchedRule: rule,
+            appendNewSemanticTag: false
+        )
+        XCTAssertEqual(tags, ["FolderA", "Profile", "Extra"])
+    }
+
+    func testInboxSortRuleDecodesWhenOmittingNewFinderTagKeys() throws {
+        let encoder = JSONEncoder()
+        let baseline = InboxSortRule.fresh(order: 1)
+        var data = try encoder.encode(baseline)
+        var raw = try XCTUnwrap(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        raw.removeValue(forKey: "finderTagPolicy")
+        raw.removeValue(forKey: "categoryDefaultReplacementTags")
+        data = try JSONSerialization.data(withJSONObject: raw)
+        let decoded = try JSONDecoder().decode(InboxSortRule.self, from: data)
+        XCTAssertEqual(decoded.finderTagPolicy, .additive)
+        XCTAssertEqual(decoded.categoryDefaultReplacementTags, [])
+    }
+
+    func testCompressionPresetDecodesWhenOmittingFinderTagDefaultsKey() throws {
+        let encoder = JSONEncoder()
+        let baseline = CompressionPreset(name: "Legacy")
+        var data = try encoder.encode(baseline)
+        var raw = try XCTUnwrap(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        raw.removeValue(forKey: "finderTagDefaultsByCategory")
+        data = try JSONSerialization.data(withJSONObject: raw)
+        let decoded = try JSONDecoder().decode(CompressionPreset.self, from: data)
+        XCTAssertEqual(decoded.finderTagDefaultsByCategory, [:])
+    }
+}

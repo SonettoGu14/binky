@@ -206,7 +206,44 @@ final class BinkyPreferences: ObservableObject {
 
     @AppStorage("sort.customRulesEnabled") var sortCustomRulesEnabled: Bool = false
 
+    /// Off / move to `Duplicates` / move to Trash when a file matches a prior byte hash or near-duplicate image.
+    @AppStorage("sort.duplicateMode") var sortDuplicateModeRaw: String = SortDuplicateHandlingMode.off.rawValue
+
+    /// Vision OCR renames default screenshot filenames using the strongest text line.
+    @AppStorage("sort.smartScreenshotNames") var sortSmartScreenshotNamesEnabled: Bool = false
+
+    /// Heuristic receipt / invoice detection for PDFs and images (routes to Receipts when enabled).
+    @AppStorage("sort.detectReceipts") var sortDetectReceiptsEnabled: Bool = false
+
+    /// Most recent sort: rows that were “already had” (skipped duplicate or moved to Duplicates). For Settings summary only.
+    @AppStorage("sort.lastRunAlreadyHadCount") var lastSortAlreadyHadCount: Int = 0
+
+    /// Move / trash stagnant files in category folders (see ``CategoryAgingRule``).
+    @AppStorage("fileAging.enabled") var fileAgingEnabled: Bool = false
+    @AppStorage("fileAging.rulesJSON") private var fileAgingRulesJSONStorage: Data = Data()
+    private var cachedFileAgingRules: [CategoryAgingRule]?
+    var fileAgingRules: [CategoryAgingRule] {
+        get {
+            if let cachedFileAgingRules { return cachedFileAgingRules }
+            let v = (try? JSONDecoder().decode([CategoryAgingRule].self, from: fileAgingRulesJSONStorage)) ?? []
+            cachedFileAgingRules = v
+            return v
+        }
+        set {
+            objectWillChange.send()
+            cachedFileAgingRules = newValue
+            fileAgingRulesJSONStorage = (try? JSONEncoder().encode(newValue)) ?? Data()
+        }
+    }
+
+    /// End-of-day totals notification.
+    @AppStorage("digest.enabled") var dailyDigestEnabled: Bool = false
+    /// Hour 0…23 local time.
+    @AppStorage("digest.hour") var dailyDigestHour: Int = 9
+
     @AppStorage("sort.routingRulesJSON") private var sortRoutingRulesJSONStorage: Data = Data()
+
+    @AppStorage("sort.finderTagDefaultsJSON") private var sortFinderTagDefaultsJSONStorage: Data = Data()
 
     private var cachedSortRoutingRules: [InboxSortRule]?
     var sortRoutingRules: [InboxSortRule] {
@@ -220,6 +257,26 @@ final class BinkyPreferences: ObservableObject {
             objectWillChange.send()
             cachedSortRoutingRules = newValue
             sortRoutingRulesJSONStorage = (try? JSONEncoder().encode(newValue)) ?? Data()
+        }
+    }
+
+    private var cachedSortFinderTagDefaults: [String: [String]]?
+    /// Default Finder tags per ``FileSortCategory`` (keys = category raw values). Empty value / missing key falls back to built-ins.
+    var sortFinderTagDefaultsByCategory: [String: [String]] {
+        get {
+            if let cachedSortFinderTagDefaults { return cachedSortFinderTagDefaults }
+            guard !sortFinderTagDefaultsJSONStorage.isEmpty else {
+                cachedSortFinderTagDefaults = [:]
+                return [:]
+            }
+            let v = (try? JSONDecoder().decode([String: [String]].self, from: sortFinderTagDefaultsJSONStorage)) ?? [:]
+            cachedSortFinderTagDefaults = v
+            return v
+        }
+        set {
+            objectWillChange.send()
+            cachedSortFinderTagDefaults = newValue
+            sortFinderTagDefaultsJSONStorage = newValue.isEmpty ? Data() : ((try? JSONEncoder().encode(newValue)) ?? Data())
         }
     }
 
@@ -394,10 +451,13 @@ extension BinkyPreferences {
     }
 
     func sortTagComposition(forCategory category: FileSortCategory) -> [String] {
-        var tags: [String] = []
-        if sortAppendNewSemanticTagEnabled { tags.append("New") }
-        tags.append(category.semanticTagHint)
-        return tags
+        FinderTagComposer.compose(
+            naturalCategory: category,
+            globalDefaults: sortFinderTagDefaultsByCategory,
+            preset: activePreset,
+            matchedRule: nil,
+            appendNewSemanticTag: sortAppendNewSemanticTagEnabled
+        )
     }
 
     func appendSortOutcomeRecord(_ outcome: SortBatchOutcome) {
