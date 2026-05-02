@@ -4,6 +4,14 @@
 
 _(Nothing yet.)_
 
+## 1.1.1 — 2026-05-01
+
+### Fixed
+
+- **Homebrew cask**: `homepage` URL uses a trailing slash so `brew style --cask` passes CI.
+- **Xcode / Swift 6**: cleared concurrency and cast warnings in `ContentInspector`, `DownloadSortServices`, and `FileAgingService` (no lock work inside async continuations; Vision results without a useless conditional cast; aging timer avoids capturing prefs in a `@Sendable` closure).
+- **SwiftUI**: aging-rule “See what would go” preview loads rows on appear instead of publishing prefs changes during view updates.
+
 ## 1.1.0 — 2026-05-01
 
 ### Added
