@@ -38,7 +38,7 @@
 - Support: help@binkyfiles.com
 - GitHub: https://github.com/heyderekj/binky
 - Latest release: https://github.com/heyderekj/binky/releases/latest
-- Download v1.1.0: https://github.com/heyderekj/binky/releases/download/v1.1.0/Binky-1.1.0.dmg
+- Download v1.1.1: https://github.com/heyderekj/binky/releases/download/v1.1.1/Binky-1.1.1.dmg
 - Homebrew: `brew tap heyderekj/binky https://github.com/heyderekj/binky` then `brew install --cask binky`
 
 ## Author
