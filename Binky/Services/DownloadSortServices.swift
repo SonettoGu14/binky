@@ -610,10 +610,7 @@ private final class SortRunGate: @unchecked Sendable {
 
     func continueWhenSortPermitsProgress() async -> Bool {
         while true {
-            lock.lock()
-            let c = control
-            let active = sessionActive
-            lock.unlock()
+            let (c, active) = snapshot()
             if !active { return false }
             if c == .paused {
                 try? await Task.sleep(for: .milliseconds(130))
@@ -622,6 +619,12 @@ private final class SortRunGate: @unchecked Sendable {
             }
             return c != .stopRequested
         }
+    }
+
+    private func snapshot() -> (ControlState, Bool) {
+        lock.lock()
+        defer { lock.unlock() }
+        return (control, sessionActive)
     }
 }
 
@@ -1751,7 +1754,7 @@ final class WatchSortCoordinator {
             }
             try? await Task.sleep(for: .milliseconds(800))
             if Task.isCancelled { return }
-            var batch = Array(queuedIncoming)
+            let batch = Array(queuedIncoming)
             queuedIncoming.removeAll()
             guard !batch.isEmpty else { return }
             while EnergyConditions.shared.shouldPauseFully {

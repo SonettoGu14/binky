@@ -79,20 +79,30 @@
       <section class="comparison">
         <div class="cmp-row">
           <div class="cmp-text-card">
-            <h2 class="cmp-title">Pick the tool that matches the tantrum</h2>
-            <p class="cmp-desc">Hazel is a rules engine for everything. Neatify sorts by project from the menu bar. Folder Actions are free if you speak AppleScript. Refolder leans on AI inside Setapp. Binky just watches a folder, sorts into sorted folders, and flags the weird stuff.</p>
+            <h2 class="cmp-title">Match the tool to the tantrum.</h2>
+            <p class="cmp-desc">Hazel is a full rules engine. Neatify runs from the menu bar. Refolder leans on AI via Setapp. Binky watches a folder, sorts into sorted folders, and flags the weird stuff — with source-aware routing, plain-English rules, receipt detection, and custom rules when sorted folders aren’t enough.</p>
             <p class="cmp-footnote">Rough tradeoffs — pricing and features move. Check each vendor.</p>
           </div>
           <div class="comparison-card">
+            <div class="cmp-mobile-tabs">
+              <div class="cmp-segmented" role="tablist" aria-label="Compare with">
+                <button type="button" class="cmp-tab is-active" data-org-tab="hazel">Hazel</button>
+                <button type="button" class="cmp-tab" data-org-tab="neatify">Neatify</button>
+                <button type="button" class="cmp-tab" data-org-tab="finder">Finder</button>
+                <button type="button" class="cmp-tab" data-org-tab="refolder">Refolder</button>
+              </div>
+            </div>
             <div class="comparison-scroll">
-              <table class="comparison-table comparison-table--static">
+              <table class="comparison-table comparison-table--org" data-active-tool="hazel">
                 <thead>
                   <tr>
                     <th scope="col"></th>
                     <th scope="col" class="th-binky"><div class="th-binky-name">Binky</div></th>
-                    <th scope="col" class="th-tool-col">Hazel</th>
-                    <th scope="col" class="th-tool-col">Neatify</th>
-                    <th scope="col" class="th-tool-col">Finder</th>
+                    <th scope="col" class="th-cycle">
+                      <div class="th-cycle-row">
+                        <span class="th-tool" id="cmp-org-name">Hazel</span>
+                      </div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -102,9 +112,10 @@
                       Price
                     </div></td>
                     <td class="cmp-binky">Free</td>
-                    <td>Paid ($42)</td>
-                    <td>Paid ($31)</td>
-                    <td>Free</td>
+                    <td data-col="hazel">Paid ($42)</td>
+                    <td data-col="neatify">Paid ($31)</td>
+                    <td data-col="finder">Free</td>
+                    <td data-col="refolder">Paid (Setapp)</td>
                   </tr>
                   <tr>
                     <td class="cmp-label-cell"><div class="cmp-label">
@@ -112,9 +123,10 @@
                       Watch folder
                     </div></td>
                     <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                    <td><span class="cmp-dim">Rules-based</span></td>
-                    <td><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                    <td><span class="cmp-cross">—</span></td>
+                    <td data-col="hazel"><span class="cmp-dim">Rules-based</span></td>
+                    <td data-col="neatify"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+                    <td data-col="finder"><span class="cmp-cross">—</span></td>
+                    <td data-col="refolder"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
                   </tr>
                   <tr>
                     <td class="cmp-label-cell"><div class="cmp-label">
@@ -122,9 +134,10 @@
                       Review folder
                     </div></td>
                     <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                    <td><span class="cmp-cross">—</span></td>
-                    <td><span class="cmp-cross">—</span></td>
-                    <td><span class="cmp-dim">You decide</span></td>
+                    <td data-col="hazel"><span class="cmp-cross">—</span></td>
+                    <td data-col="neatify"><span class="cmp-cross">—</span></td>
+                    <td data-col="finder"><span class="cmp-dim">You decide</span></td>
+                    <td data-col="refolder"><span class="cmp-cross">—</span></td>
                   </tr>
                   <tr>
                     <td class="cmp-label-cell"><div class="cmp-label">
@@ -132,9 +145,10 @@
                       Stable-file gate
                     </div></td>
                     <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                    <td><span class="cmp-dim">Depends on rule</span></td>
-                    <td><span class="cmp-dim">Varies</span></td>
-                    <td><span class="cmp-dim">You wait</span></td>
+                    <td data-col="hazel"><span class="cmp-dim">Depends on rule</span></td>
+                    <td data-col="neatify"><span class="cmp-dim">Varies</span></td>
+                    <td data-col="finder"><span class="cmp-dim">You wait</span></td>
+                    <td data-col="refolder"><span class="cmp-cross">—</span></td>
                   </tr>
                   <tr>
                     <td class="cmp-label-cell"><div class="cmp-label">
@@ -142,9 +156,10 @@
                       Optional Finder tags
                     </div></td>
                     <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                    <td><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                    <td><span class="cmp-cross">—</span></td>
-                    <td><span class="cmp-dim">DIY</span></td>
+                    <td data-col="hazel"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+                    <td data-col="neatify"><span class="cmp-cross">—</span></td>
+                    <td data-col="finder"><span class="cmp-dim">DIY</span></td>
+                    <td data-col="refolder"><span class="cmp-cross">—</span></td>
                   </tr>
                   <tr>
                     <td class="cmp-label-cell"><div class="cmp-label">
@@ -152,9 +167,32 @@
                       Undo moves
                     </div></td>
                     <td class="cmp-binky"><span class="cmp-dim">Where macOS agrees</span></td>
-                    <td><span class="cmp-dim">Workflow-dependent</span></td>
-                    <td><span class="cmp-dim">Where macOS agrees</span></td>
-                    <td><span class="cmp-dim">⌘Z in Finder</span></td>
+                    <td data-col="hazel"><span class="cmp-dim">Workflow-dependent</span></td>
+                    <td data-col="neatify"><span class="cmp-dim">Where macOS agrees</span></td>
+                    <td data-col="finder"><span class="cmp-dim">⌘Z in Finder</span></td>
+                    <td data-col="refolder"><span class="cmp-dim">Workflow-dependent</span></td>
+                  </tr>
+                  <tr>
+                    <td class="cmp-label-cell"><div class="cmp-label">
+                      <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z" clip-rule="evenodd"/></svg>
+                      Custom rules
+                    </div></td>
+                    <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+                    <td data-col="hazel"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg> <span class="cmp-dim">Full engine</span></td>
+                    <td data-col="neatify"><span class="cmp-cross">—</span></td>
+                    <td data-col="finder"><span class="cmp-cross">—</span></td>
+                    <td data-col="refolder"><span class="cmp-dim">AI-assisted</span></td>
+                  </tr>
+                  <tr>
+                    <td class="cmp-label-cell"><div class="cmp-label">
+                      <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd"/></svg>
+                      Sort preview
+                    </div></td>
+                    <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+                    <td data-col="hazel"><span class="cmp-cross">—</span></td>
+                    <td data-col="neatify"><span class="cmp-cross">—</span></td>
+                    <td data-col="finder"><span class="cmp-cross">—</span></td>
+                    <td data-col="refolder"><span class="cmp-cross">—</span></td>
                   </tr>
                   <tr>
                     <td class="cmp-label-cell"><div class="cmp-label">
@@ -162,9 +200,10 @@
                       Open source
                     </div></td>
                     <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg> <span class="cmp-dim">MIT</span></td>
-                    <td><span class="cmp-cross">—</span></td>
-                    <td><span class="cmp-cross">—</span></td>
-                    <td><span class="cmp-dim">N/A</span></td>
+                    <td data-col="hazel"><span class="cmp-cross">—</span></td>
+                    <td data-col="neatify"><span class="cmp-cross">—</span></td>
+                    <td data-col="finder"><span class="cmp-dim">N/A</span></td>
+                    <td data-col="refolder"><span class="cmp-cross">—</span></td>
                   </tr>
                   <tr>
                     <td class="cmp-label-cell"><div class="cmp-label">
@@ -172,9 +211,10 @@
                       App size
                     </div></td>
                     <td class="cmp-binky"><span class="cmp-dim">Lean</span></td>
-                    <td><span class="cmp-dim">Larger</span></td>
-                    <td><span class="cmp-dim">Moderate</span></td>
-                    <td><span class="cmp-cross">—</span></td>
+                    <td data-col="hazel"><span class="cmp-dim">Larger</span></td>
+                    <td data-col="neatify"><span class="cmp-dim">Moderate</span></td>
+                    <td data-col="finder"><span class="cmp-cross">—</span></td>
+                    <td data-col="refolder"><span class="cmp-dim">~22 MB</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -272,5 +312,29 @@
       © Testament Made, LLC · <a href="mailto:help@binkyfiles.com">help@binkyfiles.com</a>
     </footer>
   </div>
+  <script>
+    (function () {
+      var tools = ['hazel', 'neatify', 'finder', 'refolder'];
+      var names = { hazel: 'Hazel', neatify: 'Neatify', finder: 'Finder', refolder: 'Refolder' };
+      var table = document.querySelector('.comparison-table--org');
+      var nameEl = document.getElementById('cmp-org-name');
+      var tabs = document.querySelectorAll('[data-org-tab]');
+      if (!table || !nameEl || !tabs.length) return;
+
+      function activate(tool) {
+        table.setAttribute('data-active-tool', tool);
+        nameEl.textContent = names[tool];
+        tabs.forEach(function (btn) {
+          btn.classList.toggle('is-active', btn.getAttribute('data-org-tab') === tool);
+        });
+      }
+
+      tabs.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          activate(btn.getAttribute('data-org-tab'));
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

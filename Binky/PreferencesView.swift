@@ -576,10 +576,7 @@ private struct FileAgingPreviewSheet: View {
     @EnvironmentObject private var prefs: BinkyPreferences
     let rule: CategoryAgingRule
     @Environment(\.dismiss) private var dismiss
-
-    private var rows: [FileAgingPreviewRow] {
-        FileAgingService.shared.previewCandidates(rule: rule, prefs: prefs)
-    }
+    @State private var rows: [FileAgingPreviewRow] = []
 
     private static let rowDateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -631,6 +628,10 @@ private struct FileAgingPreviewSheet: View {
         }
         .padding(22)
         .frame(minWidth: 440, minHeight: 320)
+        .onAppear {
+            let root = prefs.activeSortSweepRootDirectory()
+            rows = FileAgingService.shared.previewCandidates(rule: rule, root: root)
+        }
     }
 }
 

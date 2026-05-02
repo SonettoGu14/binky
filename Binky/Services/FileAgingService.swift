@@ -16,16 +16,19 @@ final class FileAgingService {
     static let shared = FileAgingService()
 
     private var timer: Timer?
+    private weak var prefsRef: BinkyPreferences?
 
     private init() {}
 
     func restartTimer(prefs: BinkyPreferences) {
+        prefsRef = prefs
         timer?.invalidate()
         timer = nil
         guard prefs.fileAgingEnabled, !prefs.fileAgingRules.isEmpty else { return }
         timer = Timer.scheduledTimer(withTimeInterval: 86_400, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.runSweep(prefs: prefs)
+            guard let self else { return }
+            MainActor.assumeIsolated {
+                self.runSweepUsingStoredPreferences()
             }
         }
         RunLoop.main.add(timer!, forMode: .common)
@@ -35,6 +38,12 @@ final class FileAgingService {
     func stop() {
         timer?.invalidate()
         timer = nil
+        prefsRef = nil
+    }
+
+    private func runSweepUsingStoredPreferences() {
+        guard let prefs = prefsRef else { return }
+        runSweep(prefs: prefs)
     }
 
     func runSweep(prefs: BinkyPreferences) {
@@ -93,11 +102,9 @@ final class FileAgingService {
     }
 
     /// Files that would be moved or trashed **now** if this rule ran (read-only).
-    func previewCandidates(rule: CategoryAgingRule, prefs: BinkyPreferences) -> [FileAgingPreviewRow] {
+    func previewCandidates(rule: CategoryAgingRule, root: URL) -> [FileAgingPreviewRow] {
         guard rule.untouchedDays > 0,
               let category = FileSortCategory(rawValue: rule.categoryRaw) else { return [] }
-        prefs.reconcileFolderBookmarksIfNeeded()
-        let root = prefs.activeSortSweepRootDirectory()
         let fm = FileManager.default
         let folder = StarterDestinations.directory(for: category, root: root)
         guard let urls = try? fm.contentsOfDirectory(at: folder, includingPropertiesForKeys: [

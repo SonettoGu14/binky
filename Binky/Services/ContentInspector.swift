@@ -72,12 +72,9 @@ enum ContentInspector {
 
         guard let digest = quickSHA256(url: url) else { return emptyInspection }
         let cacheKey = digest as NSString
-        cacheLock.lock()
-        if let hit = cache.object(forKey: cacheKey) {
-            cacheLock.unlock()
-            return hit.result
+        if let hit = cachedResult(for: cacheKey) {
+            return hit
         }
-        cacheLock.unlock()
 
         let ext = signals.ext
         let result: ContentInspectionResult
@@ -89,9 +86,7 @@ enum ContentInspector {
             result = emptyInspection
         }
 
-        cacheLock.lock()
-        cache.setObject(CacheEntry(result: result), forKey: cacheKey)
-        cacheLock.unlock()
+        cacheResult(result, for: cacheKey)
         return result
     }
 
@@ -205,7 +200,7 @@ enum ContentInspector {
         request.usesLanguageCorrection = true
         let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
         try handler.perform([request])
-        let obs = request.results as? [VNRecognizedTextObservation] ?? []
+        let obs = request.results ?? []
         return obs.compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
     }
 
@@ -302,5 +297,17 @@ enum ContentInspector {
             out = String(out.prefix(maxLen)).trimmingCharacters(in: CharacterSet(charactersIn: "-"))
         }
         return out
+    }
+
+    private static func cachedResult(for key: NSString) -> ContentInspectionResult? {
+        cacheLock.lock()
+        defer { cacheLock.unlock() }
+        return cache.object(forKey: key)?.result
+    }
+
+    private static func cacheResult(_ result: ContentInspectionResult, for key: NSString) {
+        cacheLock.lock()
+        cache.setObject(CacheEntry(result: result), forKey: key)
+        cacheLock.unlock()
     }
 }

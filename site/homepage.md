@@ -2,7 +2,7 @@
 
 **Tagline:** Binky sorts your files.
 
-A native macOS app that watches your inbox (defaults to `~/Downloads`), waits for files to finish landing, then sorts them into sensible sorted folders — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc. Unknowns route to **Review** so nothing sketchy silently disappears. Optional Finder tags; history with reveal and undo where macOS allows.
+A native macOS app that watches your inbox (defaults to `~/Downloads`), waits for files to finish landing, then sorts them into sensible sorted folders — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc. Source-aware routing, plain-English rules, receipt detection, duplicate guard, smart screenshot names, optional housekeeping (stale-file aging) and a morning digest keep things calm. Unknowns route to **Review** so nothing sketchy silently disappears. Optional Finder tags; history with reveal and undo where macOS allows.
 
 - **Site:** [binkyfiles.com](https://binkyfiles.com)
 - **Repo:** [GitHub — heyderekj/binky](https://github.com/heyderekj/binky)
@@ -12,10 +12,13 @@ A native macOS app that watches your inbox (defaults to `~/Downloads`), waits fo
 ## Highlights
 
 - **Sort Downloads Now** — primary action; stable-file gate, collision-safe moves
-- **Profiles & sorting rules** — destination behavior per profile
+- **Profiles & sorting rules** — destination behavior per profile; describe a rule in plain English on macOS 26+
+- **Source-aware routing** — match by download origin and content, not just filename
 - **Watch inbox** — optional; defaults to Downloads when a bookmark is missing
-- **Finder Quick Action** — “Sort with Binky” on selected files
+- **Receipt & invoice detection** — routes financial PDFs when content looks like a receipt
+- **Duplicate guard** — hashing before files settle
 - **Shortcuts** — “Sort Files” App Intent passes paths to the running app
+- **Daily digest** — optional summary notification of moves, renames, and archives
 - **Review folder** — ambiguous types land here first
 - **History** — batch summaries; undo where possible
 

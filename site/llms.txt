@@ -1,16 +1,22 @@
 # Binky
 
-> A native macOS app for Downloads: watch the inbox, wait for files to settle, sort into sorted folders, route unknowns to Review. Pacifier calm, pacifier blunt. Runs locally.
+> A native macOS app for Downloads: watch the inbox, wait for files to settle, sort into sorted folders, route unknowns to Review. Source-aware routing, plain-English rules, receipt detection, duplicate guard, smart screenshot names, optional aging and a morning digest. Pacifier calm, pacifier blunt. Runs locally.
 
 ## What it does
 
 - **Sort Downloads Now** — batch sort with summaries; collision-safe renaming when names collide
 - **Stable-file gate** — avoids grabbing half-downloaded noise
 - **Destinations** — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc
+- **Source-aware routing** — rules can use where a file came from (browser metadata) and content matches
+- **Describe a rule** — plain-English rule building where the OS supports it; manual editor always available
+- **Receipt & invoice detection** — PDF and image cues for financial documents
+- **Duplicate guard** — hashes files to catch duplicates before routing
+- **Smart screenshot names** — Vision reads screens; filenames follow the content
+- **Stale-file aging** — optional archive for untouched files (housekeeping)
+- **Daily digest** — one notification summarizing moves, renames, and archives
 - **Review** — trust-first staging for ambiguous files
 - **Profiles** — per-profile sorted folders and sorting rules
 - **Watch inbox** — optional; Downloads by default unless you aim elsewhere
-- **Finder Quick Action** — “Sort with Binky” without opening the app
 - **Shortcuts** — Sort Files intent for automation chains
 - **Optional Finder tags** — on route when you want them
 - **History** — reveals and undo moves when the OS cooperates
