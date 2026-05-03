@@ -16,6 +16,7 @@ A native macOS sorter that follows your rules — no cloud, no guessing. **Quick
 - **Source-aware routing** — match by download origin and content, not just filename
 - **Receipt & invoice detection** — routes financial PDFs when content looks like a receipt
 - **Duplicate guard** — hashing before files settle
+- **CLI (`binky`)** — sort, preview, and run Routines from Terminal; same rules and prefs as the app; build from source with SwiftPM
 - **Shortcuts** — “Sort Files” App Intent passes paths to the running app
 - **Daily & weekly digest** — optional notifications; weekly share card (PNG) from session history
 - **Review folder** — ambiguous types land here first
