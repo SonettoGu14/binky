@@ -7,7 +7,7 @@
 #
 # What it does:
 #   1. Bumps MARKETING_VERSION + CURRENT_PROJECT_VERSION in the Xcode project
-#   2. Updates version + download URLs in site/index.html, site/llms.txt, site/homepage.md, site/compare/*/index.html
+#   2. Updates only explicit version copy/download tokens on site pages
 #   3. Builds the Release scheme
 #   4. Creates the DMG (+ zip for in-app updater), then updates Casks/binky.rb (version + sha256 of the zip) for Homebrew
 #   5. Commits, tags, pushes, and publishes the GitHub release
@@ -65,6 +65,28 @@ OLD_MARKETING="$FILE_MARKETING"
 echo "▶ Releasing Binky v$VERSION (project marketing version is $FILE_MARKETING)"
 echo ""
 
+replace_token_if_present() {
+  local file="$1"
+  local old="$2"
+  local new="$3"
+  [ -f "$file" ] || return 0
+
+  python3 - "$file" "$old" "$new" <<'PY'
+import pathlib
+import sys
+
+path = pathlib.Path(sys.argv[1])
+old = sys.argv[2]
+new = sys.argv[3]
+
+text = path.read_text(encoding="utf-8")
+if old not in text:
+    raise SystemExit(0)
+
+path.write_text(text.replace(old, new), encoding="utf-8")
+PY
+}
+
 # ── 1. Bump version (skip if project + site already at $VERSION) ─────────────
 
 if [ "$FILE_MARKETING" != "$VERSION" ]; then
@@ -80,26 +102,23 @@ fi
 # ── 2. Update site ────────────────────────────────────────────────────────────
 
 if [ "$OLD_MARKETING" != "$VERSION" ]; then
-  echo "→ Updating site/index.html…"
-  sed -E -i '' "s|\"softwareVersion\": \"[0-9]+\.[0-9]+\.[0-9]+\"|\"softwareVersion\": \"$VERSION\"|g" site/index.html
-  sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+/Binky-[0-9]+\.[0-9]+\.[0-9]+\.dmg|v$VERSION/Binky-$VERSION.dmg|g" site/index.html
-  sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+ · Requires|v$VERSION · Requires|g" site/index.html
+  echo "→ Updating site version copy tokens…"
+  replace_token_if_present site/index.html "\"softwareVersion\": \"$OLD_MARKETING\"" "\"softwareVersion\": \"$VERSION\""
+  replace_token_if_present site/index.html "v$OLD_MARKETING/Binky-$OLD_MARKETING.dmg" "v$VERSION/Binky-$VERSION.dmg"
+  replace_token_if_present site/index.html "v$OLD_MARKETING · Requires" "v$VERSION · Requires"
 
-  echo "→ Updating site/llms.txt…"
-  sed -E -i '' "s|Download v[0-9]+\.[0-9]+\.[0-9]+:|Download v$VERSION:|g" site/llms.txt
-  sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+/Binky-[0-9]+\.[0-9]+\.[0-9]+\.dmg|v$VERSION/Binky-$VERSION.dmg|g" site/llms.txt
+  replace_token_if_present site/llms.txt "Download v$OLD_MARKETING:" "Download v$VERSION:"
+  replace_token_if_present site/llms.txt "v$OLD_MARKETING/Binky-$OLD_MARKETING.dmg" "v$VERSION/Binky-$VERSION.dmg"
 
   if [ -f site/homepage.md ]; then
-    echo "→ Updating site/homepage.md…"
-    sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+/Binky-[0-9]+\.[0-9]+\.[0-9]+\.dmg|v$VERSION/Binky-$VERSION.dmg|g" site/homepage.md
+    replace_token_if_present site/homepage.md "v$OLD_MARKETING/Binky-$OLD_MARKETING.dmg" "v$VERSION/Binky-$VERSION.dmg"
   fi
 
   if compgen -G "site/compare/*/index.html" > /dev/null || [ -f site/compare/index.html ]; then
-    echo "→ Updating site/compare/**/index.html…"
     for f in site/compare/*/index.html site/compare/index.html; do
       [ -f "$f" ] || continue
-      sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+ · Requires|v$VERSION · Requires|g" "$f"
-      sed -E -i '' "s|v[0-9]+\.[0-9]+\.[0-9]+/Binky-[0-9]+\.[0-9]+\.[0-9]+\.dmg|v$VERSION/Binky-$VERSION.dmg|g" "$f"
+      replace_token_if_present "$f" "v$OLD_MARKETING · Requires" "v$VERSION · Requires"
+      replace_token_if_present "$f" "v$OLD_MARKETING/Binky-$OLD_MARKETING.dmg" "v$VERSION/Binky-$VERSION.dmg"
     done
   fi
 else
