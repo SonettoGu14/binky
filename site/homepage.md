@@ -24,7 +24,7 @@ A native macOS app that watches your inbox (defaults to `~/Downloads`), waits fo
 
 ## Install
 
-**Download:** [Binky for macOS (DMG)](https://github.com/heyderekj/binky/releases/download/v1.2.0/Binky-1.2.0.dmg) — or install with [Homebrew](https://brew.sh): `brew tap heyderekj/binky https://github.com/heyderekj/binky` then `brew install --cask binky`
+**Download:** [Binky for macOS (DMG)](https://github.com/heyderekj/binky/releases/download/v1.3.0/Binky-1.3.0.dmg) — or install with [Homebrew](https://brew.sh): `brew tap heyderekj/binky https://github.com/heyderekj/binky` then `brew install --cask binky`
 
 **GitHub:** Latest release and DMG/ZIP: [github.com/heyderekj/binky/releases/latest](https://github.com/heyderekj/binky/releases/latest)
 
