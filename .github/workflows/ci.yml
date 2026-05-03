@@ -19,15 +19,22 @@ jobs:
     # macOS 26 + Xcode 26 (e.g. SwiftUI `.glassEffect()`); macos-15 images only ship Xcode 16.x.
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build and test
         run: |
           set -eo pipefail
-          xcodebuild \
-            -project Binky.xcodeproj \
-            -scheme Binky \
-            -configuration Debug \
-            -destination 'platform=macOS' \
-            CODE_SIGN_IDENTITY=- \
-            CODE_SIGNING_REQUIRED=NO \
-            test
+          for attempt in 1 2; do
+            xcodebuild \
+              -project Binky.xcodeproj \
+              -scheme Binky \
+              -configuration Debug \
+              -destination 'platform=macOS' \
+              CODE_SIGN_IDENTITY=- \
+              CODE_SIGNING_REQUIRED=NO \
+              test && break
+            status=$?
+            if [ "$status" -ne 65 ] || [ "$attempt" -eq 2 ]; then
+              exit "$status"
+            fi
+            echo "xcodebuild exited 65 (LaunchServices test-runner flake on GitHub macOS). Retrying once..."
+          done

@@ -65,7 +65,9 @@ final class GlobalHotkeyManager {
     /// Opens the main organizer window (autosave name ``BinkyMainWindow``), or creates one if needed.
     @MainActor
     static func activateMainWindow() {
-        NSApp.activate(ignoringOtherApps: true)
+        // macOS 14+: prefer parameterless `activate()`; older `activate(ignoringOtherApps:)`
+        // is deprecated and may be a no-op on recent macOS when invoked from a status item.
+        NSApp.activate()
         bringMainWindowForward()
     }
 

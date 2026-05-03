@@ -23,6 +23,10 @@ extension Notification.Name {
     static let binkyStartSort = Notification.Name("binkyStartSort")
     /// Sweep one automation by id (`userInfo`: ``BinkyNotificationUserInfoKey/sortAutomationPresetID`` → `UUID`).
     static let binkyStartSortForAutomation = Notification.Name("binkyStartSortForAutomation")
+    /// Open the SwiftUI `Settings` scene from any AppKit context (menu bar, status item, etc.).
+    static let binkyOpenSettings = Notification.Name("binkyOpenSettings")
+    /// Bring the main organizer window forward (or create one) from any AppKit context.
+    static let binkyShowMainWindow = Notification.Name("binkyShowMainWindow")
     /// Another sort couldn’t start because one is already in flight.
     static let binkySortRejectedBecauseBusy = Notification.Name("binkySortRejectedBecauseBusy")
     /// Posted before quit so SwiftUI can dismiss sheets; used with `applicationShouldTerminate` / `terminateLater`.
