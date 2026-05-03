@@ -21,8 +21,8 @@ extension Notification.Name {
     static let binkyToggleSidebar       = Notification.Name("binkyToggleSidebar")
     /// User asked to run the Downloads / default folder sweep (`Sort Downloads Now` menu, shortcuts, menu bar).
     static let binkyStartSort = Notification.Name("binkyStartSort")
-    /// Sweep one automation by id (`userInfo`: ``BinkyNotificationUserInfoKey/sortAutomationPresetID`` → `UUID`).
-    static let binkyStartSortForAutomation = Notification.Name("binkyStartSortForAutomation")
+    /// Sweep one routine by id (`userInfo`: ``BinkyNotificationUserInfoKey/sortRoutinePresetID`` → `UUID`).
+    static let binkyStartSortForRoutine = Notification.Name("binkyStartSortForRoutine")
     /// Open the SwiftUI `Settings` scene from any AppKit context (menu bar, status item, etc.).
     static let binkyOpenSettings = Notification.Name("binkyOpenSettings")
     /// Bring the main organizer window forward (or create one) from any AppKit context.
@@ -31,6 +31,8 @@ extension Notification.Name {
     static let binkySortRejectedBecauseBusy = Notification.Name("binkySortRejectedBecauseBusy")
     /// Posted before quit so SwiftUI can dismiss sheets; used with `applicationShouldTerminate` / `terminateLater`.
     static let binkyPrepareQuit = Notification.Name("binkyPrepareQuit")
+    /// `userInfo[BinkyNotificationUserInfoKey.mainWindowModeRaw]` is a `MainWindowMode` rawValue string (`quickSort` / `routines`).
+    static let binkySwitchMainWindowMode = Notification.Name("binkySwitchMainWindowMode")
     /// Menu bar toggled **Pause watching** — syncs `UserDefaults` → SwiftUI preferences.
     static let binkyFolderWatchPauseChanged = Notification.Name("binkyFolderWatchPauseChanged")
     /// Posted when sorting progress changes. `SortProgressTracker` includes values in `userInfo`.
@@ -44,8 +46,10 @@ extension Notification.Name {
 
 /// Keys for `Notification.userInfo` payloads used across the app.
 enum BinkyNotificationUserInfoKey {
-    /// Value: `UUID` of the ``CompressionPreset`` / automation to sweep.
-    static let sortAutomationPresetID = "presetID"
+    /// Value: `UUID` of the ``CompressionPreset`` / routine to sweep.
+    static let sortRoutinePresetID = "presetID"
+    /// Value: ``MainWindowMode`` `.rawValue` string.
+    static let mainWindowModeRaw = "mainWindowModeRaw"
 }
 
 enum S {
@@ -169,7 +173,7 @@ enum S {
         String(localized: "Assign shortcuts for Finder’s “Sort with Binky” in System Settings → Keyboard → Keyboard Shortcuts → Services.", comment: "Settings Shortcuts tab footer.")
     }
     static func shortcutsTabHelpFooter(helpMenuShortcut: String) -> String {
-        String(localized: "For watch folders, automations, and full troubleshooting, open Binky Help from the Help menu (\(helpMenuShortcut)).", comment: "Settings Shortcuts tab footer; argument is help shortcut.")
+        String(localized: "For watch folders, routines, and full troubleshooting, open Binky Help from the Help menu (\(helpMenuShortcut)).", comment: "Settings Shortcuts tab footer; argument is help shortcut.")
     }
     static var shortcutsAppDescription: String {
         String(localized: "Binky exposes a Sort Files action in the Shortcuts app. Hand files from Finder or other actions through Binky — same routing rules as the main window.", comment: "Settings: Shortcuts app integration description.")

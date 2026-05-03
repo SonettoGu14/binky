@@ -1,4 +1,6 @@
 import Foundation
+import BinkyCoreShared
+import BinkyCoreSort
 
 // MARK: - Orchestrator callbacks
 
@@ -8,34 +10,12 @@ enum SortRunState: String, Sendable {
     case stopping
 }
 
-/// Visual buckets for organizer empty-state “fly to folder” animation (images / videos / documents only).
-enum SortAnimationBucket: String, Sendable, Equatable {
-    case images
-    case videos
-    case documents
-}
-
 /// One pulse of animation tied to a real `fileStarted` event.
 struct SortAnimationPulse: Equatable, Sendable {
     let id: UUID
     let bucket: SortAnimationBucket
 }
 
-enum SortProgressEvent: Sendable {
-    case batchStarted(total: Int)
-    case fileStarted(path: String, displayName: String, animationBucket: SortAnimationBucket)
-    case fileFinished(path: String)
-    case batchEnded
-}
-
-/// Energy / thermal hold while a sort is running (distinct from user Pause).
-enum SortEnergyHoldKind: Equatable {
-    case none
-    case thermal
-    case lowPower
-}
-
-/// One file currently passing through the sorter — shown on the sheet.
 struct ActiveSortItem: Identifiable, Equatable {
     let id: UUID
     let path: String

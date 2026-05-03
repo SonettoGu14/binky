@@ -4,31 +4,14 @@ import SwiftUI
 
 private let prefsLog = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Binky", category: "BinkyPreferences")
 
-// MARK: - Energy (large-batch sorting / thermal)
-
-/// `UserDefaults` keys for energy behavior. Also read from ``EnergyConditions`` / ``SortEnergy`` off the main actor.
-enum EnergySettingsKey {
-    static let pauseOnLowPowerMode = "energy.pauseOnLowPowerMode"
-    static let pauseOnThermalCritical = "energy.pauseOnThermalCritical"
-    static let bigBatchThreshold = "energy.bigBatchThreshold"
-    static let throttleProfile = "energy.throttleProfile"
-}
-
-enum EnergyThrottleProfile: String, CaseIterable, Identifiable, Sendable {
-    case auto
-    case gentle
-    case aggressive
-
-    var id: String { rawValue }
-}
-
 final class BinkyPreferences: ObservableObject {
 
     init() {
         Self.migrateSortNowShortcutKeyIfNeeded()
+        Self.migratePendingRoutineTemplateUserDefaultsIfNeeded()
         seedDefaultProfileIfNeeded()
         ensureActiveProfileIsValid()
-        migrateAutomationLegacyWatchFoldersIfNeeded()
+        migrateRoutineLegacyWatchFoldersIfNeeded()
     }
 
     /// One-time migrate from compression-era defaults key (`shortcut.compressNow` → `shortcut.sortNow`).
@@ -41,6 +24,18 @@ final class BinkyPreferences: ObservableObject {
             defaults.set(blob, forKey: modernKey)
         }
         defaults.removeObject(forKey: legacyKey)
+    }
+
+    /// One-shot copy from legacy `pendingAutomationTemplate` → `pendingRoutineTemplate` staging key used by onboarding.
+    private static func migratePendingRoutineTemplateUserDefaultsIfNeeded() {
+        let defaults = UserDefaults.standard
+        let legacyKey = "binky.pendingAutomationTemplate"
+        let modernKey = "binky.pendingRoutineTemplate"
+        if defaults.object(forKey: modernKey) == nil,
+           let staged = defaults.object(forKey: legacyKey) {
+            defaults.set(staged, forKey: modernKey)
+            defaults.removeObject(forKey: legacyKey)
+        }
     }
 
     private func seedDefaultProfileIfNeeded() {
@@ -66,7 +61,7 @@ final class BinkyPreferences: ObservableObject {
         }
     }
 
-    private func migrateAutomationLegacyWatchFoldersIfNeeded() {
+    private func migrateRoutineLegacyWatchFoldersIfNeeded() {
         let key = "binky.automation.legacyGlobalPathHydrated.v1"
         let d = UserDefaults.standard
         guard !d.bool(forKey: key) else { return }
@@ -133,6 +128,12 @@ final class BinkyPreferences: ObservableObject {
     @AppStorage("ui.showMenuBarIcon") var showMenuBarIcon: Bool = true
     /// Hides Dock icon and runs as accessory app; sorting still happens in the background.
     @AppStorage("ui.menuBarOnlyMode") var menuBarOnlyMode: Bool = false
+    @AppStorage("binky.mainWindowModeVisibility") private var mainWindowModeVisibilityRaw: String = MainWindowModeVisibility.both.rawValue
+
+    var mainWindowModeVisibility: MainWindowModeVisibility {
+        get { MainWindowModeVisibility(rawValue: mainWindowModeVisibilityRaw) ?? .both }
+        set { mainWindowModeVisibilityRaw = newValue.rawValue }
+    }
 
     @AppStorage("folderWatchEnabled")   var folderWatchEnabled: Bool = true
     @AppStorage("watchedFolderPath")    var watchedFolderPath: String = ""
@@ -276,6 +277,10 @@ final class BinkyPreferences: ObservableObject {
     @AppStorage("digest.enabled") var dailyDigestEnabled: Bool = false
     /// Hour 0…23 local time.
     @AppStorage("digest.hour") var dailyDigestHour: Int = 9
+    /// Monday-style weekly rollup from session history.
+    @AppStorage("digest.weekly.enabled") var weeklyDigestEnabled: Bool = true
+    /// Calendar weekday component (Sunday = 1 … default Monday = 2).
+    @AppStorage("digest.weekly.weekday") var weeklyDigestWeekday: Int = 2
 
     @AppStorage("sort.routingRulesJSON") private var sortRoutingRulesJSONStorage: Data = Data()
 
@@ -466,6 +471,37 @@ final class BinkyPreferences: ObservableObject {
 }
 
 extension BinkyPreferences {
+
+    @MainActor
+    func makeSortPreferencesSnapshot() -> SortPreferencesSnapshot {
+        var byPresetID: [UUID: CompressionPreset] = [:]
+        for p in savedPresets {
+            byPresetID[p.id] = p
+        }
+        return SortPreferencesSnapshot(
+            excludeExtensions: sortExcludeExtensionsNormalized(),
+            excludeNameFragments: sortExcludeNameFragmentsNormalized(),
+            sortCustomRulesEnabled: sortCustomRulesEnabled,
+            sortRoutingRules: sortRoutingRules,
+            sortAppendNewSemanticTagEnabled: sortAppendNewSemanticTagEnabled,
+            assignFinderTagsOnSortEnabled: assignFinderTagsOnSortEnabled,
+            finderTagDefaultsByCategory: sortFinderTagDefaultsByCategory,
+            globalInboxRoot: downloadsSortRootDirectory(),
+            watchRegistry: WatchPipelineRegistry(prefs: self),
+            presetsByID: byPresetID,
+            sortDuplicateMode: SortDuplicateHandlingMode(rawValue: sortDuplicateModeRaw) ?? .off,
+            sortSmartScreenshotNamesEnabled: sortSmartScreenshotNamesEnabled,
+            sortDetectReceiptsEnabled: sortDetectReceiptsEnabled,
+            watchRecursiveOneLevel: watchRecursiveOneLevel,
+            savedPresetOrder: savedPresets.map(\.id),
+            globalSkipTagSet: Set(
+                globalSkipTags
+                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+                    .filter { !$0.isEmpty }
+            ),
+            slowMode: sortSlowModeEnabled
+        )
+    }
 
     func downloadsSortRootDirectory() -> URL {
         reconcileFolderBookmarksIfNeeded()

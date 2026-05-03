@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Binky sorts your files.</title>
-  <meta name="description" content="Binky sorts your files. Watch a folder, route by source, describe rules in plain English, review the unknowns. Free and open source for macOS." />
+  <meta name="description" content="Binky sorts your files. Watch a folder, route by source, describe rules in plain English, review the unknowns. 1.x is free and open source (MIT); 2.0 adds a one-time license for official macOS builds." />
 
   <link rel="canonical" href="https://binkyfiles.com" />
   <link rel="icon" type="image/png" href="Binky%20App%20Icon.png" />
@@ -39,7 +39,22 @@
     "url": "https://binkyfiles.com",
     "downloadUrl": "https://github.com/heyderekj/binky/releases/download/v1.3.1/Binky-1.3.1.dmg",
     "softwareVersion": "1.3.1",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Binky 1.x",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "Current releases: MIT-licensed source; official builds free."
+      },
+      {
+        "@type": "Offer",
+        "name": "Binky 2.0 App License",
+        "price": "10",
+        "priceCurrency": "USD",
+        "description": "Planned: one-time purchase with one year of app updates included; optional yearly renewal for further updates on official builds."
+      }
+    ],
     "author": { "@type": "Person", "name": "Derek Castelli", "url": "https://heyderekj.com" },
     "contactPoint": { "@type": "ContactPoint", "contactType": "customer support", "email": "help@binkyfiles.com" }
   }
@@ -1652,7 +1667,7 @@
     <h1>Binky</h1>
     <p class="tagline">Binky sorts your files.</p>
     <p class="description">
-      A macOS app that sorts your files into sorted folders. Automatic stable-file detection. Free and open source.
+      A macOS sorter that follows your rules — no cloud, no guessing. Quick Sort tidies a fussy folder in one tap; Routines watch continuously with the same routing logic. Stable-file detection plus a Review inbox for unknowns. 1.x is free and open source (MIT); 2.0 will add a one-time license for official builds and optional renewals for updates.
     </p>
 
     <div class="buttons">
@@ -1768,14 +1783,14 @@
       </div>
     </div>
 
-    <!-- Row 2: Automations -->
+    <!-- Row 2: Routines -->
     <div class="ss-row is-rev">
       <div class="ss-card">
         <div class="ss-card-features">
           <div class="ss-card-feature">
             <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z" clip-rule="evenodd"/></svg>
             <h3>Watch folder</h3>
-            <p>Within each automation, new files settle; then Binky routes. Optional watch; pause without killing the setup.</p>
+            <p>Within each routine, new files settle; then Binky routes. Optional watch; pause without killing the setup.</p>
           </div>
           <div class="ss-card-feature">
             <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z" clip-rule="evenodd"/></svg>
@@ -1784,12 +1799,12 @@
           </div>
           <div class="ss-card-feature">
             <svg class="feature-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M19.5 21a3 3 0 0 0 3-3V9a3 3 0 0 0-3-3h-5.379a.75.75 0 0 1-.53-.22L11.47 3.66A2.25 2.25 0 0 0 9.879 3H4.5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h15Zm-6.75-10.5a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25v2.25a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V10.5Z" clip-rule="evenodd"/></svg>
-            <h3>Automations</h3>
+            <h3>Routines</h3>
             <p>Parallel workflows for Downloads, Desktop, Dropbox inboxes, whatever&apos;s yelling. Each source keeps its toggle, rule stack, and tag defaults — protect a Finder tag and Binky won&apos;t nudge tagged files.</p>
           </div>
         </div>
       </div>
-      <img src="screenshots/binky-automations.webp" alt="Binky Automations list with sources, rules, and tag defaults" class="ss-screenshot" loading="lazy" />
+      <img src="screenshots/binky-routines.webp" alt="Binky Routines list with sources, rules, and tag defaults" class="ss-screenshot" loading="lazy" />
     </div>
 
     <!-- Row 3: Preview, routing, natural-language rules -->
@@ -1843,7 +1858,7 @@
         <path fill-rule="evenodd" d="M5.25 2.25a3 3 0 0 0-3 3v4.318a3 3 0 0 0 .879 2.121l9.58 9.581c.92.92 2.39 1.186 3.548.428a18.849 18.849 0 0 0 5.441-5.44c.758-1.16.492-2.629-.428-3.548l-9.58-9.581a3 3 0 0 0-2.122-.879H5.25ZM6.375 7.5a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" clip-rule="evenodd"/>
       </svg>
       <h3>Finder tags</h3>
-      <p>Automation defaults plus per-rule tagging. Spotlight hues still rescue memory lapses — protected Finder tags keep chosen files politely frozen.</p>
+      <p>Routine defaults plus per-rule tagging. Spotlight hues still rescue memory lapses — protected Finder tags keep chosen files politely frozen.</p>
     </div>
 
     <div class="feature">
@@ -1851,7 +1866,7 @@
         <path fill-rule="evenodd" d="M15 3.75C12.1005 3.75 9.75 6.10051 9.75 9L9.75 19.1893L14.4697 14.4697C14.7626 14.1768 15.2374 14.1768 15.5303 14.4697C15.8232 14.7626 15.8232 15.2374 15.5303 15.5303L9.53033 21.5303C9.38968 21.671 9.19891 21.75 9 21.75C8.80109 21.75 8.61032 21.671 8.46967 21.5303L2.46967 15.5303C2.17678 15.2374 2.17678 14.7626 2.46967 14.4697C2.76256 14.1768 3.23744 14.1768 3.53033 14.4697L8.25 19.1893V9C8.25 5.27208 11.2721 2.25 15 2.25C18.7279 2.25 21.75 5.27208 21.75 9V12C21.75 12.4142 21.4142 12.75 21 12.75C20.5858 12.75 20.25 12.4142 20.25 12V9C20.25 6.10051 17.8995 3.75 15 3.75Z" clip-rule="evenodd"/>
       </svg>
       <h3>Shortcuts</h3>
-      <p>Plug Binky into your own Shortcuts. Sort a folder on a hotkey, after a Focus mode, or as part of a bigger automation.</p>
+      <p>Plug Binky into your own Shortcuts. Sort a folder on a hotkey, after a Focus mode, or as part of a bigger routine.</p>
     </div>
 
     <div class="feature">
@@ -1925,7 +1940,7 @@
           Creatives · Professionals · Businesses
         </div>
         <h3 class="ss-card-hero-title">Less digging, more making.</h3>
-        <p class="ss-card-hero-text">Figma exports, client zips, video renders, PDFs — sorted when they finish landing. Automations plus source-aware rules push assets toward project disks without babysitting Downloads.</p>
+        <p class="ss-card-hero-text">Figma exports, client zips, video renders, PDFs — sorted when they finish landing. Routines plus source-aware rules push assets toward project disks without babysitting Downloads.</p>
       </div>
       <div class="ss-card is-hero">
         <div class="ss-hero-eyebrow">
@@ -1939,7 +1954,7 @@
 
   <section class="cta-mid">
     <h2 class="cta-mid-headline">Give it to Binky.</h2>
-    <p class="cta-mid-sub">Free. Open source. Runs on your Mac only.</p>
+    <p class="cta-mid-sub">Open source. 1.x free. 2.0 calms the bill for official builds. Runs on your Mac only.</p>
     <a class="btn btn-primary" href="https://github.com/heyderekj/binky/releases/download/v1.3.1/Binky-1.3.1.dmg" onclick="window.fathom&&window.fathom.trackEvent('Download macOS mid'); var im=document.getElementById('install-modal'); im.classList.remove('install-modal--help'); im.classList.add('open')">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true">
         <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
@@ -1952,7 +1967,7 @@
     <div class="cmp-row">
       <div class="cmp-text-card">
         <h2 class="cmp-title">Match the tool to the tantrum.</h2>
-        <p class="cmp-desc">Hazel is a full rules engine. Neatify runs from the menu bar. Binky runs Automations across fussy inboxes — sorted buckets first, previews before moves, Receipt sniffing — and parks doubtful files behind Review alongside source-aware routing, plain-language rules, plus extractor / DMG actions whenever buckets aren&apos;t enough.</p>
+        <p class="cmp-desc">Hazel is a full rules engine. Neatify runs from the menu bar. Binky runs Routines across fussy inboxes — sorted buckets first, previews before moves, Receipt sniffing — and parks doubtful files behind Review alongside source-aware routing, plain-language rules, plus extractor / DMG actions whenever buckets aren&apos;t enough.</p>
         <p class="cmp-footnote">Rough tradeoffs — pricing and features move. <a href="/compare/">Full comparisons →</a></p>
       </div>
       <div class="comparison-card">
@@ -1983,7 +1998,7 @@
                   <svg class="cmp-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.25 2.25a3 3 0 0 0-3 3v4.318a3 3 0 0 0 .879 2.121l9.58 9.581c.92.92 2.39 1.186 3.548.428a18.849 18.849 0 0 0 5.441-5.44c.758-1.16.492-2.629-.428-3.548l-9.58-9.581a3 3 0 0 0-2.122-.879H5.25ZM6.375 7.5a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" clip-rule="evenodd"/></svg>
                   Price
                 </div></td>
-                <td class="cmp-binky">Free</td>
+                <td class="cmp-binky"><span class="cmp-dim">1.x free</span> · 2.0 from $10</td>
                 <td data-col="hazel">Paid ($42)</td>
                 <td data-col="neatify">Paid ($31)</td>
                 <td data-col="finder">Free</td>
@@ -2112,12 +2127,27 @@
 
       <div class="faq-item">
         <h3 class="faq-q">Do I need to be technical to use this?</h3>
-        <p class="faq-a">Nope. Out of the box, automations watch a folder — Downloads still polite default — and sort calm buckets. Reach for Describe a rule once you crave specifics.</p>
+        <p class="faq-a">Nope. Out of the box, routines watch a folder — Downloads still polite default — and sort calm buckets. Reach for Describe a rule once you crave specifics.</p>
+      </div>
+
+      <div class="faq-item" id="faq-licensing">
+        <h3 class="faq-q">How does Binky 2.0 licensing work?</h3>
+        <p class="faq-a"><strong>It’s not a subscription.</strong> Pay once for Binky 2.0 on official builds, keep the app, get <strong>one year of updates</strong> included. After that you can <strong>renew yearly</strong> (planned around half the purchase price) if you want another year of updates — or stay on the last version you installed. <a href="https://github.com/heyderekj/binky" target="_blank" rel="noopener">Source stays MIT</a>; the license is for hassle-free signed builds and the update channel.</p>
       </div>
 
       <div class="faq-item">
-        <h3 class="faq-q">Is it actually free?</h3>
-        <p class="faq-a"><a href="https://github.com/heyderekj/binky" target="_blank" rel="noopener">Open source on GitHub</a> under MIT. Free.</p>
+        <h3 class="faq-q">Do I have to renew?</h3>
+        <p class="faq-a">No. Renewal only extends how long you receive updates. The app you already have keeps working.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">I’m on Binky 1.x — do I pay?</h3>
+        <p class="faq-a">Not for what you’re using now. 1.x stays free and open source. Payment starts when you choose to move to <strong>2.0</strong> for official builds and new paid-tier features.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">Is there a Binky + Dinky bundle?</h3>
+        <p class="faq-a">Planned: a family bundle with <a href="https://dinkyfiles.com" target="_blank" rel="noopener">Dinky</a> — one-time purchase, one year of updates for both, with a lower yearly renewal than buying separately. Calm inbox, smaller files.</p>
       </div>
 
       <div class="faq-item">
@@ -2137,7 +2167,7 @@
 
       <div class="faq-item">
         <h3 class="faq-q">Where do files land after sorting?</h3>
-        <p class="faq-a">Each automation declares its sorted buckets and downstream actions — rename tokens, archive extraction, Finder-only DMG installs, Finder tag spreads, Trash when warranted.</p>
+        <p class="faq-a">Each routine declares its sorted buckets and downstream actions — rename tokens, archive extraction, Finder-only DMG installs, Finder tag spreads, Trash when warranted.</p>
       </div>
 
       <div class="faq-item">

@@ -1,5 +1,6 @@
 import XCTest
 @testable import Binky
+@testable import BinkyCoreSort
 
 final class DownloadSortClassificationTests: XCTestCase {
 

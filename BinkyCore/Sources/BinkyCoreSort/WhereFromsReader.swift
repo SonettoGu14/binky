@@ -2,11 +2,11 @@ import Darwin
 import Foundation
 
 /// Reads `kMDItemWhereFroms` from browser / app download metadata (`com.apple.metadata:kMDItemWhereFroms`).
-enum WhereFromsReader {
-    static let xattrName = "com.apple.metadata:kMDItemWhereFroms"
+public enum WhereFromsReader {
+    public static let xattrName = "com.apple.metadata:kMDItemWhereFroms"
 
     /// Ordered list of source URLs (page, then often the asset URL).
-    static func sourceURLs(forFileAt url: URL) -> [URL] {
+    public static func sourceURLs(forFileAt url: URL) -> [URL] {
         let path = url.path
         guard let data = readXattr(path: path, name: xattrName), !data.isEmpty else { return [] }
         guard let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) else { return [] }
@@ -14,7 +14,7 @@ enum WhereFromsReader {
     }
 
     /// Host labels from each where-from URL (lowercased, no port).
-    static func originHosts(forFileAt url: URL) -> [String] {
+    public static func originHosts(forFileAt url: URL) -> [String] {
         var seen = Set<String>()
         var out: [String] = []
         for u in sourceURLs(forFileAt: url) {
@@ -27,12 +27,12 @@ enum WhereFromsReader {
     }
 
     /// First page-like host when available (prefers HTTPS `http` URLs that look like pages over raw asset hosts).
-    static func primaryOriginHost(forFileAt url: URL) -> String? {
+    public static func primaryOriginHost(forFileAt url: URL) -> String? {
         originHosts(forFileAt: url).first
     }
 
     /// Wildcard domain patterns: `*.stripe.com`, `figma.com`. Empty pattern list = no constraint (handled by caller).
-    static func matchesAnyOriginPattern(_ patterns: [String], hosts: [String]) -> Bool {
+    public static func matchesAnyOriginPattern(_ patterns: [String], hosts: [String]) -> Bool {
         let trimmed = patterns
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
             .filter { !$0.isEmpty }
@@ -48,7 +48,7 @@ enum WhereFromsReader {
     // MARK: - Glob matching
 
     /// `*.example.com` matches `sub.example.com` and `example.com`. `example.com` matches `example.com` and `www.example.com`.
-    static func domainMatches(pattern: String, host: String) -> Bool {
+    public static func domainMatches(pattern: String, host: String) -> Bool {
         let h = host.lowercased()
         let p = pattern.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard !p.isEmpty else { return true }
@@ -63,7 +63,7 @@ enum WhereFromsReader {
         return false
     }
 
-    static func sanitizedOriginLabel(forHost host: String?) -> String {
+    public static func sanitizedOriginLabel(forHost host: String?) -> String {
         guard let host, !host.isEmpty else { return "" }
         let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-."))
         return String(host.unicodeScalars.map { allowed.contains($0) ? Character($0) : Character("-") })

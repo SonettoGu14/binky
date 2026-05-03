@@ -1,7 +1,8 @@
 import XCTest
 @testable import Binky
+@testable import BinkyCoreSort
 
-final class AutomationsOverhaulTests: XCTestCase {
+final class RoutinesOverhaulTests: XCTestCase {
 
     func testRuleMatchesRequiresFinderTag() {
         var rule = SortRule.fresh(order: 1)
@@ -91,16 +92,16 @@ final class AutomationsOverhaulTests: XCTestCase {
         let home = "/Users/test"
         let reg = WatchPipelineRegistry(
             globalPath: nil,
-            automationPaths: [(idA, home), (idB, home)]
+            routinePaths: [(idA, home), (idB, home)]
         )
         XCTAssertEqual(reg.watchedRootPaths.count, 1)
         XCTAssertEqual(reg.watchedRootPaths.first, home)
 
         let file = URL(fileURLWithPath: "\(home)/file.pdf")
-        if case .automation(_, let ids) = reg.routing(for: file) {
+        if case .routine(_, let ids) = reg.routing(for: file) {
             XCTAssertEqual(Set(ids), [idA, idB])
         } else {
-            XCTFail("expected automation routing")
+            XCTFail("expected routine routing")
         }
     }
 

@@ -64,6 +64,15 @@ struct UpdateBanner: View {
                             .foregroundStyle(.secondary)
                             .underline()
                             .fixedSize(horizontal: true, vertical: false)
+
+                        Button(String(localized: "Licensing…", comment: "Update banner link to licensing FAQ on site.")) {
+                            NSWorkspace.shared.open(URL(string: "https://binkyfiles.com/#faq-licensing")!)
+                        }
+                        .buttonStyle(.plain)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .underline()
+                        .fixedSize(horizontal: true, vertical: false)
                     }
 
                     Button {

@@ -1,35 +1,35 @@
 import Foundation
 
-/// Named automation: source folder, routing rules, and tag defaults. JSON persists under legacy keys (`savedPresetsData`).
-struct Automation: Codable, Identifiable, Equatable, Sendable {
-    let id: UUID
-    var name: String
-    /// When true, this automation participates in folder watching when its source path resolves.
-    var isEnabled: Bool
+/// Named sorting routine: source folder, routing rules, and tag defaults. JSON persists under legacy keys (`savedPresetsData`).
+public struct SortingRoutine: Codable, Identifiable, Equatable, Sendable {
+    public let id: UUID
+    public var name: String
+    /// When true, this routine participates in folder watching when its source path resolves.
+    public var isEnabled: Bool
 
-    var watchFolderPath: String
-    var watchFolderBookmark: Data
+    public var watchFolderPath: String
+    public var watchFolderBookmark: Data
 
-    var customFinderTags: [String]
+    public var customFinderTags: [String]
     /// Optional per-`FileSortCategory` default Finder tags (keys = category raw values). Empty map = use globals / built-ins.
-    var finderTagDefaultsByCategory: [String: [String]]
-    var sortRules: [SortRule]
-    var newTagExpiryDays: Int
-    var postSortShortcutName: String
+    public var finderTagDefaultsByCategory: [String: [String]]
+    public var sortRules: [SortRule]
+    public var newTagExpiryDays: Int
+    public var postSortShortcutName: String
 
     /// First matching entry wins when a file has multiple Finder tags for ``SortRuleMatchAction/tagFanout``.
-    var tagFanoutPriority: [String]
+    public var tagFanoutPriority: [String]
 
     /// Destination for ``installFromDMG`` (copy `.app` here). Empty = `~/Applications`.
-    var applicationsInstallPath: String
-    var applicationsInstallBookmark: Data
+    public var applicationsInstallPath: String
+    public var applicationsInstallBookmark: Data
 
-    let createdAt: Date
+    public let createdAt: Date
 
     /// One-shot migration: legacy `watchFolderModeRaw == "global"` meant “use global watch path”.
     private var legacyUsedGlobalWatchFolder: Bool
 
-    init(name: String) {
+    public init(name: String) {
         self.id = UUID()
         self.name = name
         self.isEnabled = false
@@ -47,7 +47,7 @@ struct Automation: Codable, Identifiable, Equatable, Sendable {
         self.legacyUsedGlobalWatchFolder = false
     }
 
-    init(duplicating source: Automation, name: String) {
+    public init(duplicating source: SortingRoutine, name: String) {
         self.id = UUID()
         self.name = name
         self.isEnabled = source.isEnabled
@@ -65,7 +65,7 @@ struct Automation: Codable, Identifiable, Equatable, Sendable {
         self.legacyUsedGlobalWatchFolder = false
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(UUID.self, forKey: .id)
         name = try c.decode(String.self, forKey: .name)
@@ -97,7 +97,7 @@ struct Automation: Codable, Identifiable, Equatable, Sendable {
         applicationsInstallBookmark = try c.decodeIfPresent(Data.self, forKey: .applicationsInstallBookmark) ?? Data()
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(id, forKey: .id)
         try c.encode(name, forKey: .name)
@@ -127,7 +127,7 @@ struct Automation: Codable, Identifiable, Equatable, Sendable {
         case legacyUsedGlobalWatchFolder
     }
 
-    mutating func hydrateLegacyGlobalWatchIfNeeded(globalPath: String, globalBookmark: Data) {
+    public mutating func hydrateLegacyGlobalWatchIfNeeded(globalPath: String, globalBookmark: Data) {
         guard legacyUsedGlobalWatchFolder else { return }
         legacyUsedGlobalWatchFolder = false
         if watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -140,7 +140,7 @@ struct Automation: Codable, Identifiable, Equatable, Sendable {
     }
 
     /// Destination for ``SortRuleMatchAction/installFromDMG``. Empty path = `~/Applications`.
-    func resolvedApplicationsInstallDirectory(fileManager: FileManager = .default) -> URL {
+    public func resolvedApplicationsInstallDirectory(fileManager: FileManager = .default) -> URL {
         let trimmed = applicationsInstallPath.trimmingCharacters(in: .whitespacesAndNewlines)
         if !applicationsInstallBookmark.isEmpty {
             var stale = false
@@ -167,8 +167,8 @@ struct Automation: Codable, Identifiable, Equatable, Sendable {
         return URL(fileURLWithPath: trimmed).standardizedFileURL
     }
 
-    /// Finder-style unique automation name among existing names.
-    static func uniqueDuplicatePresetName(baseName: String, existingNames: Set<String>) -> String {
+    /// Finder-style unique routine name among existing names.
+    public static func uniqueDuplicatePresetName(baseName: String, existingNames: Set<String>) -> String {
         let copyFrag = String(localized: " copy", comment: "Filename: first duplicate after base name, as in Finder “file copy”.")
         var n = 1
         while true {
@@ -183,43 +183,43 @@ struct Automation: Codable, Identifiable, Equatable, Sendable {
         }
     }
 
-    /// Subtitle for automation lists (sidebar, Settings).
-    var organizerListSubtitle: String {
+    /// Subtitle for routine lists (sidebar, Settings).
+    public var organizerListSubtitle: String {
         var parts: [String] = []
 
         if isEnabled {
             if watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                parts.append(String(localized: "Folder not set", comment: "Automation subtitle when watch path empty."))
+                parts.append(String(localized: "Folder not set", comment: "Routine subtitle when watch path empty."))
             } else {
                 parts.append(URL(fileURLWithPath: watchFolderPath).lastPathComponent)
             }
         } else {
-            parts.append(String(localized: "Off", comment: "Automation subtitle when disabled."))
+            parts.append(String(localized: "Off", comment: "Routine subtitle when disabled."))
         }
 
         let tagCount = customFinderTags.count
         if tagCount == 1 {
-            parts.append(String(localized: "1 tag", comment: "Automation subtitle: single custom tag."))
+            parts.append(String(localized: "1 tag", comment: "Routine subtitle: single custom tag."))
         } else if tagCount > 1 {
             parts.append(String.localizedStringWithFormat(
-                String(localized: "%lld tags", comment: "Automation subtitle: multiple custom Finder tags."),
+                String(localized: "%lld tags", comment: "Routine subtitle: multiple custom Finder tags."),
                 Int64(tagCount)
             ))
         }
 
         let ruleCount = sortRules.count
         if ruleCount == 1 {
-            parts.append(String(localized: "1 rule", comment: "Automation subtitle: single sort rule."))
+            parts.append(String(localized: "1 rule", comment: "Routine subtitle: single sort rule."))
         } else if ruleCount > 1 {
             parts.append(String.localizedStringWithFormat(
-                String(localized: "%lld rules", comment: "Automation subtitle: multiple sort rules."),
+                String(localized: "%lld rules", comment: "Routine subtitle: multiple sort rules."),
                 Int64(ruleCount)
             ))
         }
 
         if newTagExpiryDays > 0 {
             parts.append(String.localizedStringWithFormat(
-                String(localized: "%lldd \u{201C}New\u{201D}", comment: "Automation subtitle: New-tag expiry in days."),
+                String(localized: "%lldd \u{201C}New\u{201D}", comment: "Routine subtitle: New-tag expiry in days."),
                 Int64(newTagExpiryDays)
             ))
         }
@@ -230,11 +230,11 @@ struct Automation: Codable, Identifiable, Equatable, Sendable {
         }
 
         if parts.isEmpty {
-            return String(localized: "Default routing", comment: "Automation subtitle when no detail.")
+            return String(localized: "Default routing", comment: "Routine subtitle when no detail.")
         }
         return parts.joined(separator: " · ")
     }
 }
 
 /// Backward-compatible alias for saved presets / profiles.
-typealias CompressionPreset = Automation
+public typealias CompressionPreset = SortingRoutine

@@ -122,7 +122,7 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
 
-        let enabledPresets = Self.enabledAutomationsFromDefaults()
+        let enabledPresets = Self.enabledRoutinesFromDefaults()
         let isSorting = DownloadsSortOrchestrator.shared.isSorting
 
         if enabledPresets.count > 1 {
@@ -133,7 +133,7 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
             )
             let submenu = NSMenu()
             let sortAll = NSMenuItem(
-                title: String(localized: "Sort All Folders", comment: "Menu bar: sweep every enabled automation."),
+                title: String(localized: "Sort All Folders", comment: "Menu bar: sweep every enabled routine."),
                 action: #selector(sortNow),
                 keyEquivalent: ""
             )
@@ -142,12 +142,12 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
             submenu.addItem(sortAll)
             submenu.addItem(.separator())
             let sorted = enabledPresets.sorted {
-                Self.menuBarAutomationDisplayTitle($0).localizedCaseInsensitiveCompare(Self.menuBarAutomationDisplayTitle($1)) == .orderedAscending
+                Self.menuBarRoutineDisplayTitle($0).localizedCaseInsensitiveCompare(Self.menuBarRoutineDisplayTitle($1)) == .orderedAscending
             }
             for preset in sorted {
                 let row = NSMenuItem(
-                    title: Self.menuBarAutomationDisplayTitle(preset),
-                    action: #selector(sortAutomationNow(_:)),
+                    title: Self.menuBarRoutineDisplayTitle(preset),
+                    action: #selector(sortRoutineNow(_:)),
                     keyEquivalent: ""
                 )
                 row.target = self
@@ -256,17 +256,17 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
         NotificationCenter.default.post(name: .binkyStartSort, object: nil)
     }
 
-    @objc private func sortAutomationNow(_ sender: NSMenuItem) {
+    @objc private func sortRoutineNow(_ sender: NSMenuItem) {
         guard let idString = sender.representedObject as? String,
               let uuid = UUID(uuidString: idString) else { return }
         NotificationCenter.default.post(
-            name: .binkyStartSortForAutomation,
+            name: .binkyStartSortForRoutine,
             object: nil,
-            userInfo: [BinkyNotificationUserInfoKey.sortAutomationPresetID: uuid]
+            userInfo: [BinkyNotificationUserInfoKey.sortRoutinePresetID: uuid]
         )
     }
 
-    private static func enabledAutomationsFromDefaults() -> [CompressionPreset] {
+    private static func enabledRoutinesFromDefaults() -> [CompressionPreset] {
         guard let data = UserDefaults.standard.data(forKey: "savedPresetsData"),
               let presets = try? JSONDecoder().decode([CompressionPreset].self, from: data) else {
             return []
@@ -276,7 +276,7 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
         }
     }
 
-    private static func menuBarAutomationDisplayTitle(_ preset: CompressionPreset) -> String {
+    private static func menuBarRoutineDisplayTitle(_ preset: CompressionPreset) -> String {
         let trimmedName = preset.name.trimmingCharacters(in: .whitespacesAndNewlines)
         if !trimmedName.isEmpty { return trimmedName }
         let path = preset.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines)

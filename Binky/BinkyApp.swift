@@ -46,6 +46,29 @@ struct BinkyApp: App {
             CommandGroup(after: .newItem) {
                 BinkyShortcutCommands(prefs: root.prefs)
             }
+            CommandMenu(String(localized: "View mode", comment: "Menu: switch organizer layout.")) {
+                if root.prefs.mainWindowModeVisibility.allowsQuickSort {
+                    Button(MainWindowMode.quickSort.title) {
+                        NotificationCenter.default.post(
+                            name: .binkySwitchMainWindowMode,
+                            object: nil,
+                            userInfo: [BinkyNotificationUserInfoKey.mainWindowModeRaw: MainWindowMode.quickSort.rawValue]
+                        )
+                    }
+                    .keyboardShortcut("1", modifiers: [.command])
+                }
+
+                if root.prefs.mainWindowModeVisibility.allowsRoutines {
+                    Button(MainWindowMode.routines.title) {
+                        NotificationCenter.default.post(
+                            name: .binkySwitchMainWindowMode,
+                            object: nil,
+                            userInfo: [BinkyNotificationUserInfoKey.mainWindowModeRaw: MainWindowMode.routines.rawValue]
+                        )
+                    }
+                    .keyboardShortcut("2", modifiers: [.command])
+                }
+            }
             CommandGroup(replacing: .appInfo) {
                 Button(String(localized: "About Binky", comment: "Application menu: about panel.")) {
                     showAboutPanel()
@@ -115,7 +138,7 @@ private struct BinkyShortcutCommands: View {
             $0.isEnabled && !$0.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }.count
         return enabledCount > 1
-            ? String(localized: "Sort All", comment: "File menu: run sort across every enabled automation.")
+            ? String(localized: "Sort All", comment: "File menu: run sort across every enabled routine.")
             : String(localized: "Sort Now", comment: "File menu: run an immediate sort for the watched folder.")
     }
 

@@ -18,8 +18,10 @@ struct OrganizerEmptyStateView: View {
     @State private var bumpTrigger = 0
     @State private var taglineTaskID = UUID()
     @State private var flightTask: Task<Void, Never>?
+    @State private var bumpResetTask: Task<Void, Never>?
 
     private var shouldReduceMotion: Bool { prefs.reduceMotion || systemReduceMotion }
+    private var isSlowMode: Bool { prefs.sortSlowModeEnabled }
 
     /// Distance from stage center to each side destination center (matches HStack spacing math).
     private let destinationSpacing: CGFloat = 96
@@ -73,8 +75,23 @@ struct OrganizerEmptyStateView: View {
             guard !shouldReduceMotion else { return }
             guard sortProgress.isActive, let pulse = sortProgress.latestAnimationPulse else { return }
             let dest = sortDestination(for: pulse.bucket)
+
             flightTask?.cancel()
-            flightTask = Task { await runFlightCycle(to: dest) }
+            flightTask = nil
+            bumpResetTask?.cancel()
+            bumpResetTask = nil
+
+            if isSlowMode {
+                flightTask = Task { await runFlightCycle(to: dest) }
+            } else {
+                bumpedDestination = dest
+                bumpTrigger &+= 1
+                bumpResetTask = Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(250))
+                    guard !Task.isCancelled else { return }
+                    bumpedDestination = nil
+                }
+            }
         }
         .onChange(of: sortProgress.isActive) { _, active in
             if active {
@@ -82,12 +99,17 @@ struct OrganizerEmptyStateView: View {
             } else {
                 flightTask?.cancel()
                 flightTask = nil
+                bumpResetTask?.cancel()
+                bumpResetTask = nil
                 resetCardPose()
             }
         }
         .onDisappear {
             flightTask?.cancel()
             flightTask = nil
+            bumpResetTask?.cancel()
+            bumpResetTask = nil
+            bumpedDestination = nil
         }
     }
 
@@ -110,13 +132,16 @@ struct OrganizerEmptyStateView: View {
             if shouldReduceMotion || !sortProgress.isActive {
                 staticCardFan
                     .offset(y: -52)
-            } else {
+            } else if isSlowMode {
                 let dest = sortDestination(for: sortProgress.latestAnimationPulse?.bucket ?? .documents)
                 fileCard(for: dest.sourceType)
                     .scaleEffect(cardScale)
                     .rotationEffect(.degrees(cardRotation))
                     .opacity(cardOpacity)
                     .offset(cardOffset)
+            } else {
+                staticCardFan
+                    .offset(y: -52)
             }
         }
     }
@@ -133,7 +158,8 @@ struct OrganizerEmptyStateView: View {
         VStack(spacing: 6) {
             ZStack {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color.primary.opacity(0.06))
+                    .fill(Color.primary.opacity(bumpedDestination == dest ? 0.12 : 0.06))
+                    .animation(.easeOut(duration: 0.25), value: bumpedDestination)
                     .frame(width: 64, height: 48)
                 Image(systemName: dest.symbol)
                     .font(.system(size: 22, weight: .regular))
@@ -241,30 +267,30 @@ struct OrganizerEmptyStateView: View {
             cardOpacity = 1
             cardRotation = 0
         }
-        await sleep(ms: 620)
+        await sleep(ms: 480)
         guard !Task.isCancelled else { return }
 
         // 2) Glide diagonally toward the matching destination
         let destX = dest.centerOffset(spacing: destinationSpacing)
         let leanAngle: Double = dest == .videos ? 0 : (dest == .images ? -8 : 8)
-        withAnimation(.timingCurve(0.4, 0.0, 0.2, 1.0, duration: 0.78)) {
+        withAnimation(.timingCurve(0.4, 0.0, 0.2, 1.0, duration: 0.55)) {
             cardOffset = CGSize(width: destX, height: 6)
             cardRotation = leanAngle
         }
-        await sleep(ms: 580)
+        await sleep(ms: 420)
         guard !Task.isCancelled else { return }
 
         // 3) Drop into destination — shrink + fade as it lands
-        withAnimation(.easeIn(duration: 0.26)) {
+        withAnimation(.easeIn(duration: 0.22)) {
             cardOffset = CGSize(width: destX, height: 30)
             cardScale = 0.3
             cardOpacity = 0
         }
         bumpedDestination = dest
         bumpTrigger &+= 1
-        await sleep(ms: 360)
+        await sleep(ms: 260)
         bumpedDestination = nil
-        await sleep(ms: 140)
+        await sleep(ms: 90)
     }
 
     private func sleep(ms: Int) async {

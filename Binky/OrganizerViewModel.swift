@@ -120,7 +120,45 @@ final class OrganizerViewModel: ObservableObject {
         deliverCompletedSort(outcome, prefs: prefs)
     }
 
-    /// Sweep a single automation’s folder. Uses `rootOverride` so per-automation rules route
+    /// One-off sort for an arbitrary inbox folder (Quick Sort pane). Same routing model as preset sweeps.
+    func runInteractiveSweep(in rootURL: URL, prefs: BinkyPreferences) async {
+        transientBannerMessage = nil
+        guard !DownloadsSortOrchestrator.shared.isSorting else {
+            flashTransientStatus(
+                String(localized: "Sh. Binky's already on it.", comment: "Organizer transient banner when a sort is requested while one runs.")
+            )
+            return
+        }
+        let root = rootURL.standardizedFileURL
+        let recursive = prefs.watchRecursiveOneLevel
+        let (files, rootOverride) = await Task.detached(priority: .utility) {
+            let collected = DownloadsSortOrchestrator.collectSweepFiles(
+                in: root,
+                recursiveOneLevel: recursive
+            )
+            var override: [URL: URL] = [:]
+            for url in collected {
+                override[url] = root
+            }
+            return (collected, override)
+        }.value
+        guard !files.isEmpty else {
+            flashTransientStatus(
+                String(localized: "Binky'd. Already handled.", comment: "Organizer transient banner when Sweep finds no files in the watched folder.")
+            )
+            return
+        }
+        let outcome = await DownloadsSortOrchestrator.shared.sort(
+            files: files,
+            prefs: prefs,
+            rootOverride: rootOverride,
+            progress: SortProgressTracker.orchestratorClosure()
+        )
+        guard outcome.hasWork else { return }
+        deliverCompletedSort(outcome, prefs: prefs)
+    }
+
+    /// Sweep a single routine's folder. Uses `rootOverride` so per-routine rules route
     /// the same way as multi-folder batches.
     func runInteractiveSweep(preset: CompressionPreset, prefs: BinkyPreferences) async {
         transientBannerMessage = nil
@@ -159,10 +197,10 @@ final class OrganizerViewModel: ObservableObject {
         deliverCompletedSort(outcome, prefs: prefs)
     }
 
-    /// Sweep every enabled automation in one pass. Each file gets a `rootOverride` to its
-    /// own automation source, so the orchestrator routes per-automation rules correctly even
+    /// Sweep every enabled routine in one pass. Each file gets a `rootOverride` to its
+    /// own routine source, so the orchestrator routes per-routine rules correctly even
     /// though we only run the sort engine once.
-    func runInteractiveSweepAllAutomations(prefs: BinkyPreferences) async {
+    func runInteractiveSweepAllRoutines(prefs: BinkyPreferences) async {
         transientBannerMessage = nil
         guard !DownloadsSortOrchestrator.shared.isSorting else {
             flashTransientStatus(
@@ -201,7 +239,7 @@ final class OrganizerViewModel: ObservableObject {
 
         guard !allFiles.isEmpty else {
             flashTransientStatus(
-                String(localized: "All quiet. Every folder is Binky'd.", comment: "Organizer transient banner when Sweep All finds no files across all automations.")
+                String(localized: "All quiet. Every folder is Binky'd.", comment: "Organizer transient banner when Sweep All finds no files across all routines.")
             )
             return
         }

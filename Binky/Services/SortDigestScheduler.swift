@@ -57,15 +57,38 @@ final class SortDailyDigestAccumulator {
     }
 }
 
-// MARK: - Daily fire (in-app timer so body reflects live totals)
+// MARK: - Timers (daily + weekly)
 
+private final class SortDigestPrefsCapsule: @unchecked Sendable {
+    weak var prefs: BinkyPreferences?
+
+    func readHistory() -> [SessionRecord]? {
+        guard let prefs else { return nil }
+        return prefs.sessionHistory
+    }
+}
+
+private let sortDigestCapsule = SortDigestPrefsCapsule()
+
+/// In-app timers so notifications stay local (no daemon).
 @MainActor
 enum SortDigestScheduler {
     private static var digestTimer: Timer?
+    private static var weeklyTimer: Timer?
 
     static func reschedule(prefs: BinkyPreferences) {
+        sortDigestCapsule.prefs = prefs
+
         digestTimer?.invalidate()
         digestTimer = nil
+        weeklyTimer?.invalidate()
+        weeklyTimer = nil
+
+        scheduleDailyIfNeeded(prefs: prefs)
+        scheduleWeeklyIfNeeded(prefs: prefs)
+    }
+
+    private static func scheduleDailyIfNeeded(prefs: BinkyPreferences) {
         guard prefs.dailyDigestEnabled else { return }
 
         let hour = max(0, min(23, prefs.dailyDigestHour))
@@ -77,7 +100,7 @@ enum SortDigestScheduler {
 
         digestTimer = Timer(fire: next, interval: 86_400, repeats: true) { _ in
             Task { @MainActor in
-                deliverDigestNotification()
+                deliverDailyDigestNotification()
             }
         }
         if let digestTimer {
@@ -85,10 +108,55 @@ enum SortDigestScheduler {
         }
     }
 
-    static func deliverDigestNotification() {
+    private static func scheduleWeeklyIfNeeded(prefs: BinkyPreferences) {
+        guard prefs.weeklyDigestEnabled else { return }
+        let weekday = clampWeekday(prefs.weeklyDigestWeekday)
+        var dc = DateComponents()
+        dc.weekday = weekday
+        dc.hour = 9
+        dc.minute = 0
+        let cal = Calendar.current
+        guard let next = cal.nextDate(after: Date(), matching: dc, matchingPolicy: .nextTimePreservingSmallerComponents) else { return }
+
+        weeklyTimer = Timer(fire: next, interval: 604_800, repeats: true) { _ in
+            Task { @MainActor in
+                deliverWeeklyDigestNotification()
+            }
+        }
+        if let weeklyTimer {
+            RunLoop.main.add(weeklyTimer, forMode: .common)
+        }
+    }
+
+    private static func clampWeekday(_ raw: Int) -> Int {
+        min(max(raw, 1), 7)
+    }
+
+    static func deliverDailyDigestNotification() {
         let content = UNMutableNotificationContent()
         content.title = String(localized: "Binky", comment: "Notification title.")
         content.body = SortDailyDigestAccumulator.shared.consumeDigestBodyAndReset()
+        let req = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+        UNUserNotificationCenter.current().add(req) { _ in }
+    }
+
+    static func deliverWeeklyDigestNotification() {
+        guard let history = sortDigestCapsule.readHistory(),
+              let model = WeeklyDigestShareModel.build(from: history)
+        else { return }
+        guard model.filesProcessed > 0 || model.movesCount > 0 else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "Binky", comment: "Notification title.")
+        content.body = String.localizedStringWithFormat(
+            String(
+                localized: "%1$lld files sorted · %2$lld moves · %3$lld runs (last week). Tap Binky for the share card.",
+                comment: "Weekly digest notification summary."
+            ),
+            Int64(model.filesProcessed),
+            Int64(model.movesCount),
+            Int64(model.sessionCount)
+        )
         let req = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
         UNUserNotificationCenter.current().add(req) { _ in }
     }

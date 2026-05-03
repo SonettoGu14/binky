@@ -1,3 +1,4 @@
+import BinkyCoreShared
 import Foundation
 import UniformTypeIdentifiers
 
@@ -16,14 +17,13 @@ enum SortRulesEvaluator {
 
     // MARK: - Exclusions
 
-    static func isExcluded(url: URL, prefs: BinkyPreferences) -> Bool {
+    static func isExcluded(url: URL, snapshot: SortPreferencesSnapshot) -> Bool {
         let ext = url.pathExtension.lowercased()
-        let blockedExt = prefs.sortExcludeExtensionsNormalized()
-        if !blockedExt.isEmpty, blockedExt.contains(ext) {
+        if !snapshot.excludeExtensions.isEmpty, snapshot.excludeExtensions.contains(ext) {
             return true
         }
         let base = url.lastPathComponent
-        for fragment in prefs.sortExcludeNameFragmentsNormalized() {
+        for fragment in snapshot.excludeNameFragments {
             guard !fragment.isEmpty else { continue }
             if base.localizedCaseInsensitiveContains(fragment) {
                 return true

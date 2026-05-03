@@ -10,15 +10,24 @@ struct ContentView: View {
     @ObservedObject var vm: OrganizerViewModel
     @Environment(\.openSettings) private var openSettings
 
+    @AppStorage("binky.mainWindowMode") private var mainWindowStored = MainWindowMode.quickSort.rawValue
+
+    /// One-time heuristic: upgrading users land on **Routines** when they’ve already enabled watches.
+    private static let mainWindowModeMigrationKey = "binky.mainWindowMode.didMigrate.v1"
+
+    @State private var showingHistorySheet = false
+    @ObservedObject private var diagnostics = DiagnosticsReporter.shared
+
     init(vm: OrganizerViewModel) {
         self.vm = vm
     }
 
     var body: some View {
-        OrganizerMainView(vm: vm)
+        coreBody
             .environmentObject(prefs)
             .environmentObject(updater)
             .onAppear {
+                migrateMainWindowModeIfNeeded()
                 BinkyMenuBarController.shared.refresh()
                 SortDigestScheduler.reschedule(prefs: prefs)
                 FileAgingService.shared.restartTimer(prefs: prefs)
@@ -32,6 +41,54 @@ struct ContentView: View {
                 openSettings: openSettings,
                 openFilesPanel: { openSortableFilesPanel() }
             ))
+            .onReceive(NotificationCenter.default.publisher(for: .binkyShowHistory)) { _ in
+                showingHistorySheet = true
+            }
+            .sheet(isPresented: $showingHistorySheet) {
+                HistorySheet(
+                    onOpenSessionSummary: { record in
+                        guard let data = record.batchSummaryData else { return }
+                        if let sortOutcome = try? JSONDecoder().decode(SortBatchOutcome.self, from: data) {
+                            showingHistorySheet = false
+                            vm.presentHistoricalSortOutcome(sortOutcome)
+                        }
+                    }
+                )
+                .environmentObject(prefs)
+            }
+            .sheet(item: $vm.pendingSortOutcome) { outcome in
+                SortOutcomeSheet(
+                    outcome: outcome,
+                    onUndo: { vm.applySortOutcomeDismissalDefaults() },
+                    onDismiss: { vm.applySortOutcomeDismissalDefaults() },
+                    onTransientStatus: { vm.flashTransientStatus($0) }
+                )
+                .environmentObject(prefs)
+                .id(outcome.id.uuidString)
+            }
+            .sheet(item: $diagnostics.pendingCrashReport) { report in
+                PostCrashReportSheet(report: report, diagnostics: diagnostics)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .binkyPrepareQuit)) { _ in
+                vm.pendingSortOutcome = nil
+                diagnostics.pendingCrashReport = nil
+                showingHistorySheet = false
+            }
+    }
+
+    /// Single split layout; sidebar swaps between Quick Sort compact panel and full Routines controls.
+    private var coreBody: some View {
+        OrganizerMainView(vm: vm)
+    }
+
+    /// First launch after upgrading: preserve muscle memory when someone already wired Routines up.
+    private func migrateMainWindowModeIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: Self.mainWindowModeMigrationKey) else { return }
+        let routineCount = prefs.savedPresets.filter {
+            $0.isEnabled && !$0.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }.count
+        mainWindowStored = routineCount > 0 ? MainWindowMode.routines.rawValue : MainWindowMode.quickSort.rawValue
+        UserDefaults.standard.set(true, forKey: Self.mainWindowModeMigrationKey)
     }
 
     private func openSortableFilesPanel() {
@@ -112,6 +169,12 @@ private struct PreferenceObservers: ViewModifier {
             .onChange(of: prefs.dailyDigestHour) { _, _ in
                 SortDigestScheduler.reschedule(prefs: prefs)
             }
+            .onChange(of: prefs.weeklyDigestEnabled) { _, _ in
+                SortDigestScheduler.reschedule(prefs: prefs)
+            }
+            .onChange(of: prefs.weeklyDigestWeekday) { _, _ in
+                SortDigestScheduler.reschedule(prefs: prefs)
+            }
             .onChange(of: prefs.fileAgingEnabled) { _, _ in
                 FileAgingService.shared.restartTimer(prefs: prefs)
             }
@@ -150,11 +213,11 @@ private struct MenuBridgeObservers: ViewModifier {
                 Task { await vm.sortIncomingFiles(urls, prefs: prefs) }
             }
             .onReceive(NotificationCenter.default.publisher(for: .binkyStartSort)) { _ in
-                Task { await runSweep(automationID: nil) }
+                Task { await runSweep(routineID: nil) }
             }
-            .onReceive(NotificationCenter.default.publisher(for: .binkyStartSortForAutomation)) { note in
-                let id = note.userInfo?[BinkyNotificationUserInfoKey.sortAutomationPresetID] as? UUID
-                Task { await runSweep(automationID: id) }
+            .onReceive(NotificationCenter.default.publisher(for: .binkyStartSortForRoutine)) { note in
+                let id = note.userInfo?[BinkyNotificationUserInfoKey.sortRoutinePresetID] as? UUID
+                Task { await runSweep(routineID: id) }
             }
             .onReceive(NotificationCenter.default.publisher(for: .binkyShowLastBatchSummary)) { _ in
                 vm.showLastSortSummary()
@@ -163,9 +226,6 @@ private struct MenuBridgeObservers: ViewModifier {
                 NSApp.activate()
                 openSettings()
             }
-            // `.binkyShowMainWindow` is handled at App scope in `BinkyShortcutCommands`
-            // via `openWindow(id: "main")` — that path works whether or not this view is
-            // currently mounted (and thus survives closing/reopening the main window).
             .onReceive(NotificationCenter.default.publisher(for: .binkyCheckUpdates)) { _ in
                 Task {
                     let result = await updater.check(manual: true)
@@ -175,18 +235,18 @@ private struct MenuBridgeObservers: ViewModifier {
     }
 
     /// One sweep helper that handles all three menu paths:
-    /// global Sort Now, Sort All Folders, and per-automation Sort. `automationID` of `nil`
-    /// uses the count-based fallback (single automation → default sweep, multiple → all).
-    private func runSweep(automationID: UUID?) async {
+    /// global Sort Now, Sort All Folders, and per-routine sweep. `routineID` `nil`
+    /// uses the count-based fallback (single routine → default sweep, multiple → all).
+    private func runSweep(routineID: UUID?) async {
         let enabled = prefs.savedPresets.filter {
             $0.isEnabled && !$0.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }
-        if let id = automationID, let preset = prefs.savedPresets.first(where: { $0.id == id }) {
+        if let id = routineID, let preset = prefs.savedPresets.first(where: { $0.id == id }) {
             await vm.runInteractiveSweep(preset: preset, prefs: prefs)
             return
         }
         if enabled.count > 1 {
-            await vm.runInteractiveSweepAllAutomations(prefs: prefs)
+            await vm.runInteractiveSweepAllRoutines(prefs: prefs)
         } else {
             await vm.runInteractiveDownloadsSweep(prefs: prefs)
         }

@@ -34,7 +34,7 @@ private struct PreferencesRelatedTabLink: View {
 enum PreferencesTab: Int, CaseIterable, Hashable {
     case general = 0
     case destinations = 1
-    case automations = 2
+    case routines = 2
     case shortcuts = 3
     case appearance = 4
 
@@ -53,8 +53,8 @@ enum PreferencesTab: Int, CaseIterable, Hashable {
         UserDefaults.standard.removeObject(forKey: pendingTabUserDefaultsKey)
         switch raw {
         case 2, 3:
-            // Legacy: "Watch" (2) and "Profiles" (3) both land on Automations.
-            return .automations
+            // Legacy: "Watch" (2) and "Profiles" (3) both land on Routines.
+            return .routines
         case 4:
             return .shortcuts
         case 5:
@@ -64,10 +64,10 @@ enum PreferencesTab: Int, CaseIterable, Hashable {
         }
     }
 
-    /// Onboarding: open Automations and auto-create the Calm Desktop template once the tab appears.
-    static func stageAutomationsWithCalmDesktopTemplate() {
-        UserDefaults.standard.set(AutomationTemplate.calmDesktop.rawValue, forKey: AutomationTemplate.pendingUserDefaultsKey)
-        stagePendingTab(.automations)
+    /// Onboarding: open Routines and auto-create the Calm Desktop template once the tab appears.
+    static func stageRoutinesWithCalmDesktopTemplate() {
+        UserDefaults.standard.set(RoutineTemplate.calmDesktop.rawValue, forKey: RoutineTemplate.pendingUserDefaultsKey)
+        stagePendingTab(.routines)
     }
 }
 
@@ -85,9 +85,9 @@ struct PreferencesView: View {
                 .tabItem { Label(String(localized: "Sorting", comment: "Settings tab: sort sorted folders and routing rules."), systemImage: "line.3.horizontal.decrease") }
                 .tag(PreferencesTab.destinations)
                 .environmentObject(prefs)
-            AutomationsOrganizerTab()
-                .tabItem { Label(String(localized: "Automations", comment: "Settings UI: automations tab."), systemImage: "gearshape.2") }
-                .tag(PreferencesTab.automations)
+            RoutinesOrganizerTab()
+                .tabItem { Label(String(localized: "Routines", comment: "Settings UI: routines tab."), systemImage: "repeat.circle") }
+                .tag(PreferencesTab.routines)
                 .environmentObject(prefs)
             ShortcutsTab()
                 .tabItem { Label(String(localized: "Shortcuts", comment: "Settings UI."), systemImage: "keyboard") }
@@ -182,7 +182,7 @@ private struct GeneralTab: View {
                     } label: {
                         Text(String(localized: "Default tags by type", comment: "Settings: Finder tag defaults per sort category."))
                     }
-                    Text(String(localized: "Leave blank to use Binky’s built-in hint for each type. Automation settings can override these per workflow.", comment: "Settings: Finder tag defaults footer."))
+                    Text(String(localized: "Leave blank to use Binky’s built-in hint for each type. Routine settings can override these per workflow.", comment: "Settings: Finder tag defaults footer."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -252,6 +252,15 @@ private struct GeneralTab: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
+                Toggle(String(localized: "Weekly digest reminder", comment: "Settings: weekly rollup notification."), isOn: Binding(
+                    get: { prefs.weeklyDigestEnabled },
+                    set: { prefs.weeklyDigestEnabled = $0 }
+                ))
+                Text(String(localized: "Roughly Mondays at 9:00 AM (local): a rollup you can screenshot as the digest card.", comment: "Weekly digest footer."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
             } header: {
                 Text(String(localized: "Housekeeping", comment: "Settings section."))
             }
@@ -288,6 +297,54 @@ private struct GeneralTab: View {
                 .buttonStyle(.plain)
                 .font(.caption)
                 .foregroundStyle(binkyTintColor)
+            }
+
+            Section {
+                Text(
+                    String(
+                        localized: "Build `binky` from the `BinkyCore` folder for scripts & Shortcuts. Same rules & prefs — shared lock prevents racing the GUI.",
+                        comment: "CLI pro tools blurble in Settings."
+                    )
+                )
+                .fixedSize(horizontal: false, vertical: true)
+
+                Button(
+                    String(
+                        localized: "Open CLI setup on GitHub",
+                        comment: "Settings button opening docs/local-cli.md in browser."
+                    )
+                ) {
+                    NSWorkspace.shared.open(URL(string: "https://github.com/heyderekj/binky/blob/main/docs/local-cli.md")!)
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(binkyTintColor)
+
+                Button(
+                    String(
+                        localized: "Copy Terminal build snippet",
+                        comment: "Places swift build snippet on pasteboard."
+                    )
+                ) {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(
+                        "cd ~/path/to/binky/BinkyCore && swift build -c release  # releases .build/release/binky",
+                        forType: .string
+                    )
+                }
+                .buttonStyle(.borderless)
+                .font(.caption)
+                .foregroundStyle(binkyTintColor)
+            } header: {
+                Text(String(localized: "Pro tools (CLI)", comment: "Settings: CLI section heading."))
+            } footer: {
+                Text(
+                    String(
+                        localized: "Paths you pass aren’t sandboxed; bookmarks from the Finder sheet don’t propagate to Terminal.",
+                        comment: "CLI security footnote in Settings."
+                    )
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
 
             Section {
@@ -351,6 +408,25 @@ private struct GeneralTab: View {
             }
 
             Section {
+                Text(String(localized: "2.0 will use a one-time license for official builds. You keep the app; renewals only extend updates.", comment: "License section: explains paid official builds."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(String(localized: "1.x stays free and open source (MIT). Building from source remains an option.", comment: "License section: open source stays."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button(String(localized: "Pricing and licensing FAQ…", comment: "Opens site licensing FAQ in the default browser.")) {
+                    NSWorkspace.shared.open(URL(string: "https://binkyfiles.com/#faq-licensing")!)
+                }
+                .buttonStyle(.plain)
+                .font(.caption)
+                .foregroundStyle(binkyTintColor)
+            } header: {
+                Text(String(localized: "License", comment: "Settings: license section header."))
+            }
+
+            Section {
                 PreferencesRelatedTabLink(title: String(localized: "Keyboard shortcuts…", comment: "Settings UI."), tab: .shortcuts)
                 Link(S.supportEmail, destination: URL(string: "mailto:\(S.supportEmail)")!)
             } header: {
@@ -390,30 +466,39 @@ private struct AppearanceTab: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
+                let hasRoutines = prefs.savedPresets.contains(where: { $0.isEnabled })
+
                 Picker(String(localized: "Sidebar style", comment: "Settings UI."), selection: Binding(
                     get: { prefs.sidebarSimpleMode },
                     set: { prefs.applySidebarSimpleMode($0) }
                 )) {
-                    Text(String(localized: "Focused", comment: "Settings UI: organizer sidebar style (minimal).")).tag(true)
+                    Text(String(localized: "Simple", comment: "Settings UI: organizer sidebar style (minimal).")).tag(true)
                     Text(String(localized: "Expanded", comment: "Settings UI: organizer sidebar style (detailed).")).tag(false)
                 }
                 .pickerStyle(.radioGroup)
+                .disabled(hasRoutines)
 
-                if !prefs.sidebarSimpleMode {
-                    Text(String(localized: "Expanded keeps automation selection, folder controls, and quick settings visible at once.", comment: "Settings UI: organizer expanded sidebar summary."))
+                if hasRoutines {
+                    Text(String(localized: "Simple is unavailable while routines are configured. Expanded keeps them visible.", comment: "Settings UI: simple sidebar unavailable when routines exist."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else if !prefs.sidebarSimpleMode {
+                    Text(String(localized: "Expanded shows both Quick Sort and Routines sections in the sidebar.", comment: "Settings UI: organizer expanded sidebar summary."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
-                    Text(String(localized: "Focused keeps the sidebar calmer and trims extra detail until you need it.", comment: "Settings UI: organizer focused sidebar summary."))
+                    Text(String(localized: "Simple shows only the Quick Sort section.", comment: "Settings UI: organizer simple sidebar summary."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+
             } header: {
                 Text(String(localized: "Layout", comment: "Settings UI."))
             } footer: {
-                PreferencesRelatedTabLink(title: String(localized: "Open Automations…", comment: "Settings UI."), tab: .automations)
+                PreferencesRelatedTabLink(title: String(localized: "Open Routines…", comment: "Settings UI."), tab: .routines)
             }
 
             Section {
@@ -543,7 +628,7 @@ private struct DestinationsTab: View {
             } header: {
                 Text(String(localized: "Default folder", comment: "Sorting tab: default folder section header."))
             } footer: {
-                Text(String(localized: "The fallback folder when no automation's path matches. Add automations for Desktop, Dropbox, or anything else fussy.", comment: "Sorting tab: global default folder footer."))
+                Text(String(localized: "The fallback folder when no routine's path matches. Add routines for Desktop, Dropbox, or anything else fussy.", comment: "Sorting tab: global default folder footer."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -1381,7 +1466,7 @@ struct RuleEditorSheet: View {
                     if draft.finderTagPolicy == .replaceCategoryDefault {
                         TextField(String(localized: "Replacement tags (comma-separated)", comment: "Rule editor: tags that replace category defaults."), text: categoryDefaultReplacementTagsBinding)
                             .textFieldStyle(.roundedBorder)
-                        Text(String(localized: "Replaces only the type-based tags. Automation tags and “Tags on match” still apply after.", comment: "Rule editor: replace tags hint."))
+                        Text(String(localized: "Replaces only the type-based tags. Routine tags and “Tags on match” still apply after.", comment: "Rule editor: replace tags hint."))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -1476,9 +1561,9 @@ struct RuleEditorSheet: View {
         return lines.joined(separator: "\n")
     }
 }
-// MARK: - Automations (organizer)
+// MARK: - Routines (organizer)
 
-private enum AutomationTemplate: String, CaseIterable, Hashable {
+private enum RoutineTemplate: String, CaseIterable, Hashable {
     case blank
     case sortDownloads
     case calmDesktop
@@ -1488,42 +1573,42 @@ private enum AutomationTemplate: String, CaseIterable, Hashable {
     case archiveScreenshots
     case emailToObsidian
 
-    fileprivate static let pendingUserDefaultsKey = "binky.pendingAutomationTemplate"
+    fileprivate static let pendingUserDefaultsKey = "binky.pendingRoutineTemplate"
 
-    /// Staged before ``SettingsLink`` so ``AutomationsOrganizerTab`` can create on appear.
-    fileprivate static func stagePending(_ template: AutomationTemplate) {
+    /// Staged before ``SettingsLink`` so ``RoutinesOrganizerTab`` can create on appear.
+    fileprivate static func stagePending(_ template: RoutineTemplate) {
         UserDefaults.standard.set(template.rawValue, forKey: pendingUserDefaultsKey)
     }
 
-    fileprivate static func consumePending() -> AutomationTemplate? {
+    fileprivate static func consumePending() -> RoutineTemplate? {
         guard let raw = UserDefaults.standard.string(forKey: pendingUserDefaultsKey) else { return nil }
         UserDefaults.standard.removeObject(forKey: pendingUserDefaultsKey)
-        return AutomationTemplate(rawValue: raw)
+        return RoutineTemplate(rawValue: raw)
     }
 
-    fileprivate var suggestedAutomationName: String {
+    fileprivate var suggestedRoutineName: String {
         switch self {
         case .blank:
-            return String(localized: "New automation", comment: "Default name for blank automation.")
+            return String(localized: "New routine", comment: "Default name for blank routine.")
         case .sortDownloads:
-            return String(localized: "Sort my Downloads", comment: "Automation template name.")
+            return String(localized: "Sort my Downloads", comment: "Routine template name.")
         case .calmDesktop:
-            return String(localized: "Calm my Desktop", comment: "Automation template name.")
+            return String(localized: "Calm my Desktop", comment: "Routine template name.")
         case .autoInstallDMG:
-            return String(localized: "Auto-install DMGs", comment: "Automation template name.")
+            return String(localized: "Auto-install DMGs", comment: "Routine template name.")
         case .autoExtractArchives:
-            return String(localized: "Auto-extract archives", comment: "Automation template name.")
+            return String(localized: "Auto-extract archives", comment: "Routine template name.")
         case .sortByFinderTag:
-            return String(localized: "Sort by Finder tag", comment: "Automation template name.")
+            return String(localized: "Sort by Finder tag", comment: "Routine template name.")
         case .archiveScreenshots:
-            return String(localized: "Archive old screenshots", comment: "Automation template name.")
+            return String(localized: "Archive old screenshots", comment: "Routine template name.")
         case .emailToObsidian:
-            return String(localized: "Notes to Obsidian", comment: "Automation template name.")
+            return String(localized: "Notes to Obsidian", comment: "Routine template name.")
         }
     }
 }
 
-private struct AutomationsOrganizerTab: View {
+private struct RoutinesOrganizerTab: View {
     @EnvironmentObject var prefs: BinkyPreferences
     @State private var selectedPresetID: UUID?
     @State private var newCustomTagDraft: String = ""
@@ -1542,19 +1627,19 @@ private struct AutomationsOrganizerTab: View {
 
     var body: some View {
         Form {
-            Section(String(localized: "Automations", comment: "Automations list header.")) {
+            Section(String(localized: "Routines", comment: "Routines list header.")) {
                 ForEach(Array(prefs.savedPresets.enumerated()), id: \.element.id) { _, preset in
                     profileListRow(preset)
                 }
 
                 Button {
-                    createNewAutomation(.blank)
+                    createNewRoutine(.blank)
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus")
                             .frame(width: 16, alignment: .center)
                             .foregroundStyle(.secondary)
-                        Text(String(localized: "Add automation", comment: "Automations list: add row."))
+                        Text(String(localized: "Add routine", comment: "Routines list: add row."))
                             .foregroundStyle(.primary)
                         Spacer(minLength: 0)
                     }
@@ -1569,45 +1654,45 @@ private struct AutomationsOrganizerTab: View {
                         systemImage: "plus",
                         title: String(localized: "Add", comment: "Added automation toolbar: create.")
                     ) {
-                        createNewAutomation(.blank)
+                        createNewRoutine(.blank)
                     }
 
                     Menu {
-                        Button(String(localized: "Blank automation", comment: "Automation template.")) {
-                            createNewAutomation(.blank)
+                        Button(String(localized: "Blank routine", comment: "Routine template.")) {
+                            createNewRoutine(.blank)
                         }
-                        Button(String(localized: "Sort my Downloads", comment: "Automation template.")) {
-                            createNewAutomation(.sortDownloads)
+                        Button(String(localized: "Sort my Downloads", comment: "Routine template.")) {
+                            createNewRoutine(.sortDownloads)
                         }
-                        Button(String(localized: "Calm my Desktop", comment: "Automation template.")) {
-                            createNewAutomation(.calmDesktop)
+                        Button(String(localized: "Calm my Desktop", comment: "Routine template.")) {
+                            createNewRoutine(.calmDesktop)
                         }
-                        Button(String(localized: "Auto-install DMGs", comment: "Automation template.")) {
-                            createNewAutomation(.autoInstallDMG)
+                        Button(String(localized: "Auto-install DMGs", comment: "Routine template.")) {
+                            createNewRoutine(.autoInstallDMG)
                         }
-                        Button(String(localized: "Auto-extract archives", comment: "Automation template.")) {
-                            createNewAutomation(.autoExtractArchives)
+                        Button(String(localized: "Auto-extract archives", comment: "Routine template.")) {
+                            createNewRoutine(.autoExtractArchives)
                         }
-                        Button(String(localized: "Sort by Finder tag", comment: "Automation template.")) {
-                            createNewAutomation(.sortByFinderTag)
+                        Button(String(localized: "Sort by Finder tag", comment: "Routine template.")) {
+                            createNewRoutine(.sortByFinderTag)
                         }
-                        Button(String(localized: "Archive old screenshots", comment: "Automation template.")) {
-                            createNewAutomation(.archiveScreenshots)
+                        Button(String(localized: "Archive old screenshots", comment: "Routine template.")) {
+                            createNewRoutine(.archiveScreenshots)
                         }
-                        Button(String(localized: "Notes to Obsidian", comment: "Automation template; txt → md style routing.")) {
-                            createNewAutomation(.emailToObsidian)
+                        Button(String(localized: "Notes to Obsidian", comment: "Routine template; txt → md style routing.")) {
+                            createNewRoutine(.emailToObsidian)
                         }
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "wand.and.stars")
-                            Text(String(localized: "Templates", comment: "Automation templates menu."))
+                            Text(String(localized: "Templates", comment: "Routine templates menu."))
                         }
                     }
                     .menuStyle(.borderlessButton)
 
                     profileToolbarButton(
                         systemImage: "doc.on.doc",
-                        title: String(localized: "Duplicate", comment: "Automations toolbar: duplicate.")
+                        title: String(localized: "Duplicate", comment: "Routines toolbar: duplicate.")
                     ) {
                         duplicateSelectedProfile()
                     }
@@ -1615,7 +1700,7 @@ private struct AutomationsOrganizerTab: View {
 
                     profileToolbarButton(
                         systemImage: "trash",
-                        title: String(localized: "Delete", comment: "Automations toolbar: delete.")
+                        title: String(localized: "Delete", comment: "Routines toolbar: delete.")
                     ) {
                         confirmDeleteProfile = true
                     }
@@ -1626,30 +1711,30 @@ private struct AutomationsOrganizerTab: View {
             }
 
             if let idx = selectedPresetIndex {
-                Section(String(localized: "Name", comment: "Automation editor section.")) {
+                Section(String(localized: "Name", comment: "Routine editor section.")) {
                     TextField(
-                        String(localized: "Automation name", comment: "Automation editor: name field."),
+                        String(localized: "Routine name", comment: "Routine editor: name field."),
                         text: profileNameBinding(presetIndex: idx)
                     )
                     .textFieldStyle(.roundedBorder)
                 }
 
-                Section(String(localized: "When", comment: "Automation source folder section.")) {
-                    Toggle(String(localized: "Enable this automation", comment: "Automation on."), isOn: isEnabledBinding(presetIndex: idx))
+                Section(String(localized: "When", comment: "Routine source folder section.")) {
+                    Toggle(String(localized: "Enable this routine", comment: "Routine on."), isOn: isEnabledBinding(presetIndex: idx))
                     HStack {
                         Text(prefs.savedPresets[idx].watchFolderPath.isEmpty
-                             ? String(localized: "No folder selected", comment: "Automation: watch path empty.")
+                             ? String(localized: "No folder selected", comment: "Routine: watch path empty.")
                              : URL(fileURLWithPath: prefs.savedPresets[idx].watchFolderPath).lastPathComponent)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                             .truncationMode(.middle)
                         Spacer()
-                        Button(String(localized: "Choose…", comment: "Pick automation source folder.")) {
+                        Button(String(localized: "Choose…", comment: "Pick routine source folder.")) {
                             pickWatchFolder(presetIndex: idx)
                         }
                         .buttonStyle(.bordered)
                     }
-                    Text(String(localized: "Binky watches here and runs the rules below. Different folder than the default? That’s the point.", comment: "Automation watch hint; brand voice."))
+                    Text(String(localized: "Binky watches here and runs the rules below. Different folder than the default? That’s the point.", comment: "Routine watch hint; brand voice."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1685,7 +1770,7 @@ private struct AutomationsOrganizerTab: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                Section(String(localized: "Default tags by type", comment: "Automation editor: per-category Finder tag overrides.")) {
+                Section(String(localized: "Default tags by type", comment: "Routine editor: per-category Finder tag overrides.")) {
                     Text(String(localized: "Overrides global defaults for files sorted under this automation. Leave blank to inherit.", comment: "Per-type tag hint."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -1693,9 +1778,9 @@ private struct AutomationsOrganizerTab: View {
                     FinderTagDefaultsByCategoryMapEditor(map: finderTagDefaultsBinding(presetIndex: idx))
                 }
 
-                Section(String(localized: "Custom tags", comment: "Automation editor section: custom Finder tags.")) {
+                Section(String(localized: "Custom tags", comment: "Routine editor section: custom Finder tags.")) {
                     if prefs.savedPresets[idx].customFinderTags.isEmpty {
-                        Text(String(localized: "No custom tags. Sorted files only get Binky's category tags.", comment: "Automation editor: no custom tags."))
+                        Text(String(localized: "No custom tags. Sorted files only get Binky's category tags.", comment: "Routine editor: no custom tags."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -1704,7 +1789,7 @@ private struct AutomationsOrganizerTab: View {
                         HStack {
                             Text(tag)
                             Spacer()
-                            Button(String(localized: "Remove", comment: "Automation editor: remove custom Finder tag.")) {
+                            Button(String(localized: "Remove", comment: "Routine editor: remove custom Finder tag.")) {
                                 removeCustomTag(tag, presetIndex: idx)
                             }
                             .buttonStyle(.borderless)
@@ -1712,20 +1797,20 @@ private struct AutomationsOrganizerTab: View {
                     }
                     HStack(alignment: .firstTextBaseline) {
                         TextField(
-                            String(localized: "Tag name", comment: "Automation editor: add custom Finder tag placeholder."),
+                            String(localized: "Tag name", comment: "Routine editor: add custom Finder tag placeholder."),
                             text: $newCustomTagDraft
                         )
                         .textFieldStyle(.roundedBorder)
-                        Button(String(localized: "Add", comment: "Automation editor: add custom Finder tag.")) {
+                        Button(String(localized: "Add", comment: "Routine editor: add custom Finder tag.")) {
                             addCustomTag(presetIndex: idx)
                         }
                         .buttonStyle(.bordered)
                     }
                 }
 
-                Section(String(localized: "\u{201C}New\u{201D} tag expiry", comment: "Automation editor section: New tag expiry.")) {
+                Section(String(localized: "\u{201C}New\u{201D} tag expiry", comment: "Routine editor section: New tag expiry.")) {
                     Picker(
-                        String(localized: "Expires after", comment: "Automation editor: New tag expiry picker."),
+                        String(localized: "Expires after", comment: "Routine editor: New tag expiry picker."),
                         selection: newTagExpiryBinding(presetIndex: idx)
                     ) {
                         ForEach(Self.newTagExpiryChoices, id: \.self) { days in
@@ -1735,14 +1820,14 @@ private struct AutomationsOrganizerTab: View {
                     .pickerStyle(.menu)
                 }
 
-                Section(String(localized: "Sort rules", comment: "Automation editor section: sort rules.")) {
+                Section(String(localized: "Sort rules", comment: "Routine editor section: sort rules.")) {
                     if prefs.savedPresets[idx].sortRules.isEmpty {
-                        Text(String(localized: "No rules. Binky uses default sorted folders.", comment: "Automation editor: empty rules."))
+                        Text(String(localized: "No rules. Binky uses default sorted folders.", comment: "Routine editor: empty rules."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    Text(String(localized: "When this automation has rules, they apply to files from its source folder (combined with other automations on the same path in list order).", comment: "Automation editor: rules hint."))
+                    Text(String(localized: "When this routine has rules, they apply to files from its source folder (combined with other routines on the same path in list order).", comment: "Routine editor: rules hint."))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1750,13 +1835,13 @@ private struct AutomationsOrganizerTab: View {
                         .frame(minHeight: 200)
                 }
 
-                Section(String(localized: "After sorting", comment: "Automation editor section: post-sort shortcut.")) {
+                Section(String(localized: "After sorting", comment: "Routine editor section: post-sort shortcut.")) {
                     TextField(
-                        String(localized: "Shortcut name (e.g. \u{201C}Notify Slack\u{201D})", comment: "Automation editor: post-sort shortcut."),
+                        String(localized: "Shortcut name (e.g. \u{201C}Notify Slack\u{201D})", comment: "Routine editor: post-sort shortcut."),
                         text: postSortShortcutBinding(presetIndex: idx)
                     )
                     .textFieldStyle(.roundedBorder)
-                    Text(String(localized: "Runs this Shortcut with the moved file as input.", comment: "Automation editor: shortcut hint."))
+                    Text(String(localized: "Runs this Shortcut with the moved file as input.", comment: "Routine editor: shortcut hint."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1766,8 +1851,8 @@ private struct AutomationsOrganizerTab: View {
         .formStyle(.grouped)
         .onAppear {
             syncSelectedPresetSelection()
-            if let pending = AutomationTemplate.consumePending() {
-                createNewAutomation(pending)
+            if let pending = RoutineTemplate.consumePending() {
+                createNewRoutine(pending)
             }
         }
         .onChange(of: prefs.savedPresets.map(\.id)) { _, _ in
@@ -1778,19 +1863,19 @@ private struct AutomationsOrganizerTab: View {
             isPresented: $confirmDeleteProfile,
             titleVisibility: .visible
         ) {
-            Button(String(localized: "Delete", comment: "Automation editor: confirm delete."), role: .destructive) {
+            Button(String(localized: "Delete", comment: "Routine editor: confirm delete."), role: .destructive) {
                 deleteSelectedProfile()
             }
-            Button(String(localized: "Cancel", comment: "Automation editor: cancel delete."), role: .cancel) {}
+            Button(String(localized: "Cancel", comment: "Routine editor: cancel delete."), role: .cancel) {}
         }
     }
 
     private var deleteConfirmationTitle: String {
         guard let idx = selectedPresetIndex else {
-            return String(localized: "Delete automation?", comment: "Automation editor: generic delete title.")
+            return String(localized: "Delete routine?", comment: "Routine editor: generic delete title.")
         }
         return String.localizedStringWithFormat(
-            String(localized: "Delete \u{201C}%@\u{201D}?", comment: "Automation editor: delete title."),
+            String(localized: "Delete \u{201C}%@\u{201D}?", comment: "Routine editor: delete title."),
             prefs.savedPresets[idx].name
         )
     }
@@ -1859,10 +1944,10 @@ private struct AutomationsOrganizerTab: View {
         }
     }
 
-    private func createNewAutomation(_ template: AutomationTemplate) {
+    private func createNewRoutine(_ template: RoutineTemplate) {
         var copy = prefs.savedPresets
-        let baseName = template.suggestedAutomationName
-        let name = uniqueAutomationName(
+        let baseName = template.suggestedRoutineName
+        let name = uniqueRoutineName(
             baseName: baseName,
             existingNames: Set(copy.map(\.name))
         )
@@ -1874,7 +1959,7 @@ private struct AutomationsOrganizerTab: View {
     }
 
     /// Applies template defaults (paths, starter rules). Caller sets name and appends to `savedPresets`.
-    private func apply(_ template: AutomationTemplate, to preset: inout CompressionPreset) {
+    private func apply(_ template: RoutineTemplate, to preset: inout CompressionPreset) {
         func bookmarkDirectory(_ url: URL) {
             let normalized = url.standardizedFileURL
             preset.watchFolderPath = normalized.path
@@ -2004,7 +2089,7 @@ private struct AutomationsOrganizerTab: View {
         }
     }
 
-    private func uniqueAutomationName(baseName: String, existingNames: Set<String>) -> String {
+    private func uniqueRoutineName(baseName: String, existingNames: Set<String>) -> String {
         if !existingNames.contains(baseName) {
             return baseName
         }

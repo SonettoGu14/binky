@@ -1,6 +1,6 @@
 # Binky
 
-A native macOS app that calms whatever folder is fussy — Downloads, Desktop, a Dropbox inbox, a screenshots dump, you name it. **Automations** are named, parallel workflows: each can watch its own source, run its own rules, and optional Finder tags. The default global inbox still points at `~/Downloads` if you like it there.
+A native macOS app that calms whatever folder is fussy — Downloads, Desktop, a Dropbox inbox, a screenshots dump, you name it. **Quick Sort** is one-tap cleanup; **Routines** are named watchers with their own sources, rules, and optional Finder tags.
 
 Binky waits for files to finish landing, then routes them into clear sorted folders — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, and Misc — or runs the action you chose (extract an archive, install from a DMG, fan out by Finder tag, and more).
 
@@ -11,7 +11,7 @@ Unknown or sketchy extensions do not disappear silently: they land in **Review**
 <table>
   <tr>
     <td><img src="site/screenshots/binky-sorting.png" alt="Binky organizer inbox with Downloads sorted into folders" width="100%" /></td>
-    <td><img src="site/screenshots/binky-automations.webp" alt="Binky Automations list with sources, rules, and tag defaults" width="100%" /></td>
+    <td><img src="site/screenshots/binky-automations.webp" alt="Binky Routines list with sources, rules, and tag defaults" width="100%" /></td>
   </tr>
   <tr>
     <td><img src="site/screenshots/binky-sorting-summary.webp" alt="Binky sorting summary showing batch outcomes" width="100%" /></td>
@@ -38,8 +38,9 @@ Hey! I'm [Derek Castelli](https://www.heyderekj.com), a full-time freelance web 
 
 ## Features
 
-- **Sort Downloads Now** - one-click sort with stable-file checks and collision-safe moves
-- **Automations** - multiple named watchers (each with its own source folder and rules) plus a global inbox fallback
+- **Quick Sort** — one-tap sweep for any inbox (defaults to `~/Downloads`), with stable-file checks and collision-safe moves
+- **CLI (`binky`)** — ship the Organizer engine from Terminal; build `BinkyCore` with SwiftPM ([`docs/local-cli.md`](docs/local-cli.md))
+- **Routines** — multiple named watchers (each with its own source folder and rules) plus a global inbox fallback
 - **Watch** - monitor folders continuously and route new files as they settle
 - **Rules** - extensions, names, origins, OCR/receipt hints, Finder tag predicates, actions (move, zip, extract, DMG install, tag fan-out, trash, rename)
 - **Review folder** — unknown or ambiguous extensions get held for inspection first
@@ -53,7 +54,7 @@ Hey! I'm [Derek Castelli](https://www.heyderekj.com), a full-time freelance web 
 ## What others don't do
 
 - **Treat uncertainty safely** - questionable files go to **Review** instead of being buried in the wrong folder
-- **Sort with context, not just extension lists** - automations and routing logic keep behavior consistent across different workflows
+- **Sort with context, not just extension lists** — routines and routing logic keep behavior predictable while you stay in control
 - **Keep a readable paper trail** - clear per-batch outcomes so you can verify what moved and what did not
 - **Fit native Mac workflows** - Finder Services, Shortcuts, and login-item support out of the box
 - **Stay lightweight** - organizer-first UX on Apple frameworks with strict bundle-size discipline
@@ -76,7 +77,7 @@ The app keeps session outcomes so you can see exactly what happened in each run.
 - AppKit
 - Foundation
 - UserNotifications
-- Xcode project + native macOS frameworks only
+- SwiftPM package `BinkyCore/` bundles shared models + the optional `binky` CLI (`docs/local-cli.md`)
 
 ## Install
 
@@ -109,7 +110,15 @@ That's Gatekeeper. Use **System Settings → Privacy & Security → Open Anyway*
 
 **Is it actually free?**
 
-[Open source on GitHub](https://github.com/heyderekj/binky) under MIT. Free.
+[Open source on GitHub](https://github.com/heyderekj/binky) under MIT. **Binky 1.x** stays free (official builds included). **Binky 2.0** will introduce a **one-time license** for official app builds with **one year of updates** included and **optional yearly renewals** for further updates — not a subscription. See [binkyfiles.com/#faq-licensing](https://binkyfiles.com/#faq-licensing).
+
+**How does licensing work for 2.0?**
+
+Pay once, keep the app. Renewal only extends how long you receive updates. Source code stays MIT.
+
+**Binky + Dinky bundle?**
+
+Planned: family bundle (one-time purchase, one year of updates for both, lower yearly renewal than separate). Details on binkyfiles.com when live.
 
 **Does Binky upload my files?**
 

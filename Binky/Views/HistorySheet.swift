@@ -7,6 +7,8 @@ struct HistorySheet: View {
     /// When set, rows with stored batch summary data show “Open Summary…”.
     var onOpenSessionSummary: ((SessionRecord) -> Void)?
 
+    @State private var weeklyDigestPresentation: WeeklyDigestShareModel?
+
     private let dateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateStyle = .medium
@@ -26,6 +28,9 @@ struct HistorySheet: View {
         }
         .frame(minWidth: 420, minHeight: 300)
         .background(.ultraThinMaterial)
+        .sheet(item: $weeklyDigestPresentation) { model in
+            WeeklyDigestActionsSheet(model: model)
+        }
     }
 
     private var header: some View {
@@ -33,6 +38,14 @@ struct HistorySheet: View {
             Text(String(localized: "History", comment: "History window title."))
                 .font(.headline)
             Spacer()
+            if WeeklyDigestShareModel.build(from: prefs.sessionHistory) != nil {
+                Button(String(localized: "This week’s digest card…", comment: "History sheet: weekly digest opener.")) {
+                    weeklyDigestPresentation = WeeklyDigestShareModel.build(from: prefs.sessionHistory)
+                }
+                .font(.caption)
+                .foregroundStyle(binkyTintColor)
+                .buttonStyle(.plain)
+            }
             if !prefs.sessionHistory.isEmpty {
                 Button(String(localized: "Clear", comment: "Clear session history list.")) {
                     prefs.sessionHistory = []
@@ -67,11 +80,11 @@ struct HistorySheet: View {
                     HStack(spacing: 6) {
                         Text(dateFormatter.string(from: record.timestamp))
                             .font(.caption.weight(.medium))
-                        if let automationName = automationName(for: record) {
+                        if let routineNameChip = routineName(for: record) {
                             HStack(spacing: 3) {
-                                Image(systemName: "gearshape.2")
+                                Image(systemName: "repeat.circle")
                                     .font(.system(size: 8, weight: .semibold))
-                                Text(automationName)
+                                Text(routineNameChip)
                                     .font(.system(size: 9, weight: .medium))
                                     .lineLimit(1)
                             }
@@ -82,7 +95,7 @@ struct HistorySheet: View {
                                     .fill(binkyTintColor.opacity(0.12))
                             )
                             .foregroundStyle(binkyTintColor)
-                            .accessibilityLabel(String(localized: "Automation: \(automationName)", comment: "VoiceOver: history row chip naming the automation."))
+                            .accessibilityLabel(String(localized: "Routine: \(routineNameChip)", comment: "VoiceOver: history row chip naming the routine."))
                         }
                     }
                     Text(record.formats.joined(separator: ", "))
@@ -139,10 +152,10 @@ struct HistorySheet: View {
         .scrollContentBackground(.hidden)
     }
 
-    private func automationName(for record: SessionRecord) -> String? {
+    private func routineName(for record: SessionRecord) -> String? {
         guard let data = record.batchSummaryData,
               let outcome = try? JSONDecoder().decode(SortBatchOutcome.self, from: data) else { return nil }
-        return outcome.matchedAutomation(in: prefs.savedPresets)?.name
+        return outcome.matchedRoutine(in: prefs.savedPresets)?.name
     }
 
     private func sessionCompressibleURLs(_ record: SessionRecord) -> [URL] {

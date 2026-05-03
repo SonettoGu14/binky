@@ -1,5 +1,7 @@
 # Binky Help
 
+> **Localization TODO:** Resync from English `Resources/Help.md` / `en.lproj/Help.md` for **Quick Sort** + **Routines** terminology.
+
 Binky keeps your **watched folder** tidy: it watches for finished files, moves them into sensible folders, optionally adds Finder tags, and shows clear **summary + history** so you always know what happened.
 
 ## Quick start

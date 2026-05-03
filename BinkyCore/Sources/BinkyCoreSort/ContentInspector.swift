@@ -1,4 +1,5 @@
 import AppKit
+import BinkyCoreShared
 import Foundation
 import ImageIO
 import PDFKit

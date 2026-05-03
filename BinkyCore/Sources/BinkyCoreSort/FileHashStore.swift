@@ -7,9 +7,9 @@ import SQLite3
 private let sqliteTransient: (@convention(c) (UnsafeMutableRawPointer?) -> Void) = unsafeBitCast(-1, to: (@convention(c) (UnsafeMutableRawPointer?) -> Void).self)
 
 /// Persistent store for SHA-256 and perceptual image fingerprints — duplicate detection across sort runs.
-final class FileHashStore: @unchecked Sendable {
+public final class FileHashStore: @unchecked Sendable {
 
-    static let shared = FileHashStore()
+    public static let shared = FileHashStore()
 
     private let dbPath: String
     private let lock = NSLock()
@@ -22,15 +22,21 @@ final class FileHashStore: @unchecked Sendable {
         setupSchema()
     }
 
-    struct LookupResult: Sendable {
-        var priorPath: String?
-        var isByteDuplicate: Bool
-        var isNearImageDuplicate: Bool
+    public struct LookupResult: Sendable {
+        public var priorPath: String?
+        public var isByteDuplicate: Bool
+        public var isNearImageDuplicate: Bool
+
+        public init(priorPath: String?, isByteDuplicate: Bool, isNearImageDuplicate: Bool) {
+            self.priorPath = priorPath
+            self.isByteDuplicate = isByteDuplicate
+            self.isNearImageDuplicate = isNearImageDuplicate
+        }
     }
 
     // MARK: - API
 
-    func lookup(sha256: String, perceptual: UInt64?, isImage: Bool) -> LookupResult {
+    public func lookup(sha256: String, perceptual: UInt64?, isImage: Bool) -> LookupResult {
         lock.lock()
         defer { lock.unlock() }
         var out = LookupResult(priorPath: nil, isByteDuplicate: false, isNearImageDuplicate: false)
@@ -50,7 +56,7 @@ final class FileHashStore: @unchecked Sendable {
         return out
     }
 
-    func recordSortedFile(url: URL, sha256: String, byteSize: Int64, perceptual: UInt64?, isImage: Bool) {
+    public func recordSortedFile(url: URL, sha256: String, byteSize: Int64, perceptual: UInt64?, isImage: Bool) {
         lock.lock()
         defer { lock.unlock() }
         guard let db = openDB() else { return }
@@ -82,7 +88,7 @@ final class FileHashStore: @unchecked Sendable {
         _ = sqlite3_step(stmt)
     }
 
-    func digestFile(at url: URL) throws -> (sha256: String, perceptual: UInt64?, isImage: Bool) {
+    public func digestFile(at url: URL) throws -> (sha256: String, perceptual: UInt64?, isImage: Bool) {
         guard let fh = try? FileHandle(forReadingFrom: url) else {
             throw NSError(domain: "FileHashStore", code: 1, userInfo: [NSLocalizedDescriptionKey: "Cannot read file"])
         }
@@ -199,7 +205,7 @@ final class FileHashStore: @unchecked Sendable {
     }
 
     /// Rows in the duplicate-memory database (for Settings).
-    func storedRecordCount() -> Int {
+    public func storedRecordCount() -> Int {
         lock.lock()
         defer { lock.unlock() }
         guard let db = openDB() else { return 0 }
@@ -212,7 +218,7 @@ final class FileHashStore: @unchecked Sendable {
     }
 
     /// Clears all remembered fingerprints (user explicitly requests this in Settings).
-    func clearAllRecords() {
+    public func clearAllRecords() {
         lock.lock()
         defer { lock.unlock() }
         guard let db = openDB() else { return }

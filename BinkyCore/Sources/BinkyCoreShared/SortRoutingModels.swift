@@ -2,14 +2,14 @@ import Foundation
 
 // MARK: - Rename
 
-enum SortRenameStyle: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
+public enum SortRenameStyle: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
     case none
     case datePrefix
     case template
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var localizedTitle: String {
+    public var localizedTitle: String {
         switch self {
         case .none:
             return String(localized: "Keep original name", comment: "Sort rule rename style.")
@@ -23,23 +23,28 @@ enum SortRenameStyle: String, Codable, CaseIterable, Identifiable, Hashable, Sen
 
 // MARK: - Date predicate (Date Added / fallback)
 
-enum SortDateAddedPredicateKind: String, Codable, Hashable, Sendable {
+public enum SortDateAddedPredicateKind: String, Codable, Hashable, Sendable {
     case none
     case newerThanDays
     case olderThanDays
 }
 
-struct SortDateAddedPredicate: Codable, Equatable, Sendable {
-    var kind: SortDateAddedPredicateKind
+public struct SortDateAddedPredicate: Codable, Equatable, Sendable {
+    public var kind: SortDateAddedPredicateKind
     /// Ignored when kind is `.none`.
-    var days: Int
+    public var days: Int
 
-    static let disabled = SortDateAddedPredicate(kind: .none, days: 0)
+    public init(kind: SortDateAddedPredicateKind, days: Int) {
+        self.kind = kind
+        self.days = days
+    }
+
+    public static let disabled = SortDateAddedPredicate(kind: .none, days: 0)
 }
 
 // MARK: - Kind filter (UTType-aligned)
 
-enum SortFileKindFilter: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
+public enum SortFileKindFilter: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
     case any
     case image
     case movie
@@ -48,9 +53,9 @@ enum SortFileKindFilter: String, Codable, CaseIterable, Identifiable, Hashable, 
     case pdf
     case document
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var localizedTitle: String {
+    public var localizedTitle: String {
         switch self {
         case .any:
             return String(localized: "Any kind", comment: "Sort rule kind filter.")
@@ -72,21 +77,21 @@ enum SortFileKindFilter: String, Codable, CaseIterable, Identifiable, Hashable, 
 
 // MARK: - Inbox aging
 
-enum FileAgingAction: String, Codable, CaseIterable, Identifiable, Sendable {
+public enum FileAgingAction: String, Codable, CaseIterable, Identifiable, Sendable {
     case archive
     case trash
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 }
 
-struct CategoryAgingRule: Codable, Identifiable, Equatable, Sendable {
-    var id: UUID
-    var categoryRaw: String
-    var untouchedDays: Int
-    var action: FileAgingAction
-    var archiveFolderRelative: String
+public struct CategoryAgingRule: Codable, Identifiable, Equatable, Sendable {
+    public var id: UUID
+    public var categoryRaw: String
+    public var untouchedDays: Int
+    public var action: FileAgingAction
+    public var archiveFolderRelative: String
 
-    static func fresh() -> CategoryAgingRule {
+    public static func fresh() -> CategoryAgingRule {
         CategoryAgingRule(
             id: UUID(),
             categoryRaw: "misc",
@@ -100,25 +105,25 @@ struct CategoryAgingRule: Codable, Identifiable, Equatable, Sendable {
 // MARK: - Rule Finder tag policy
 
 /// How a matched rule interacts with category-derived Finder tags (`FileSortCategory` defaults).
-enum SortRuleFinderTagPolicy: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
+public enum SortRuleFinderTagPolicy: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
     /// Keep category defaults (global / profile / built-in), then apply ``SortRule/addedTags``.
     case additive
     /// Replace the category-default layer with ``SortRule/categoryDefaultReplacementTags``; profile custom tags and `addedTags` still apply after.
     case replaceCategoryDefault
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 }
 
 // MARK: - Content match (OCR / receipt rules)
 
-enum SortContentMatchKind: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
+public enum SortContentMatchKind: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
     case none
     case ocrText
     case receipt
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var localizedTitle: String {
+    public var localizedTitle: String {
         switch self {
         case .none:
             return String(localized: "Any content", comment: "Sort rule: no content predicate.")
@@ -130,16 +135,20 @@ enum SortContentMatchKind: String, Codable, CaseIterable, Identifiable, Hashable
     }
 }
 
-struct SortContentMatch: Codable, Equatable, Hashable, Sendable {
-    var kind: SortContentMatchKind
+public struct SortContentMatch: Codable, Equatable, Hashable, Sendable {
+    public var kind: SortContentMatchKind
 
-    static let disabled = SortContentMatch(kind: .none)
+    public init(kind: SortContentMatchKind) {
+        self.kind = kind
+    }
+
+    public static let disabled = SortContentMatch(kind: .none)
 }
 
 // MARK: - Rule match action
 
 /// What happens when an inbox rule matches (before automatic taxonomy sort).
-enum SortRuleMatchAction: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
+public enum SortRuleMatchAction: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
     case moveToDestination
     case moveToTrash
     case renameInPlace
@@ -148,9 +157,9 @@ enum SortRuleMatchAction: String, Codable, CaseIterable, Identifiable, Hashable,
     case installFromDMG
     case tagFanout
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var localizedTitle: String {
+    public var localizedTitle: String {
         switch self {
         case .moveToDestination:
             return String(localized: "Move to folder", comment: "Rule action: move to destination path.")
@@ -172,39 +181,39 @@ enum SortRuleMatchAction: String, Codable, CaseIterable, Identifiable, Hashable,
 
 // MARK: - User-defined inbox rule
 
-struct SortRule: Codable, Identifiable, Equatable, Sendable {
-    var id: UUID
-    var isEnabled: Bool
-    var name: String
+public struct SortRule: Codable, Identifiable, Equatable, Sendable {
+    public var id: UUID
+    public var isEnabled: Bool
+    public var name: String
     /// Lowercased extensions without leading dot; empty = match any extension.
-    var matchExtensions: [String]
+    public var matchExtensions: [String]
     /// Case-insensitive substring on full filename; empty = ignore.
-    var nameContains: String
-    var fileKindFilter: SortFileKindFilter
-    var minSizeBytes: Int64?
-    var maxSizeBytes: Int64?
+    public var nameContains: String
+    public var fileKindFilter: SortFileKindFilter
+    public var minSizeBytes: Int64?
+    public var maxSizeBytes: Int64?
     /// Compared against Date Added to folder when available, else creation date.
-    var dateAddedPredicate: SortDateAddedPredicate?
+    public var dateAddedPredicate: SortDateAddedPredicate?
     /// Download origin: host glob per line, e.g. `*.stripe.com`, `figma.com`. Empty = any origin.
-    var originDomains: [String]
+    public var originDomains: [String]
     /// Content-based predicate (OCR / receipt). Evaluated after basic signals when not `.none`.
-    var contentMatch: SortContentMatch
+    public var contentMatch: SortContentMatch
     /// File must carry at least one of these Finder tags (case-insensitive). Empty = ignore.
-    var matchTags: [String]
+    public var matchTags: [String]
     /// When set, the final filename uses this extension instead of the original (no leading dot).
-    var outputExtension: String?
+    public var outputExtension: String?
     /// Relative path under the inbox root (slashes for nested folders). Sanitized on use.
-    var destinationRelativePath: String
-    var renameStyle: SortRenameStyle
+    public var destinationRelativePath: String
+    public var renameStyle: SortRenameStyle
     /// Tokens: {date}, {stem}, {ext}, {n}, {origin}, {ocr}, {vendor}, {amount}
-    var renameTemplate: String
+    public var renameTemplate: String
     /// Effect when this rule matches (default: move into ``destinationRelativePath``).
-    var matchAction: SortRuleMatchAction
+    public var matchAction: SortRuleMatchAction
     /// Finder tags merged when this rule matches (after category defaults and profile custom tags).
-    var addedTags: [String]
+    public var addedTags: [String]
     /// When ``finderTagPolicy`` is ``SortRuleFinderTagPolicy/replaceCategoryDefault``, replaces the category-default tag layer (comma list → array in UI).
-    var finderTagPolicy: SortRuleFinderTagPolicy
-    var categoryDefaultReplacementTags: [String]
+    public var finderTagPolicy: SortRuleFinderTagPolicy
+    public var categoryDefaultReplacementTags: [String]
 
     private enum CodingKeys: String, CodingKey {
         case id, isEnabled, name, matchExtensions, nameContains, fileKindFilter
@@ -217,7 +226,7 @@ struct SortRule: Codable, Identifiable, Equatable, Sendable {
         case matchTags, outputExtension
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(UUID.self, forKey: .id)
         isEnabled = try c.decode(Bool.self, forKey: .isEnabled)
@@ -244,7 +253,7 @@ struct SortRule: Codable, Identifiable, Equatable, Sendable {
         outputExtension = (rawOut?.isEmpty == false) ? rawOut : nil
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(id, forKey: .id)
         try c.encode(isEnabled, forKey: .isEnabled)
@@ -268,7 +277,7 @@ struct SortRule: Codable, Identifiable, Equatable, Sendable {
         try c.encodeIfPresent(outputExtension, forKey: .outputExtension)
     }
 
-    static func fresh(order: Int) -> SortRule {
+    public static func fresh(order: Int) -> SortRule {
         SortRule(
             id: UUID(),
             isEnabled: true,
@@ -293,7 +302,7 @@ struct SortRule: Codable, Identifiable, Equatable, Sendable {
         )
     }
 
-    init(
+    public init(
         id: UUID,
         isEnabled: Bool,
         name: String,
@@ -337,18 +346,4 @@ struct SortRule: Codable, Identifiable, Equatable, Sendable {
         self.categoryDefaultReplacementTags = categoryDefaultReplacementTags
     }
 
-    /// Starter fields for a new rule when the user is triaging a file from Review.
-    static func draftFromReviewFile(url: URL, order: Int) -> SortRule {
-        var rule = SortRule.fresh(order: order)
-        rule.name = String(localized: "From Review", comment: "Default name for rule created from Review triage.")
-        let ext = url.pathExtension.lowercased().replacingOccurrences(of: ".", with: "")
-        if !ext.isEmpty {
-            rule.matchExtensions = [ext]
-        }
-        if let host = WhereFromsReader.primaryOriginHost(forFileAt: url), !host.isEmpty {
-            rule.originDomains = [host]
-        }
-        rule.destinationRelativePath = FileSortCategory.misc.downloadsSubfolder
-        return rule
-    }
 }

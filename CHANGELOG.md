@@ -2,18 +2,34 @@
 
 ## Unreleased
 
-### Added — v2.0 Automations
+### Added — free-launch refresh
 
-- **Automations** replace Profiles: each automation has its own source folder, enable toggle, rules, tag defaults, DMG install destination, and tag fan-out priority list. Multiple automations can run in parallel; the watch pipeline dedupes shared sources.
+- **Quick Sort** mode: default toolbar segment for one-shot folder sweeps; segmented **Routines** mode keeps the power-user split view.
+- **Routines** wording end-to-end (formerly “Automations”): settings tab, menu bar, shortcuts, site, and help; `UserDefaults` migrates `pendingAutomationTemplate` staging key to `pendingRoutineTemplate`.
+- **Weekly digest share card** from session history (PNG copy/save) plus optional weekly notification; history sheet entry point.
+- Main menu **View mode** commands (⌘1 / ⌘2) to jump between Quick Sort and Routines.
+- Test target: renamed `AutomationsOverhaulTests` → `RoutinesOverhaulTests` for consistency.
+
+### Planned — distribution & licensing (Binky 2.0)
+
+- **Paid official builds (not a subscription):** one-time **Binky App License** (anchor **$10**, optional launch window at **$5**) with **one year of updates** included; **optional renewal** (~**$5/year**) extends update eligibility only — the app you have keeps working.
+- **Binky + Dinky bundle:** planned one-time **$15** with one year of updates for both; **$9/year** bundle renewal draft. Internal spec: [`docs/future/BINKY_2.0_PAID_TRANSITION.md`](docs/future/BINKY_2.0_PAID_TRANSITION.md).
+- **MIT source** remains; license pays for signed binaries + update channel + 2.0 feature work.
+- **Site + docs:** FAQ + schema offers updated on [`site/index.html`](site/index.html); compare hub/leaves; [`README.md`](README.md), [`site/homepage.md`](site/homepage.md), [`site/llms.txt`](site/llms.txt). Help: [`Binky/Resources/Help.md`](Binky/Resources/Help.md), [`Binky/Resources/en.lproj/Help.md`](Binky/Resources/en.lproj/Help.md).
+- **In-app:** Settings → **License** (General); update banner **Licensing…** link.
+
+### Added — v2.0 Routines (formerly Automations)
+
+- **Routines** replace Profiles: each routine has its own source folder, enable toggle, rules, tag defaults, DMG install destination, and tag fan-out priority list. Multiple routines can run in parallel; the watch pipeline dedupes shared sources.
 - **Global inbox + protected tags**: default watched folder plus **Protected Finder tags** (e.g. DoNotMove) so tagged files are never touched.
 - **Rule upgrades**: match by Finder tag; forced **output extension** and `{newExt}` rename token; actions **Extract archive then trash**, **Install app from disk image**, **Sort into subfolder by Finder tag**.
-- **Templates** when adding an automation (Downloads, Desktop, DMG install, archive extract, tag fan-out, screenshot archive, notes to Markdown, blank) plus empty-state onboarding for **Calm my Desktop**.
+- **Templates** when adding a routine (Downloads, Desktop, DMG install, archive extract, tag fan-out, screenshot archive, notes to Markdown, blank) plus empty-state onboarding for **Calm my Desktop**.
 - **Services**: `ArchiveExtractionService` (ditto/tar), `DMGInstallerService` (hdiutil + copy `.app`), tag read for predicates/skip list.
-- **Tests**: `AutomationsOverhaulTests` (tag predicate, fan-out priority, rename/`{newExt}`, zip extract, shared watch root routing).
+- **Tests**: `RoutinesOverhaulTests` (tag predicate, fan-out priority, rename/`{newExt}`, zip extract, shared watch root routing).
 
 ### Changed
 
-- Settings tabs: **Automations** merges the old Watch + Profiles surface; sidebar links and copy use Automation terminology.
+- Settings tabs: **Routines** merges the old Watch + Profiles surface; sidebar links use routine terminology.
 
 ## 1.2.0 — 2026-05-02
 

@@ -1,15 +1,16 @@
+import BinkyCoreShared
 import Foundation
 
-/// Central precedence for Finder tags at sort time. Keeps ``DownloadSortServices`` and tests aligned.
-enum FinderTagComposer {
+/// Central precedence for Finder tags at sort time (shared GUI + CLI + tests).
+public enum FinderTagComposer {
 
     /// Resolves tags in this order:
     /// 1. Category defaults: preset map → global map → built-in ``FileSortCategory/semanticTagHint`` (unless a rule replaces this layer).
     /// 2. Matched rule with ``SortRuleFinderTagPolicy/replaceCategoryDefault`` replaces the category-default layer with ``SortRule/categoryDefaultReplacementTags``.
-    /// 3. Profile ``CompressionPreset/customFinderTags`` (all sorts in that profile context).
+    /// 3. Routine ``CompressionPreset/customFinderTags`` (all sorts in that profile context).
     /// 4. Rule ``SortRule/addedTags``.
     /// 5. Optional literal `"New"` when enabled.
-    static func compose(
+    public static func compose(
         naturalCategory: FileSortCategory,
         globalDefaults: [String: [String]],
         preset: CompressionPreset?,

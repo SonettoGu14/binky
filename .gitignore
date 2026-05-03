@@ -5,6 +5,8 @@ xcuserdata/
 DerivedData/
 build/
 BinkyCoreImage/.build/
+BinkyCore/.build/
+BinkyCore/.swiftpm/
 *.ipa
 *.dSYM.zip
 *.dSYM

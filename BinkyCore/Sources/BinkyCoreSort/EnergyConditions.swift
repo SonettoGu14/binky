@@ -1,12 +1,13 @@
+import BinkyCoreShared
 import Foundation
 
 // MARK: - User-configurable batch threshold
 
-enum SortEnergy {
+public enum SortEnergy {
     private static let defaultBigBatchThreshold = 200
 
     /// File count threshold from Settings → General → Energy, or default 200 when unset.
-    static var bigBatchFileCount: Int {
+    public static var bigBatchFileCount: Int {
         let d = UserDefaults.standard
         let key = EnergySettingsKey.bigBatchThreshold
         guard d.object(forKey: key) != nil else { return defaultBigBatchThreshold }
@@ -38,8 +39,8 @@ private enum EnergyPreferenceDefaults {
 }
 
 /// Thermal / Low Power Mode awareness for sort throttling. Thread-safe for use from detached tasks.
-final class EnergyConditions: @unchecked Sendable {
-    static let shared = EnergyConditions()
+public final class EnergyConditions: @unchecked Sendable {
+    public static let shared = EnergyConditions()
 
     private let lock = NSLock()
     private var thermalState: ProcessInfo.ThermalState
@@ -67,14 +68,14 @@ final class EnergyConditions: @unchecked Sendable {
         }
     }
 
-    var shouldPauseFully: Bool {
+    public var shouldPauseFully: Bool {
         lock.lock()
         defer { lock.unlock() }
         return isFullPauseUnlocked
     }
 
     /// Which hold to show in sort progress UI when `shouldPauseFully` is true.
-    func energyHoldKindForProgressUI() -> SortEnergyHoldKind {
+    public func energyHoldKindForProgressUI() -> SortEnergyHoldKind {
         let pi = ProcessInfo.processInfo
         if pi.isLowPowerModeEnabled, EnergyPreferenceDefaults.pauseOnLowPowerMode {
             return .lowPower
@@ -86,7 +87,7 @@ final class EnergyConditions: @unchecked Sendable {
     }
 
     /// Inter-file delay for large batches when not in full pause.
-    func interFileSleepNanos(batchSize: Int) -> UInt64 {
+    public func interFileSleepNanos(batchSize: Int) -> UInt64 {
         guard batchSize >= SortEnergy.bigBatchFileCount else { return 0 }
         lock.lock()
         let thermal = thermalState
@@ -148,7 +149,7 @@ final class EnergyConditions: @unchecked Sendable {
         }
     }
 
-    func waitUntilOK() async {
+    public func waitUntilOK() async {
         while shouldPauseFully {
             await withCheckedContinuation { continuation in
                 lock.lock()
@@ -194,7 +195,7 @@ final class EnergyConditions: @unchecked Sendable {
         }
 
         if wasFullPause && !isFullPause {
-            NotificationCenter.default.post(name: .binkyEnergyHoldReleased, object: nil)
+            NotificationCenter.default.post(name: Notification.Name("binkyEnergyHoldReleased"), object: nil)
         }
     }
 }
