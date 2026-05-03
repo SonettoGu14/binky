@@ -10,12 +10,12 @@ Unknown or sketchy extensions do not disappear silently: they land in **Review**
 
 <table>
   <tr>
-    <td><img src="site/screenshots/sorting.png" alt="Binky sorting dashboard" width="100%" /></td>
-    <td><img src="site/screenshots/profiles.webp" alt="Binky automations and rules" width="100%" /></td>
+    <td><img src="site/screenshots/binky-sorting.png" alt="Binky organizer inbox with Downloads sorted into folders" width="100%" /></td>
+    <td><img src="site/screenshots/binky-automations.webp" alt="Binky Automations list with sources, rules, and tag defaults" width="100%" /></td>
   </tr>
   <tr>
-    <td><img src="site/screenshots/sorting-breakdown.webp" alt="Binky sorting breakdown" width="100%" /></td>
-    <td><img src="site/screenshots/review.webp" alt="Binky review queue" width="100%" /></td>
+    <td><img src="site/screenshots/binky-sorting-summary.webp" alt="Binky sorting summary showing batch outcomes" width="100%" /></td>
+    <td><img src="site/screenshots/binky-review.webp" alt="Binky Review folder triage sheet" width="100%" /></td>
   </tr>
 </table>
 
