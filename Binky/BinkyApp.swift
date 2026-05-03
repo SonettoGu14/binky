@@ -25,7 +25,9 @@ struct BinkyApp: App {
     @StateObject private var updater = UpdateChecker()
 
     var body: some Scene {
-        WindowGroup {
+        // Explicit `id` lets the menu bar / hotkey bridge re-open this window via
+        // `openWindow(id: "main")` even when ContentView has been unmounted (closed).
+        WindowGroup(id: "main") {
             ContentView(vm: root.organizerVM)
                 .environmentObject(root.prefs)
                 .environmentObject(updater)
@@ -103,6 +105,10 @@ private struct LastSortSummaryCommands: View {
 
 private struct BinkyShortcutCommands: View {
     @ObservedObject var prefs: BinkyPreferences
+    // `openWindow` lives in the App's environment and is callable any time the App scene
+    // tree is alive — even when no WindowGroup window is currently presented. This is the
+    // only reliable path for "Show Binky" after the user has closed the main window.
+    @Environment(\.openWindow) private var openWindow
 
     private var sortNowMenuTitle: String {
         let enabledCount = prefs.savedPresets.filter {
@@ -123,6 +129,15 @@ private struct BinkyShortcutCommands: View {
             NotificationCenter.default.post(name: .binkyStartSort, object: nil)
         }
         .keyboardShortcut(prefs.shortcut(for: .sortNow).swiftUIKeyboardShortcut)
+        // Bridges the AppKit menu bar's "Show Binky" / global hotkey into SwiftUI's
+        // `openWindow(id:)`. SwiftUI keeps Commands views alive for the full app lifetime
+        // (they back the main menu bar), so this `.onReceive` fires whether or not the
+        // main window is currently presented. `openWindow(id:)` brings an existing instance
+        // forward, or creates a fresh one if the user previously closed the window.
+        .onReceive(NotificationCenter.default.publisher(for: .binkyShowMainWindow)) { _ in
+            NSApp.activate()
+            openWindow(id: "main")
+        }
     }
 }
 

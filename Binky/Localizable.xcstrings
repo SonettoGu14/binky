@@ -10198,6 +10198,9 @@
     "Sort" : {
       "comment" : "Menu bar: parent menu for choosing which folder to sweep.\nOpen panel button."
     },
+    "Sort ${files} with Binky" : {
+
+    },
     "Sort All" : {
       "comment" : "File menu: run sort across every enabled automation.\nPrimary sort button: sort all enabled automations."
     },

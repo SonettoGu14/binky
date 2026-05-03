@@ -304,14 +304,14 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
     }
 
     @objc private func showMainWindow() {
-        // Activate first so the SwiftUI scene receiver below can run inside a foregrounded app.
-        NSApp.activate()
-        // Primary path: SwiftUI scene picks up the notification and uses the `openWindow`
-        // environment action (handles closed-window / menu-bar-only scenarios reliably).
-        NotificationCenter.default.post(name: .binkyShowMainWindow, object: nil)
-        // AppKit fallback in case ContentView isn't currently mounted (e.g. very early startup).
+        // SwiftUI Commands bridge in `BinkyApp` (`BinkyShortcutCommands`) listens for this
+        // notification and calls `openWindow(id: "main")` — the only reliable way to
+        // (re)create or refocus a `WindowGroup` window from the AppKit menu bar, including
+        // when the user has closed the main window entirely. We post on the next runloop tick
+        // so AppKit finishes dismissing the status menu first.
         DispatchQueue.main.async {
-            GlobalHotkeyManager.activateMainWindow()
+            NSApp.activate()
+            NotificationCenter.default.post(name: .binkyShowMainWindow, object: nil)
         }
     }
 
@@ -327,25 +327,5 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
                 NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
             }
         }
-    }
-
-    /// Bring an existing organizer window forward. Called from `ContentView` after the
-    /// `binkyShowMainWindow` notification fires; if no main window exists, the AppKit fallback
-    /// path in `showMainWindow()` (via `GlobalHotkeyManager`) handles creating one.
-    static func bringMainOrganizerWindowForward() {
-        if let w = NSApp.windows.first(where: { $0.frameAutosaveName == "BinkyMainWindow" && $0.isVisible }) {
-            w.makeKeyAndOrderFront(nil)
-            return
-        }
-        if let w = NSApp.windows.first(where: { w in
-            w.isVisible
-                && w.canBecomeKey
-                && w.title != "Binky Help"
-                && w.frameAutosaveName != "help"
-        }) {
-            w.makeKeyAndOrderFront(nil)
-            return
-        }
-        NSApp.sendAction(Selector(("newWindow:")), to: nil, from: nil)
     }
 }

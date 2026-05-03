@@ -68,24 +68,11 @@ final class GlobalHotkeyManager {
         // macOS 14+: prefer parameterless `activate()`; older `activate(ignoringOtherApps:)`
         // is deprecated and may be a no-op on recent macOS when invoked from a status item.
         NSApp.activate()
-        bringMainWindowForward()
-    }
-
-    private static func bringMainWindowForward() {
-        if let w = NSApp.windows.first(where: { $0.frameAutosaveName == "BinkyMainWindow" && $0.isVisible }) {
-            w.makeKeyAndOrderFront(nil)
-            return
-        }
-        if let w = NSApp.windows.first(where: { w in
-            w.isVisible
-                && w.canBecomeKey
-                && w.title != "Binky Help"
-                && w.frameAutosaveName != "help"
-        }) {
-            w.makeKeyAndOrderFront(nil)
-            return
-        }
-        NSApp.sendAction(Selector(("newWindow:")), to: nil, from: nil)
+        // Routed through SwiftUI Commands (`BinkyShortcutCommands`), which calls
+        // `openWindow(id: "main")`. The AppKit `newWindow:` selector does not reliably
+        // open a SwiftUI `WindowGroup` window once the user has closed the only instance;
+        // `openWindow(id:)` does — and brings an existing window forward when present.
+        NotificationCenter.default.post(name: .binkyShowMainWindow, object: nil)
     }
 
     // MARK: - Carbon event handler

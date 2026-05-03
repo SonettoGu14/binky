@@ -163,10 +163,9 @@ private struct MenuBridgeObservers: ViewModifier {
                 NSApp.activate()
                 openSettings()
             }
-            .onReceive(NotificationCenter.default.publisher(for: .binkyShowMainWindow)) { _ in
-                NSApp.activate()
-                BinkyMenuBarController.bringMainOrganizerWindowForward()
-            }
+            // `.binkyShowMainWindow` is handled at App scope in `BinkyShortcutCommands`
+            // via `openWindow(id: "main")` — that path works whether or not this view is
+            // currently mounted (and thus survives closing/reopening the main window).
             .onReceive(NotificationCenter.default.publisher(for: .binkyCheckUpdates)) { _ in
                 Task {
                     let result = await updater.check(manual: true)
