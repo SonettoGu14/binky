@@ -4,10 +4,10 @@ import Foundation
 import FoundationModels
 #endif
 
-/// Natural-language → ``InboxSortRule``. On macOS 26+ uses on-device Foundation Models when available; falls back to heuristics.
+/// Natural-language → ``SortRule``. On macOS 26+ uses on-device Foundation Models when available; falls back to heuristics.
 enum RuleSynthesizer {
 
-    static func synthesize(from phrase: String, order: Int) async -> InboxSortRule? {
+    static func synthesize(from phrase: String, order: Int) async -> SortRule? {
         let trimmed = phrase.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
 
@@ -22,8 +22,8 @@ enum RuleSynthesizer {
         return heuristicRule(from: trimmed, order: order)
     }
 
-    private static func heuristicRule(from phrase: String, order: Int) -> InboxSortRule {
-        var rule = InboxSortRule.fresh(order: order)
+    private static func heuristicRule(from phrase: String, order: Int) -> SortRule {
+        var rule = SortRule.fresh(order: order)
         rule.name = String(localized: "From phrase", comment: "NL rule default name.")
 
         let lower = phrase.lowercased()
@@ -48,7 +48,7 @@ enum RuleSynthesizer {
         return rule
     }
 
-    private static func extractDomains(from head: String, into rule: inout InboxSortRule) {
+    private static func extractDomains(from head: String, into rule: inout SortRule) {
         if head.contains("from ") {
             let raw = head.replacingOccurrences(of: "from ", with: "")
             let parts = raw.split(whereSeparator: { $0 == "," || $0 == ";" })
@@ -60,7 +60,7 @@ enum RuleSynthesizer {
 
     #if canImport(FoundationModels)
     @available(macOS 26.0, *)
-    private static func synthesizeWithFoundationModels(phrase: String, order: Int) async -> InboxSortRule? {
+    private static func synthesizeWithFoundationModels(phrase: String, order: Int) async -> SortRule? {
         let system = """
         Output ONLY JSON for an inbox file sort rule. Keys:
         name (string), originDomains (string array, globs like *.stripe.com), destinationRelativePath (string),
@@ -75,7 +75,7 @@ enum RuleSynthesizer {
             guard let data = text.data(using: .utf8),
                   let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
 
-            var rule = InboxSortRule.fresh(order: order)
+            var rule = SortRule.fresh(order: order)
             if let n = obj["name"] as? String { rule.name = n }
             if let d = obj["destinationRelativePath"] as? String, !d.isEmpty { rule.destinationRelativePath = d }
             if let doms = obj["originDomains"] as? [String] {

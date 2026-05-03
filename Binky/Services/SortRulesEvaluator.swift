@@ -110,7 +110,7 @@ enum SortRulesEvaluator {
 
     // MARK: - Rule match
 
-    static func ruleMatches(_ rule: InboxSortRule, signals: FileSignals, content: ContentRuleMatchInput? = nil) -> Bool {
+    static func ruleMatches(_ rule: SortRule, signals: FileSignals, content: ContentRuleMatchInput? = nil, fileTags: [String] = []) -> Bool {
         guard rule.isEnabled else { return false }
         if !rule.matchExtensions.isEmpty {
             guard rule.matchExtensions.contains(signals.ext) else { return false }
@@ -131,11 +131,22 @@ enum SortRulesEvaluator {
             guard WhereFromsReader.matchesAnyOriginPattern(originPatterns, hosts: signals.originHosts) else { return false }
         }
 
+        let requiredTags = rule.matchTags
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        if !requiredTags.isEmpty {
+            let lowerFileTags = Set(fileTags.map { $0.lowercased() })
+            let ok = requiredTags.contains { req in
+                lowerFileTags.contains(req.lowercased())
+            }
+            guard ok else { return false }
+        }
+
         guard matchesContentPredicate(rule, content: content) else { return false }
         return true
     }
 
-    private static func matchesContentPredicate(_ rule: InboxSortRule, content: ContentRuleMatchInput?) -> Bool {
+    private static func matchesContentPredicate(_ rule: SortRule, content: ContentRuleMatchInput?) -> Bool {
         switch rule.contentMatch.kind {
         case .none:
             return true
@@ -168,12 +179,12 @@ enum SortRulesEvaluator {
     }
 
     /// True when any enabled rule needs OCR or receipt matching.
-    static func anyRuleRequiresContentInspection(_ rules: [InboxSortRule]) -> Bool {
+    static func anyRuleRequiresContentInspection(_ rules: [SortRule]) -> Bool {
         rules.contains { $0.isEnabled && $0.contentMatch.kind != .none }
     }
-    static func firstMatchingRule(in rules: [InboxSortRule], signals: FileSignals, content: ContentRuleMatchInput? = nil) -> InboxSortRule? {
+    static func firstMatchingRule(in rules: [SortRule], signals: FileSignals, content: ContentRuleMatchInput? = nil, fileTags: [String] = []) -> SortRule? {
         for r in rules where r.isEnabled {
-            if ruleMatches(r, signals: signals, content: content) { return r }
+            if ruleMatches(r, signals: signals, content: content, fileTags: fileTags) { return r }
         }
         return nil
     }
@@ -201,7 +212,7 @@ enum SortRulesEvaluator {
 
     static func renamedFilename(
         originalURL: URL,
-        rule: InboxSortRule?,
+        rule: SortRule?,
         renameCounter: Int,
         originHost: String? = nil,
         ocrSlug: String? = nil,
@@ -211,6 +222,11 @@ enum SortRulesEvaluator {
         let stem = originalURL.deletingPathExtension().lastPathComponent
         let ext = originalURL.pathExtension
         let dotExt = ext.isEmpty ? "" : ".\(ext)"
+        let newExtOptional = rule?.outputExtension?.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ".", with: "")
+        let newDotExt: String = {
+            guard let n = newExtOptional, !n.isEmpty else { return dotExt }
+            return ".\(n)"
+        }()
         let dateStr = isoDateFormatter.string(from: Date())
         let originLabel = WhereFromsReader.sanitizedOriginLabel(forHost: originHost ?? originalURL.host)
 
@@ -226,6 +242,7 @@ enum SortRulesEvaluator {
                 .replacingOccurrences(of: "{date}", with: dateStr)
                 .replacingOccurrences(of: "{stem}", with: stem)
                 .replacingOccurrences(of: "{ext}", with: dotExt)
+                .replacingOccurrences(of: "{newExt}", with: newDotExt)
                 .replacingOccurrences(of: "{n}", with: "\(renameCounter)")
                 .replacingOccurrences(of: "{counter}", with: "\(renameCounter)")
                 .replacingOccurrences(of: "{origin}", with: originLabel.isEmpty ? "unknown-origin" : originLabel)
@@ -234,20 +251,26 @@ enum SortRulesEvaluator {
                 .replacingOccurrences(of: "{amount}", with: amt.isEmpty ? "amount" : amt)
         }
 
+        func filenameWithOutputExtension(_ baseName: String) -> String {
+            guard let n = newExtOptional, !n.isEmpty else { return baseName }
+            let s = URL(fileURLWithPath: baseName).deletingPathExtension().lastPathComponent
+            return "\(s).\(n)"
+        }
+
         switch rule.renameStyle {
         case .none:
-            return originalURL.lastPathComponent
+            return filenameWithOutputExtension(originalURL.lastPathComponent)
         case .datePrefix:
-            return "\(dateStr) \(stem)\(dotExt)"
+            return filenameWithOutputExtension("\(dateStr) \(stem)\(dotExt)")
         case .template:
             let tpl = rule.renameTemplate.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !tpl.isEmpty else { return originalURL.lastPathComponent }
-            return applyTemplateTokens(tpl)
+            guard !tpl.isEmpty else { return filenameWithOutputExtension(originalURL.lastPathComponent) }
+            return filenameWithOutputExtension(applyTemplateTokens(tpl))
         }
     }
 
     /// Destination directory URL under inbox root for a rule or taxonomy category.
-    static func destinationDirectory(rule: InboxSortRule?, category: FileSortCategory, inboxRoot: URL) -> URL {
+    static func destinationDirectory(rule: SortRule?, category: FileSortCategory, inboxRoot: URL) -> URL {
         if let rule {
             let rel = sanitizedRelativeDestination(rule.destinationRelativePath)
             return inboxRoot.appendingPathComponent(rel, isDirectory: true)
@@ -257,4 +280,33 @@ enum SortRulesEvaluator {
 
     /// Category used for Finder tags when a custom rule matched (neutral destination).
     static var customRuleTagCategory: FileSortCategory { .misc }
+
+    // MARK: - Tag fan-out
+
+    static func sanitizedTagFolderSegment(_ raw: String) -> String {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "Untagged" }
+        return trimmed
+            .replacingOccurrences(of: "/", with: " ")
+            .replacingOccurrences(of: ":", with: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    static func resolvedFanoutTag(fileTags: [String], priority: [String]) -> String? {
+        for p in priority {
+            let t = p.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !t.isEmpty else { continue }
+            if fileTags.contains(where: { $0.caseInsensitiveCompare(t) == .orderedSame }) {
+                return t
+            }
+        }
+        return fileTags.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }.first
+    }
+
+    static func tagFanoutDestinationDirectory(rule: SortRule, inboxRoot: URL, fileTags: [String], priority: [String]) -> URL {
+        let base = destinationDirectory(rule: rule, category: customRuleTagCategory, inboxRoot: inboxRoot)
+        let tag = resolvedFanoutTag(fileTags: fileTags, priority: priority)
+        let segment = sanitizedTagFolderSegment(tag ?? "Untagged")
+        return base.appendingPathComponent(segment, isDirectory: true)
+    }
 }

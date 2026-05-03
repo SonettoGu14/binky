@@ -20,6 +20,7 @@ struct OrganizerMainView: View {
 
     /// Same persistence key as Dinky below-update review strip.
     @AppStorage("reviewPromptBelowUpdateDismissed") private var reviewPromptBelowUpdateDismissed = false
+    @AppStorage("binky.onboarding.calmDesktopDismissed") private var calmDesktopOnboardingDismissed = false
 
     private static let absoluteTimeFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -37,6 +38,13 @@ struct OrganizerMainView: View {
                 .frame(minWidth: 440, minHeight: 440)
                 .background(.ultraThinMaterial)
                 .onDrop(of: [.fileURL], isTargeted: $isDropTargeted, perform: handleDrop)
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                if showReviewBanner {
+                    reviewToolbarButton
+                }
+            }
         }
         .task {
             await updater.check()
@@ -79,6 +87,7 @@ struct OrganizerMainView: View {
                 onDismiss: { vm.applySortOutcomeDismissalDefaults() },
                 onTransientStatus: { vm.flashTransientStatus($0) }
             )
+            .environmentObject(prefs)
             .id(sortOutcomeSheetRefreshID(for: outcome))
         }
         .sheet(item: $diagnostics.pendingCrashReport) { report in
@@ -97,13 +106,25 @@ struct OrganizerMainView: View {
     // MARK: - Sidebar (Binky only)
 
     private var slimOrganizerSidebar: some View {
-        ScrollView(.vertical, showsIndicators: false) {
+        VStack(spacing: 0) {
+            watchStatusBar
+
+            Divider().opacity(0.3)
+
+            ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 10) {
                 VStack(alignment: .leading, spacing: 8) {
-                    settingsSectionHeading(
-                        icon: "person.crop.circle",
-                        title: String(localized: "Profile", comment: "Organizer sidebar profile section.")
-                    )
+                    HStack(spacing: 6) {
+                        settingsSectionHeading(
+                            icon: "gearshape.2",
+                            title: String(localized: "Automations", comment: "Organizer sidebar: automations list section.")
+                        )
+                        Spacer(minLength: 0)
+                        Text(automationsCountLabel)
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
 
                     profileSelectionRows
                 }
@@ -111,7 +132,7 @@ struct OrganizerMainView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(.primary.opacity(0.03)))
 
-                inboxControlsCard
+                quickActionsCard
 
                 VStack(alignment: .leading, spacing: 8) {
                     settingsSectionHeading(
@@ -154,14 +175,9 @@ struct OrganizerMainView: View {
                         title: String(localized: "Additional settings", comment: "Organizer sidebar extra settings header.")
                     )
                     organizerSettingsSidebarLink(
-                        tab: .profiles,
-                        title: String(localized: "Profiles", comment: "Organizer sidebar shortcut to profiles tab."),
-                        systemImage: "slider.horizontal.3"
-                    )
-                    organizerSettingsSidebarLink(
-                        tab: .watch,
-                        title: String(localized: "Watch Folder", comment: "Organizer sidebar shortcut to watch tab."),
-                        systemImage: "eye"
+                        tab: .automations,
+                        title: String(localized: "Automations", comment: "Organizer sidebar shortcut to automations."),
+                        systemImage: "gearshape.2"
                     )
                     organizerSettingsSidebarLink(
                         tab: .general,
@@ -174,7 +190,136 @@ struct OrganizerMainView: View {
                 .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(.primary.opacity(0.03)))
             }
             .padding(10)
+            } // ScrollView
+        } // outer VStack
+    }
+
+    // MARK: - Sidebar watch status bar
+
+    private var watchStatusBar: some View {
+        HStack(spacing: 10) {
+            Circle()
+                .fill(watchStatusColor)
+                .frame(width: 8, height: 8)
+                .shadow(color: watchStatusColor.opacity(0.5), radius: 3, x: 0, y: 0)
+                .animation(.easeInOut(duration: 0.3), value: watchStatusColor)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(watchStatusLabel)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.primary)
+                    .animation(.none, value: watchStatusLabel)
+                Text(watchStatusFolderName)
+                    .font(.system(size: 10))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            if prefs.folderWatchEnabled {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.18)) {
+                        prefs.folderWatchPaused.toggle()
+                    }
+                } label: {
+                    Image(systemName: prefs.folderWatchPaused ? "play.circle.fill" : "pause.circle.fill")
+                        .font(.system(size: 22))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(prefs.folderWatchPaused ? Color.green : binkyTintColor)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(
+                    prefs.folderWatchPaused
+                        ? String(localized: "Resume watching", comment: "Sidebar watch status: resume button.")
+                        : String(localized: "Pause watching", comment: "Sidebar watch status: pause button.")
+                )
+                .accessibilityHint(
+                    prefs.folderWatchPaused
+                        ? String(localized: "Resumes reacting to new files in the watched folder.", comment: "VoiceOver hint.")
+                        : String(localized: "Temporarily stops reacting to new files in the watched folder.", comment: "VoiceOver hint.")
+                )
+            }
         }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity)
+        .background(.regularMaterial)
+    }
+
+    private var watchStatusColor: Color {
+        guard prefs.folderWatchEnabled else { return Color.secondary.opacity(0.5) }
+        if prefs.folderWatchPaused { return .orange }
+        return enabledAutomationCount == 0 ? Color.secondary.opacity(0.5) : .green
+    }
+
+    private var watchStatusLabel: String {
+        if !prefs.folderWatchEnabled {
+            return String(localized: "Watch off", comment: "Sidebar watch status label.")
+        }
+        if prefs.folderWatchPaused {
+            return String(localized: "Paused", comment: "Sidebar watch status label.")
+        }
+        let n = enabledAutomationCount
+        if n == 0 {
+            return String(localized: "Idle", comment: "Sidebar watch status: no enabled automations.")
+        }
+        if n == 1 {
+            return String(localized: "Watching", comment: "Sidebar watch status: single automation.")
+        }
+        return String.localizedStringWithFormat(
+            String(localized: "Watching %lld folders", comment: "Sidebar watch status: multiple folders."),
+            Int64(n)
+        )
+    }
+
+    private var watchStatusFolderName: String {
+        let enabled = enabledAutomations
+        if enabled.isEmpty {
+            if prefs.folderWatchEnabled {
+                return String(localized: "Nothing enabled yet", comment: "Sidebar watch status subtitle when no automations on.")
+            }
+            return String(localized: "Sorting paused indefinitely", comment: "Sidebar watch status subtitle when watching is off.")
+        }
+        if enabled.count == 1, let only = enabled.first {
+            return tildeShorten(only.watchFolderPath)
+        }
+        let names = enabled.prefix(2).map { $0.name }.joined(separator: ", ")
+        if enabled.count > 2 {
+            return String.localizedStringWithFormat(
+                String(localized: "%@, +%lld more", comment: "Sidebar watch status subtitle: list overflow."),
+                names, Int64(enabled.count - 2)
+            )
+        }
+        return names
+    }
+
+    private var enabledAutomations: [CompressionPreset] {
+        prefs.savedPresets.filter {
+            $0.isEnabled && !$0.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+    }
+
+    private var enabledAutomationCount: Int { enabledAutomations.count }
+
+    private var automationsCountLabel: String {
+        let total = prefs.savedPresets.count
+        let on = enabledAutomationCount
+        return String.localizedStringWithFormat(
+            String(localized: "%lld of %lld on", comment: "Automations count chip: enabled / total."),
+            Int64(on), Int64(total)
+        )
+    }
+
+    private func tildeShorten(_ path: String) -> String {
+        let p = path.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !p.isEmpty else { return "" }
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        if p.hasPrefix(home) {
+            return "~" + String(p.dropFirst(home.count))
+        }
+        return p
     }
 
     private var activePreset: CompressionPreset? {
@@ -184,47 +329,88 @@ struct OrganizerMainView: View {
 
     private var profileSelectionRows: some View {
         VStack(spacing: 3) {
-            ForEach(prefs.savedPresets) { preset in
-                profileSelectionRow(
-                    name: preset.name,
-                    subtitle: preset.organizerListSubtitle,
-                    isActive: prefs.activePresetID == preset.id.uuidString
-                ) {
-                    prefs.activePresetID = preset.id.uuidString
-                }
+            ForEach(Array(prefs.savedPresets.enumerated()), id: \.element.id) { idx, preset in
+                automationRow(preset: preset, presetIndex: idx)
             }
         }
     }
 
-    @ViewBuilder
-    private func profileSelectionRow(
-        name: String,
-        subtitle: String,
-        isActive: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            HStack(alignment: .top, spacing: 6) {
-                Image(systemName: isActive ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 14))
-                    .foregroundStyle(isActive ? binkyTintColor : Color.primary.opacity(0.25))
+    /// Maps a preset's runtime state to the dot color shown in the sidebar row.
+    private func presetRuntimeColor(_ preset: CompressionPreset) -> Color {
+        let pathSet = !preset.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        if !preset.isEnabled || !pathSet {
+            return Color.secondary.opacity(0.4)
+        }
+        if !prefs.folderWatchEnabled || prefs.folderWatchPaused {
+            return .orange
+        }
+        return .green
+    }
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(name)
+    /// Short, human source-folder hint displayed under the automation name.
+    private func presetPathSubtitle(_ preset: CompressionPreset) -> String {
+        let path = preset.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines)
+        if path.isEmpty {
+            return String(localized: "No folder yet", comment: "Automation row subtitle when path empty.")
+        }
+        return tildeShorten(path)
+    }
+
+    @ViewBuilder
+    private func automationRow(preset: CompressionPreset, presetIndex: Int) -> some View {
+        let isActive = prefs.activePresetID == preset.id.uuidString
+        let pathEmpty = preset.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        Button {
+            prefs.activePresetID = preset.id.uuidString
+        } label: {
+            HStack(alignment: .center, spacing: 8) {
+                Circle()
+                    .fill(presetRuntimeColor(preset))
+                    .frame(width: 7, height: 7)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(preset.name)
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.primary)
-                    Text(subtitle)
+                        .foregroundStyle(preset.isEnabled ? .primary : .secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    Text(presetPathSubtitle(preset))
                         .font(.system(size: 10))
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+
+                Button {
+                    var copy = prefs.savedPresets
+                    guard copy.indices.contains(presetIndex) else { return }
+                    copy[presetIndex].isEnabled.toggle()
+                    prefs.savedPresets = copy
+                } label: {
+                    Image(systemName: preset.isEnabled ? "eye.fill" : "eye.slash")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(preset.isEnabled ? binkyTintColor : Color.secondary)
+                        .frame(width: 22, height: 22)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(pathEmpty)
+                .opacity(pathEmpty ? 0.35 : 1)
+                .help(preset.isEnabled
+                      ? String(localized: "Turn this automation off", comment: "Eye icon tooltip when on.")
+                      : String(localized: "Turn this automation on", comment: "Eye icon tooltip when off."))
             }
             .padding(.horizontal, 7)
             .padding(.vertical, 6)
+            .contentShape(Rectangle())
             .background(
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(isActive ? binkyTintColor.opacity(0.08) : Color.clear)
+                    .fill(isActive ? binkyTintColor.opacity(0.10) : Color.clear)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .strokeBorder(isActive ? binkyTintColor.opacity(0.45) : Color.clear, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -273,20 +459,6 @@ struct OrganizerMainView: View {
         .foregroundStyle(binkyTintColor)
     }
 
-    private func pickGlobalWatchFolder() {
-        let panel = NSOpenPanel()
-        panel.canChooseFiles = false
-        panel.canChooseDirectories = true
-        panel.allowsMultipleSelection = false
-        panel.prompt = String(localized: "Watch", comment: "Open panel: choose folder to watch.")
-        if panel.runModal() == .OK, let url = panel.url {
-            prefs.watchedFolderPath = url.path
-            if let bookmark = try? url.bookmarkData(options: .withSecurityScope) {
-                prefs.watchedFolderBookmark = bookmark
-            }
-        }
-    }
-
     // MARK: - Main: activity feed
 
     private var sortProgressBanner: some View {
@@ -295,7 +467,7 @@ struct OrganizerMainView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 14) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(String(localized: "Sorting", comment: "Main pane banner title while inbox sort runs."))
+                            Text(String(localized: "Sorting", comment: "Main pane banner title while folder sort runs."))
                                 .font(.subheadline.weight(.semibold))
                             if sortProgress.bannerCaption.isEmpty == false {
                                 Text(sortProgress.bannerCaption)
@@ -362,7 +534,7 @@ struct OrganizerMainView: View {
                     .animation(.easeInOut(duration: 0.42), value: sortProgress.fraction)
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, (showReviewBanner || showUpdateBanner) ? 10 : 16)
+                .padding(.top, (showCalmDesktopBanner || showUpdateBanner) ? 10 : 16)
                 .padding(.bottom, 14)
                 .background(Color.primary.opacity(0.035))
                 .overlay(alignment: .bottom) {
@@ -392,8 +564,8 @@ struct OrganizerMainView: View {
                         .opacity(0.35)
                 }
 
-                if showReviewBanner {
-                    reviewBanner
+                if showCalmDesktopBanner {
+                    calmDesktopBanner
                         .padding(.horizontal, 20)
                         .padding(.top, 16)
                         .padding(.bottom, 12)
@@ -419,95 +591,84 @@ struct OrganizerMainView: View {
         }
     }
 
-    private var inboxControlsCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                settingsSectionHeading(
-                    icon: "tray.full",
-                    title: String(localized: "Watch Folder", comment: "Organizer sidebar watch folder controls title.")
-                )
+    /// The path the active automation sorts. Falls back to the global default when no preset is selected.
+    private var activeFolderURL: URL {
+        prefs.activeSortSweepRootDirectory()
+    }
 
-                Spacer(minLength: 0)
+    /// macOS uses special icons for `~/Downloads`, `~/Desktop`, etc. — fetching the live Finder icon makes the card unmistakable.
+    private var activeFolderIcon: NSImage {
+        let path = activeFolderURL.path
+        if FileManager.default.fileExists(atPath: path) {
+            return NSWorkspace.shared.icon(forFile: path)
+        }
+        return NSWorkspace.shared.icon(for: .folder)
+    }
 
-                if prefs.folderWatchEnabled {
-                    Button {
-                        prefs.folderWatchPaused.toggle()
-                    } label: {
-                        Image(systemName: prefs.folderWatchPaused ? "play.fill" : "pause.fill")
-                            .font(.system(size: 11, weight: .bold))
-                            .frame(width: 14, height: 14)
-                            .padding(5)
-                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(prefs.folderWatchPaused ? .green : binkyTintColor)
-                    .accessibilityLabel(
-                        prefs.folderWatchPaused
-                            ? String(localized: "Resume auto-sort", comment: "Play icon button that resumes auto-sort.")
-                            : String(localized: "Pause auto-sort", comment: "Pause icon button that pauses auto-sort.")
-                    )
-                    .accessibilityHint(
-                        prefs.folderWatchPaused
-                            ? String(localized: "Resumes reacting to new files in the inbox.", comment: "VoiceOver hint for resuming auto-sort.")
-                            : String(localized: "Temporarily stops reacting to new files in the inbox.", comment: "VoiceOver hint for pausing auto-sort.")
-                    )
-                }
-            }
+    private var activeFolderName: String {
+        let name = activeFolderURL.lastPathComponent
+        return name.isEmpty ? String(localized: "Folder", comment: "Fallback folder name.") : name
+    }
 
-            HStack(alignment: .center, spacing: 8) {
-                Button {
-                    openInboxInFinder()
-                } label: {
-                    Text(watchedInboxPath)
-                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                        .foregroundStyle(binkyTintColor)
-                        .lineLimit(2)
-                        .multilineTextAlignment(.leading)
-                        .truncationMode(.middle)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(String(localized: "Show in Finder", comment: "Reveal watched inbox in Finder."))
-                .accessibilityHint(String(localized: "Opens the watched folder in a Finder window.", comment: "VoiceOver hint for watch path button."))
+    private var activeFolderShortPath: String {
+        tildeShorten(activeFolderURL.path)
+    }
 
-                if prefs.folderWatchEnabled {
-                    Button(String(localized: "Choose…", comment: "Watch folder chooser button.")) {
-                        pickGlobalWatchFolder()
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                }
-            }
-
+    private var activeFolderCard: some View {
+        Button {
+            openInboxInFinder()
+        } label: {
             HStack(spacing: 10) {
-                Toggle(String(localized: "Watch", comment: "Short watch toggle in organizer sidebar inbox card."), isOn: Binding(
-                    get: { prefs.folderWatchEnabled },
-                    set: { prefs.folderWatchEnabled = $0 }
-                ))
-                .toggleStyle(.checkbox)
-                .font(.system(size: 11, weight: .medium))
+                Image(nsImage: activeFolderIcon)
+                    .resizable()
+                    .interpolation(.high)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 32, height: 32)
 
-                Spacer(minLength: 0)
-
-                if sortProgress.isActive {
-                    BinkySortProgressBar(
-                        fraction: sortProgress.fraction,
-                        caption: nil,
-                        compact: true,
-                        showsCaption: false
-                    )
-                    .frame(maxWidth: 140)
-                    .transition(.opacity)
-                }
-            }
-
-            if prefs.folderWatchEnabled {
-                if prefs.folderWatchPaused {
-                    Text(String(localized: "Watching is on, but new files won’t sort until you resume.", comment: "Shown when auto-sort is paused."))
-                        .font(.caption2)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(activeFolderName)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                    Text(activeFolderShortPath)
+                        .font(.system(size: 10))
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: "arrow.up.forward.app")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(binkyTintColor.opacity(0.7))
             }
+            .padding(.horizontal, 9)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(.background.opacity(0.6))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(Color.primary.opacity(0.07), lineWidth: 1)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(String(localized: "Reveal \(activeFolderName) in Finder", comment: "VoiceOver: active folder card opens Finder."))
+        .help(String(localized: "Reveal in Finder", comment: "Tooltip for active folder card."))
+    }
+
+    private var quickActionsCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            settingsSectionHeading(
+                icon: "bolt.fill",
+                title: String(localized: "Quick actions", comment: "Organizer sidebar: ad-hoc sort/preview controls.")
+            )
+
+            activeFolderCard
 
             HStack(spacing: 10) {
                 Button {
@@ -527,15 +688,34 @@ struct OrganizerMainView: View {
                 Spacer(minLength: 0)
 
                 Button {
-                    Task { await vm.runInteractiveDownloadsSweep(prefs: prefs) }
+                    Task {
+                        if enabledAutomationCount > 1 {
+                            await vm.runInteractiveSweepAllAutomations(prefs: prefs)
+                        } else {
+                            await vm.runInteractiveDownloadsSweep(prefs: prefs)
+                        }
+                    }
                 } label: {
-                    Text(String(localized: "Sort Now", comment: "Primary sort button."))
+                    Text(enabledAutomationCount > 1
+                         ? String(localized: "Sort All", comment: "Primary sort button: sort all enabled automations.")
+                         : String(localized: "Sort Now", comment: "Primary sort button."))
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
             }
 
+            if sortProgress.isActive {
+                BinkySortProgressBar(
+                    fraction: sortProgress.fraction,
+                    caption: nil,
+                    compact: true,
+                    showsCaption: false
+                )
+                .transition(.opacity)
+            }
+
             if showInlineSortPreview, !sortPreviewRows.isEmpty {
+                Divider().opacity(0.4)
                 VStack(alignment: .leading, spacing: 6) {
                     ForEach(sortPreviewRows.prefix(5)) { row in
                         HStack(spacing: 6) {
@@ -567,7 +747,6 @@ struct OrganizerMainView: View {
                     .font(.caption)
                     .foregroundStyle(binkyTintColor)
                 }
-                .padding(.top, 4)
             }
         }
         .padding(12)
@@ -607,14 +786,159 @@ struct OrganizerMainView: View {
         .animation(.easeOut(duration: 0.2), value: vm.transientBannerMessage)
     }
 
-    private var watchedInboxPath: String {
-        prefs.activeSortSweepRootDirectory().path
+    private var showCalmDesktopBanner: Bool {
+        guard !calmDesktopOnboardingDismissed else { return false }
+        let desktopPath = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Desktop", isDirectory: true)
+            .standardizedFileURL.path
+        return !prefs.savedPresets.contains { preset in
+            let path = preset.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !path.isEmpty else { return false }
+            return URL(fileURLWithPath: path).standardizedFileURL.path == desktopPath
+        }
+    }
+
+    @State private var showCalmDesktopPopover = false
+    @State private var showReviewPopover = false
+
+    private var calmDesktopToolbarButton: some View {
+        Button {
+            showCalmDesktopPopover.toggle()
+        } label: {
+            Image(systemName: "desktopcomputer")
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(binkyTintColor)
+        }
+        .buttonStyle(.plain)
+        .help(String(localized: "Desktop also loud?", comment: "Toolbar button tooltip: Desktop onboarding."))
+        .popover(isPresented: $showCalmDesktopPopover, arrowEdge: .top) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 8) {
+                    Image(systemName: "desktopcomputer")
+                        .foregroundStyle(binkyTintColor)
+                        .font(.system(size: 15))
+                    Text(String(localized: "Desktop also loud?", comment: "Onboarding popover title."))
+                        .font(.headline)
+                }
+                Text(String(localized: "Same pacifier, different crib.", comment: "Onboarding popover subtitle."))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                HStack(spacing: 10) {
+                    SettingsLink {
+                        Text(String(localized: "Calm my Desktop…", comment: "Opens Settings to add Desktop automation."))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(binkyTintColor)
+                    .controlSize(.regular)
+                    .simultaneousGesture(TapGesture().onEnded {
+                        showCalmDesktopPopover = false
+                        PreferencesTab.stageAutomationsWithCalmDesktopTemplate()
+                    })
+                    Button(String(localized: "Dismiss", comment: "Dismiss Desktop onboarding popover.")) {
+                        withAnimation { calmDesktopOnboardingDismissed = true }
+                        showCalmDesktopPopover = false
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.secondary)
+                }
+            }
+            .padding(16)
+            .frame(minWidth: 240)
+        }
+    }
+
+    private var reviewToolbarButton: some View {
+        Button {
+            showReviewPopover.toggle()
+        } label: {
+            Image(systemName: "folder.badge.questionmark")
+        }
+        .help(String(localized: "Pending review", comment: "Toolbar button tooltip: pending review files."))
+        .overlay(alignment: .topLeading) {
+            if reviewBannerCount > 0 {
+                Text("\(min(reviewBannerCount, 99))")
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 1)
+                    .background(Capsule().fill(binkyTintColor))
+                    .offset(x: -8, y: -6)
+                    .allowsHitTesting(false)
+            }
+        }
+        .popover(isPresented: $showReviewPopover, arrowEdge: .top) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 8) {
+                    Image(systemName: "folder.badge.questionmark")
+                        .foregroundStyle(binkyTintColor)
+                        .font(.system(size: 15))
+                    Text(String(localized: "Pending review", comment: "Review popover title."))
+                        .font(.headline)
+                }
+                Text(String(localized: "\(reviewBannerCount) want a second look.", comment: "Review popover subtitle."))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                HStack(spacing: 10) {
+                    Button(String(localized: "Tidy here…", comment: "Open in-app Review triage sheet.")) {
+                        showReviewPopover = false
+                        showingReviewTriage = true
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(binkyTintColor)
+                    .controlSize(.regular)
+                    Button(String(localized: "Open in Finder", comment: "Reveal Review folder in Finder.")) {
+                        showReviewPopover = false
+                        openReviewInFinder()
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.secondary)
+                }
+            }
+            .padding(16)
+            .frame(minWidth: 220)
+        }
+    }
+
+    private var calmDesktopBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "desktopcomputer")
+                .foregroundStyle(.tint)
+                .font(.system(size: 16))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(String(localized: "Desktop also loud?", comment: "Onboarding banner: suggest Calm my Desktop automation."))
+                    .font(.subheadline.weight(.semibold))
+                Text(String(localized: "Same pacifier, different crib.", comment: "Onboarding banner subtitle."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+            SettingsLink {
+                Text(String(localized: "Calm my Desktop…", comment: "Opens Settings to add Desktop automation."))
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(binkyTintColor)
+            .controlSize(.small)
+            .simultaneousGesture(TapGesture().onEnded {
+                PreferencesTab.stageAutomationsWithCalmDesktopTemplate()
+            })
+
+            Button(String(localized: "Dismiss", comment: "Dismiss Desktop onboarding banner.")) {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    calmDesktopOnboardingDismissed = true
+                }
+            }
+            .buttonStyle(.plain)
+            .font(.caption)
+            .foregroundStyle(binkyTintColor)
+        }
+        .padding(12)
+        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.primary.opacity(0.06)))
     }
 
     private var reviewBanner: some View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(.yellow)
+                .foregroundStyle(binkyTintColor)
             VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: "Pending review", comment: "Organizer banner when the Review folder has items."))
                     .font(.subheadline.weight(.semibold))
@@ -686,10 +1010,16 @@ struct OrganizerMainView: View {
     }
 
     private func activityRow(_ row: SortHistoryRowModel) -> some View {
-        HStack(alignment: .top, spacing: 14) {
+        let automationName = row.outcome.matchedAutomation(in: prefs.savedPresets)?.name
+        return HStack(alignment: .top, spacing: 14) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(Self.absoluteTimeFormatter.string(from: row.record.timestamp))
-                    .font(.subheadline.weight(.semibold))
+                HStack(spacing: 8) {
+                    Text(Self.absoluteTimeFormatter.string(from: row.record.timestamp))
+                        .font(.subheadline.weight(.semibold))
+                    if let automationName {
+                        automationAttributionChip(name: automationName)
+                    }
+                }
                 Text(countSummary(for: row.outcome))
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -706,8 +1036,8 @@ struct OrganizerMainView: View {
                 .tint(binkyTintColor)
                 .controlSize(.small)
 
-                Button(String(localized: "Show in Finder", comment: "Reveal watched inbox in Finder.")) {
-                    openInboxInFinder()
+                Button(String(localized: "Show in Finder", comment: "Reveal watched folder in Finder.")) {
+                    revealHistoricalSource(row.outcome)
                 }
                 .buttonStyle(.plain)
                 .font(.caption)
@@ -716,6 +1046,33 @@ struct OrganizerMainView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 12)
+    }
+
+    /// Tiny pill that names the automation an outcome belongs to. Mirrors the row dot styling so the eye is consistent across sidebar + activity feed.
+    private func automationAttributionChip(name: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: "gearshape.2")
+                .font(.system(size: 9, weight: .semibold))
+            Text(name)
+                .font(.caption2.weight(.medium))
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 7)
+        .padding(.vertical, 3)
+        .background(
+            Capsule(style: .continuous)
+                .fill(binkyTintColor.opacity(0.12))
+        )
+        .foregroundStyle(binkyTintColor)
+        .accessibilityLabel(String(localized: "Automation: \(name)", comment: "VoiceOver: chip naming the automation that produced an outcome."))
+    }
+
+    private func revealHistoricalSource(_ outcome: SortBatchOutcome) {
+        if let url = outcome.sourceRootURL(in: prefs.savedPresets) {
+            NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
+        } else {
+            openInboxInFinder()
+        }
     }
 
     @ViewBuilder
@@ -738,8 +1095,10 @@ struct OrganizerMainView: View {
                             )
                             .foregroundStyle(.secondary)
                     }
+                    Color.clear.frame(width: 16, height: 1)
                 }
             }
+            .modifier(TrailingChipFadeModifier())
             .accessibilityElement(children: .combine)
             .accessibilityLabel(String(localized: "Session summary chips", comment: "VoiceOver: chips for sort session highlights."))
         }
@@ -786,8 +1145,10 @@ struct OrganizerMainView: View {
                             )
                             .foregroundStyle(.secondary)
                     }
+                    Color.clear.frame(width: 16, height: 1)
                 }
             }
+            .modifier(TrailingChipFadeModifier())
             .accessibilityElement(children: .combine)
             .accessibilityLabel(String(localized: "Sources for Review items", comment: "VoiceOver: where-from host chips."))
         }
@@ -919,5 +1280,24 @@ struct OrganizerMainView: View {
             }
         }
         return true
+    }
+}
+
+/// Soft trailing fade for horizontal chip scrollers so clipped chips read as intentionally
+/// trimmed instead of mid-character cut-offs. The leading edge stays sharp because content
+/// always starts flush-left.
+private struct TrailingChipFadeModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content.mask(
+            LinearGradient(
+                stops: [
+                    .init(color: .black, location: 0),
+                    .init(color: .black, location: 0.88),
+                    .init(color: .clear, location: 1.0)
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        )
     }
 }

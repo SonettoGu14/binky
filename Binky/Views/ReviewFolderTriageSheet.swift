@@ -57,7 +57,7 @@ struct ReviewFolderTriageSheet: View {
                                 Button(String(localized: "Make a rule…", comment: "Review triage new rule.")) {
                                     let order = prefs.sortRoutingRules.count + 1
                                     ruleEditor = RuleEditorSheetState(
-                                        draft: InboxSortRule.draftFromReviewFile(url: item.url, order: order),
+                                        draft: SortRule.draftFromReviewFile(url: item.url, order: order),
                                         isNew: true,
                                         showDescribeSection: false
                                     )

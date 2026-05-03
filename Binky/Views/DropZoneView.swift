@@ -75,7 +75,7 @@ struct DropZoneView: View {
         case .hovering:
             return String(localized: "Release the dragged items to sort files from your watch folder.", comment: "VoiceOver hint for organizer drop zone while dragging.")
         case .processing:
-            return String(localized: "Sorting is in progress.", comment: "VoiceOver hint while sorting inbox.")
+            return String(localized: "Sorting is in progress.", comment: "VoiceOver hint while sorting folder.")
         case .done:
             return String(localized: "Activate to choose more files.", comment: "VoiceOver hint for drop zone when a batch finished.")
         }
@@ -200,7 +200,7 @@ private extension View {
 private enum FileCardType {
     case image, video, pdf
 
-    /// UTTypes aligned with common inbox file kinds (icons only).
+    /// UTTypes aligned with common watched-folder file kinds (icons only).
     var workspaceContentType: UTType {
         switch self {
         case .image: return .jpeg

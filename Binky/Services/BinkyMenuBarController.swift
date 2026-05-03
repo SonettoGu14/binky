@@ -122,14 +122,52 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
 
-        let sort = NSMenuItem(
-            title: String(localized: "Sort Now", comment: "Menu bar command."),
-            action: #selector(sortNow),
-            keyEquivalent: ""
-        )
-        sort.target = self
-        sort.isEnabled = !DownloadsSortOrchestrator.shared.isSorting
-        menu.addItem(sort)
+        let enabledPresets = Self.enabledAutomationsFromDefaults()
+        let isSorting = DownloadsSortOrchestrator.shared.isSorting
+
+        if enabledPresets.count > 1 {
+            let sortParent = NSMenuItem(
+                title: String(localized: "Sort", comment: "Menu bar: parent menu for choosing which folder to sweep."),
+                action: nil,
+                keyEquivalent: ""
+            )
+            let submenu = NSMenu()
+            let sortAll = NSMenuItem(
+                title: String(localized: "Sort All Folders", comment: "Menu bar: sweep every enabled automation."),
+                action: #selector(sortNow),
+                keyEquivalent: ""
+            )
+            sortAll.target = self
+            sortAll.isEnabled = !isSorting
+            submenu.addItem(sortAll)
+            submenu.addItem(.separator())
+            let sorted = enabledPresets.sorted {
+                Self.menuBarAutomationDisplayTitle($0).localizedCaseInsensitiveCompare(Self.menuBarAutomationDisplayTitle($1)) == .orderedAscending
+            }
+            for preset in sorted {
+                let row = NSMenuItem(
+                    title: Self.menuBarAutomationDisplayTitle(preset),
+                    action: #selector(sortAutomationNow(_:)),
+                    keyEquivalent: ""
+                )
+                row.target = self
+                row.representedObject = preset.id.uuidString
+                row.isEnabled = !isSorting
+                submenu.addItem(row)
+            }
+            sortParent.submenu = submenu
+            sortParent.isEnabled = !isSorting
+            menu.addItem(sortParent)
+        } else {
+            let sort = NSMenuItem(
+                title: String(localized: "Sort Now", comment: "Menu bar command."),
+                action: #selector(sortNow),
+                keyEquivalent: ""
+            )
+            sort.target = self
+            sort.isEnabled = !isSorting
+            menu.addItem(sort)
+        }
 
         let tracker = SortProgressTracker.shared
         if tracker.isActive {
@@ -218,6 +256,33 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
         NotificationCenter.default.post(name: .binkyStartSort, object: nil)
     }
 
+    @objc private func sortAutomationNow(_ sender: NSMenuItem) {
+        guard let idString = sender.representedObject as? String,
+              let uuid = UUID(uuidString: idString) else { return }
+        NotificationCenter.default.post(
+            name: .binkyStartSortForAutomation,
+            object: nil,
+            userInfo: [BinkyNotificationUserInfoKey.sortAutomationPresetID: uuid]
+        )
+    }
+
+    private static func enabledAutomationsFromDefaults() -> [CompressionPreset] {
+        guard let data = UserDefaults.standard.data(forKey: "savedPresetsData"),
+              let presets = try? JSONDecoder().decode([CompressionPreset].self, from: data) else {
+            return []
+        }
+        return presets.filter {
+            $0.isEnabled && !$0.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+    }
+
+    private static func menuBarAutomationDisplayTitle(_ preset: CompressionPreset) -> String {
+        let trimmedName = preset.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedName.isEmpty { return trimmedName }
+        let path = preset.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines)
+        return (path as NSString).lastPathComponent
+    }
+
     @objc private func togglePauseSorting() {
         let tracker = SortProgressTracker.shared
         if tracker.runState == .paused {
@@ -244,9 +309,15 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
 
     @objc private func openSettings() {
         NSApp.activate(ignoringOtherApps: true)
-        // In SwiftUI apps, calling `showSettingsWindow:` directly can log
-        // "Please use SettingsLink for opening the Settings scene."
-        // `showPreferencesWindow:` opens the same Settings scene without that warning.
-        NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
+        // macOS 14+ ships `showSettingsWindow:` on NSApplication — same selector that SwiftUI's
+        // `SettingsLink` ultimately fires. Calling it directly avoids the SwiftUI runtime warning
+        // we'd hit by routing through the `openSettings` environment action from a notification.
+        // We still dispatch on the next runloop tick so activation lands first in menu-bar-only mode.
+        DispatchQueue.main.async {
+            let modern = Selector(("showSettingsWindow:"))
+            if !NSApp.sendAction(modern, to: nil, from: nil) {
+                NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
+            }
+        }
     }
 }

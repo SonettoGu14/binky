@@ -194,6 +194,52 @@ struct SortBatchOutcome: Identifiable, Equatable, Codable, Sendable {
     }
 }
 
+extension SortBatchOutcome {
+    /// Most likely originating watch root, derived by tallying which automation path is the longest
+    /// matching prefix of each entry's source. Robust to sweeps that pull from subfolders.
+    func matchedAutomation(in presets: [CompressionPreset]) -> CompressionPreset? {
+        guard !entries.isEmpty else { return nil }
+        var tally: [UUID: (preset: CompressionPreset, hits: Int, length: Int)] = [:]
+
+        for entry in entries {
+            let sourcePath = URL(fileURLWithPath: entry.sourcePath).standardizedFileURL.path
+            var localBest: (preset: CompressionPreset, length: Int)?
+            for preset in presets {
+                let raw = preset.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !raw.isEmpty else { continue }
+                let normalized = URL(fileURLWithPath: raw).standardizedFileURL.path
+                guard sourcePath == normalized || sourcePath.hasPrefix(normalized + "/") else { continue }
+                if localBest == nil || normalized.count > localBest!.length {
+                    localBest = (preset, normalized.count)
+                }
+            }
+            if let lb = localBest {
+                if var existing = tally[lb.preset.id] {
+                    existing.hits += 1
+                    tally[lb.preset.id] = existing
+                } else {
+                    tally[lb.preset.id] = (lb.preset, 1, lb.length)
+                }
+            }
+        }
+
+        return tally.values.max { lhs, rhs in
+            if lhs.hits != rhs.hits { return lhs.hits < rhs.hits }
+            return lhs.length < rhs.length
+        }?.preset
+    }
+
+    /// Folder to reveal when the user wants to "Show in Finder" the place this sort acted on.
+    func sourceRootURL(in presets: [CompressionPreset]) -> URL? {
+        if let preset = matchedAutomation(in: presets),
+           !preset.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return URL(fileURLWithPath: preset.watchFolderPath).standardizedFileURL
+        }
+        guard let firstSource = entries.first?.sourcePath else { return nil }
+        return URL(fileURLWithPath: firstSource).deletingLastPathComponent()
+    }
+}
+
 // MARK: - Transient filenames
 
 private let suspiciousSuffixes: [String] = [
@@ -317,6 +363,11 @@ enum FinderTagApplicator {
 
     private static let xattrName = "com.apple.metadata:_kMDItemUserTags"
 
+    /// Finder-visible tag display names on a file (from xattr), for rule matching / exclusions.
+    static func readTagNames(for url: URL) -> [String] {
+        normalizedTagStrings(existingPlistData(onPath: url.path))
+    }
+
     /// - Returns: Whether the xattr write succeeded (or was a no-op merge).
     @discardableResult
     static func merge(_ newTags: [String], onto url: URL) -> Bool {
@@ -422,13 +473,6 @@ enum FinderTagApplicator {
     ]
 }
 
-private func activeSortRulesForSort(prefs: BinkyPreferences, preset: CompressionPreset?) -> [InboxSortRule] {
-    if let preset, !preset.inboxSortRules.isEmpty {
-        return preset.inboxSortRules
-    }
-    return prefs.sortCustomRulesEnabled ? prefs.sortRoutingRules : []
-}
-
 private enum PostSortShortcutRunner {
     static func run(shortcutName: String, fileURL: URL) {
         let trimmed = shortcutName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -450,7 +494,7 @@ struct SortPreferencesSnapshot: Sendable {
     let excludeExtensions: Set<String>
     let excludeNameFragments: [String]
     let sortCustomRulesEnabled: Bool
-    let sortRoutingRules: [InboxSortRule]
+    let sortRoutingRules: [SortRule]
     let sortAppendNewSemanticTagEnabled: Bool
     let assignFinderTagsOnSortEnabled: Bool
     let finderTagDefaultsByCategory: [String: [String]]
@@ -460,8 +504,14 @@ struct SortPreferencesSnapshot: Sendable {
     let sortDuplicateMode: SortDuplicateHandlingMode
     let sortSmartScreenshotNamesEnabled: Bool
     let sortDetectReceiptsEnabled: Bool
-    /// Also collect files one level inside immediate subfolders of each inbox root.
     let watchRecursiveOneLevel: Bool
+    /// Preset / automation order (for combining rules when multiple automations share a folder).
+    let savedPresetOrder: [UUID]
+    /// Lowercased Finder tags — files tagged with any of these are never sorted.
+    let globalSkipTagSet: Set<String>
+    /// When `true`, the work loop processes files one at a time with a per-file delay so the user
+    /// can read along in the progress UI. Defaults to `false`.
+    let slowMode: Bool
 }
 
 /// What to do when a file matches an existing hash (or near-duplicate image).
@@ -494,28 +544,27 @@ private extension BinkyPreferences {
             sortDuplicateMode: SortDuplicateHandlingMode(rawValue: sortDuplicateModeRaw) ?? .off,
             sortSmartScreenshotNamesEnabled: sortSmartScreenshotNamesEnabled,
             sortDetectReceiptsEnabled: sortDetectReceiptsEnabled,
-            watchRecursiveOneLevel: watchRecursiveOneLevel
+            watchRecursiveOneLevel: watchRecursiveOneLevel,
+            savedPresetOrder: savedPresets.map(\.id),
+            globalSkipTagSet: Set(
+                globalSkipTags
+                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+                    .filter { !$0.isEmpty }
+            ),
+            slowMode: sortSlowModeEnabled
         )
     }
 }
 
-private func sortInboxContext(for fileURL: URL, snapshot: SortPreferencesSnapshot) -> (inboxRoot: URL, preset: CompressionPreset?) {
+private func sortInboxContext(for fileURL: URL, snapshot: SortPreferencesSnapshot) -> (inboxRoot: URL, presets: [CompressionPreset]) {
     let reg = snapshot.watchRegistry
-    switch reg.pipeline(for: fileURL) {
+    switch reg.routing(for: fileURL) {
     case .global:
-        return (snapshot.globalInboxRoot, nil)
-    case .preset(let id):
-        guard let preset = snapshot.presetsByID[id] else {
-            return (snapshot.globalInboxRoot, nil)
-        }
-        if preset.watchFolderModeRaw == "unique",
-           let path = WatchFolderPathResolver.resolvedWatchDirectoryPath(
-                bookmark: preset.watchFolderBookmark,
-                storedPath: preset.watchFolderPath
-           ) {
-            return (URL(fileURLWithPath: path).standardizedFileURL, preset)
-        }
-        return (snapshot.globalInboxRoot, preset)
+        return (snapshot.globalInboxRoot, [])
+    case .automation(let root, let ids):
+        let idSet = Set(ids)
+        let presets = snapshot.savedPresetOrder.compactMap { snapshot.presetsByID[$0] }.filter { idSet.contains($0.id) }
+        return (root, presets)
     }
 }
 
@@ -538,9 +587,10 @@ private func isURLExcludedForSort(url: URL, snapshot: SortPreferencesSnapshot) -
     return false
 }
 
-private func activeSortRulesForSnapshot(snapshot: SortPreferencesSnapshot, preset: CompressionPreset?) -> [InboxSortRule] {
-    if let preset, !preset.inboxSortRules.isEmpty {
-        return preset.inboxSortRules
+private func activeSortRulesForSnapshot(snapshot: SortPreferencesSnapshot, presets: [CompressionPreset]) -> [SortRule] {
+    let combined = presets.flatMap(\.sortRules)
+    if !combined.isEmpty {
+        return combined
     }
     return snapshot.sortCustomRulesEnabled ? snapshot.sortRoutingRules : []
 }
@@ -548,16 +598,50 @@ private func activeSortRulesForSnapshot(snapshot: SortPreferencesSnapshot, prese
 private func composedFinderTagsForSort(
     snapshot: SortPreferencesSnapshot,
     naturalCategory: FileSortCategory,
-    preset: CompressionPreset?,
-    matchedRule: InboxSortRule?
+    presets: [CompressionPreset],
+    matchedRule: SortRule?
 ) -> [String] {
     FinderTagComposer.compose(
         naturalCategory: naturalCategory,
         globalDefaults: snapshot.finderTagDefaultsByCategory,
-        preset: preset,
+        preset: presets.first,
         matchedRule: matchedRule,
         appendNewSemanticTag: snapshot.sortAppendNewSemanticTagEnabled
     )
+}
+
+private func fileURLMatchesGlobalSkipTags(_ url: URL, snapshot: SortPreferencesSnapshot) -> Bool {
+    guard !snapshot.globalSkipTagSet.isEmpty else { return false }
+    let tags = FinderTagApplicator.readTagNames(for: url)
+    return tags.contains { snapshot.globalSkipTagSet.contains($0.lowercased()) }
+}
+
+private func combinedTagFanoutPriority(presets: [CompressionPreset]) -> [String] {
+    var seen = Set<String>()
+    var out: [String] = []
+    for p in presets {
+        for t in p.tagFanoutPriority {
+            let trimmed = t.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { continue }
+            let k = trimmed.lowercased()
+            if seen.insert(k).inserted {
+                out.append(trimmed)
+            }
+        }
+    }
+    return out
+}
+
+private func newTagExpiryDays(from presets: [CompressionPreset]) -> Int {
+        presets.first(where: { $0.newTagExpiryDays > 0 })?.newTagExpiryDays ?? 0
+}
+
+private func postSortShortcutName(from presets: [CompressionPreset]) -> String {
+    for p in presets {
+        let t = p.postSortShortcutName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !t.isEmpty { return t }
+    }
+    return ""
 }
 
 private func destinationDisplayLabelForSort(root: URL, destinationDir: URL) -> String {
@@ -750,7 +834,10 @@ private enum SortWork {
         let batchSize = workURLs.count
         let destGate = PerDestinationUniquifyGate()
         let renameCounter = SortRenameCounterActor()
-        let maxConcurrent = min(8, max(1, ProcessInfo.processInfo.processorCount))
+        // Slow mode forces sequential processing so each file's progress UI is readable.
+        let maxConcurrent = snapshot.slowMode
+            ? 1
+            : min(8, max(1, ProcessInfo.processInfo.processorCount))
         let runOne: @Sendable (URL) async -> SortIndexedFileResult = { standardized in
             let fm = FileManager.default
             var rows: [SortBatchEntry] = []
@@ -829,6 +916,23 @@ private enum SortWork {
                 return SortIndexedFileResult(rows: rows, tagWriteFailures: tagWriteFailures)
             }
 
+            if fileURLMatchesGlobalSkipTags(standardized, snapshot: snapshot) {
+                let oh = WhereFromsReader.primaryOriginHost(forFileAt: standardized)
+                emitFileStarted(categoryForAnimation: .misc)
+                rows.append(SortBatchEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    destinationPath: nil,
+                    category: .misc,
+                    disposition: .skippedExcluded,
+                    reason: String(localized: "Skipped — file has a protected Finder tag.", comment: "Sort log: global skip tag."),
+                    matchedRuleName: nil,
+                    originHost: oh
+                ))
+                await applyEnergyThrottleBetweenFiles(batchSize: batchSize)
+                return SortIndexedFileResult(rows: rows, tagWriteFailures: tagWriteFailures)
+            }
+
             let signals = SortRulesEvaluator.loadSignals(url: standardized)
                 ?? SortRulesEvaluator.FileSignals(
                     ext: standardized.pathExtension.lowercased(),
@@ -840,11 +944,13 @@ private enum SortWork {
                     originHosts: WhereFromsReader.originHosts(forFileAt: standardized)
                 )
 
+            let fileTags = FinderTagApplicator.readTagNames(for: standardized)
+
             let originHost = signals.originHosts.first
 
-            let (defaultRoot, preset) = sortInboxContext(for: standardized, snapshot: snapshot)
+            let (defaultRoot, presets) = sortInboxContext(for: standardized, snapshot: snapshot)
             let inboxRoot = rootOverride[standardized] ?? defaultRoot
-            let activeRules = activeSortRulesForSnapshot(snapshot: snapshot, preset: preset)
+            let activeRules = activeSortRulesForSnapshot(snapshot: snapshot, presets: presets)
 
             var pendingFileDigest: (sha256: String, perceptual: UInt64?, isImage: Bool)?
             if snapshot.sortDuplicateMode != .off {
@@ -960,7 +1066,7 @@ private enum SortWork {
                 hasSignificantOCR: inspection.hasSignificantOCR,
                 isReceiptLike: inspection.isReceiptLike
             )
-            let matchedRule = SortRulesEvaluator.firstMatchingRule(in: activeRules, signals: signals, content: contentInput)
+            let matchedRule = SortRulesEvaluator.firstMatchingRule(in: activeRules, signals: signals, content: contentInput, fileTags: fileTags)
 
             if let rule = matchedRule, rule.matchAction == .moveToTrash {
                 emitFileStarted(categoryForAnimation: .misc)
@@ -996,6 +1102,91 @@ private enum SortWork {
                 return SortIndexedFileResult(rows: rows, tagWriteFailures: tagWriteFailures)
             }
 
+            if let rule = matchedRule, rule.matchAction == .extractAndTrash {
+                emitFileStarted(categoryForAnimation: .archives)
+                let category = SortRulesEvaluator.customRuleTagCategory
+                let destinationDir = SortRulesEvaluator.destinationDirectory(rule: rule, category: category, inboxRoot: inboxRoot)
+                let extractReason = String.localizedStringWithFormat(
+                    String(localized: "Extracted archive (rule “%@”).", comment: "Sort log extract rule."),
+                    rule.name
+                )
+                do {
+                    _ = try destGate.sync(directory: destinationDir) {
+                        try fm.createDirectory(at: destinationDir, withIntermediateDirectories: true)
+                    }
+                    try ArchiveExtractionService.extract(source: standardized, destinationDirectory: destinationDir)
+                    try fm.trashItem(at: standardized, resultingItemURL: nil)
+                    rows.append(SortBatchEntry(
+                        id: UUID(),
+                        sourcePath: standardized.path,
+                        destinationPath: destinationDir.path,
+                        category: category,
+                        disposition: .moved,
+                        reason: extractReason,
+                        matchedRuleName: rule.name,
+                        originHost: originHost
+                    ))
+                } catch {
+                    rows.append(SortBatchEntry(
+                        id: UUID(),
+                        sourcePath: standardized.path,
+                        destinationPath: nil,
+                        category: category,
+                        disposition: .skippedError,
+                        reason: error.localizedDescription,
+                        matchedRuleName: rule.name,
+                        originHost: originHost
+                    ))
+                }
+                await applyEnergyThrottleBetweenFiles(batchSize: batchSize)
+                return SortIndexedFileResult(rows: rows, tagWriteFailures: tagWriteFailures)
+            }
+
+            if let rule = matchedRule, rule.matchAction == .installFromDMG {
+                emitFileStarted(categoryForAnimation: .apps)
+                let category = FileSortCategory.apps
+                let appsDest: URL = {
+                    if let p = presets.first {
+                        return p.resolvedApplicationsInstallDirectory()
+                    }
+                    return FileManager.default.homeDirectoryForCurrentUser
+                        .appendingPathComponent("Applications", isDirectory: true)
+                        .standardizedFileURL
+                }()
+                let installReason = String.localizedStringWithFormat(
+                    String(localized: "Installed from disk image (rule “%@”).", comment: "Sort log DMG install."),
+                    rule.name
+                )
+                do {
+                    let installed = try DMGInstallerService.installApps(fromDmg: standardized, applicationsDestination: appsDest)
+                    try fm.trashItem(at: standardized, resultingItemURL: nil)
+                    let destPath = installed.first?.path ?? appsDest.path
+                    rows.append(SortBatchEntry(
+                        id: UUID(),
+                        sourcePath: standardized.path,
+                        destinationPath: destPath,
+                        category: category,
+                        disposition: .moved,
+                        reason: installReason,
+                        matchedRuleName: rule.name,
+                        originHost: originHost
+                    ))
+                } catch {
+                    rows.append(SortBatchEntry(
+                        id: UUID(),
+                        sourcePath: standardized.path,
+                        destinationPath: nil,
+                        category: category,
+                        disposition: .skippedError,
+                        reason: error.localizedDescription,
+                        matchedRuleName: rule.name,
+                        originHost: originHost
+                    ))
+                }
+                await applyEnergyThrottleBetweenFiles(batchSize: batchSize)
+                return SortIndexedFileResult(rows: rows, tagWriteFailures: tagWriteFailures)
+            }
+
             let useReceiptAutoRoute =
                 matchedRule == nil
                 && snapshot.sortDetectReceiptsEnabled
@@ -1016,6 +1207,13 @@ private enum SortWork {
                 category = SortRulesEvaluator.customRuleTagCategory
                 if rule.matchAction == .renameInPlace {
                     destinationDir = standardized.deletingLastPathComponent().standardizedFileURL
+                } else if rule.matchAction == .tagFanout {
+                    destinationDir = SortRulesEvaluator.tagFanoutDestinationDirectory(
+                        rule: rule,
+                        inboxRoot: inboxRoot,
+                        fileTags: fileTags,
+                        priority: combinedTagFanoutPriority(presets: presets)
+                    )
                 } else {
                     destinationDir = SortRulesEvaluator.destinationDirectory(rule: rule, category: category, inboxRoot: inboxRoot)
                 }
@@ -1091,7 +1289,7 @@ private enum SortWork {
                     try SortZipViaDitto.zipReplacingSource(file: standardized, zipDestinationURL: zipURL)
                     if snapshot.assignFinderTagsOnSortEnabled {
                         let okTag = FinderTagApplicator.merge(
-                            composedFinderTagsForSort(snapshot: snapshot, naturalCategory: naturalCategoryForTags, preset: preset, matchedRule: matchedRule),
+                            composedFinderTagsForSort(snapshot: snapshot, naturalCategory: naturalCategoryForTags, presets: presets, matchedRule: matchedRule),
                             onto: zipURL
                         )
                         if !okTag {
@@ -1099,14 +1297,15 @@ private enum SortWork {
                         }
                     }
                     if snapshot.assignFinderTagsOnSortEnabled, snapshot.sortAppendNewSemanticTagEnabled,
-                       let preset, preset.newTagExpiryDays > 0 {
+                       newTagExpiryDays(from: presets) > 0 {
                         await MainActor.run {
-                            NewTagExpiryService.shared.register(file: zipURL, expiryDays: preset.newTagExpiryDays)
+                            NewTagExpiryService.shared.register(file: zipURL, expiryDays: newTagExpiryDays(from: presets))
                         }
                     }
-                    if let preset, !preset.postSortShortcutName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    let shortcut = postSortShortcutName(from: presets)
+                    if !shortcut.isEmpty {
                         await MainActor.run {
-                            PostSortShortcutRunner.run(shortcutName: preset.postSortShortcutName, fileURL: zipURL)
+                            PostSortShortcutRunner.run(shortcutName: shortcut, fileURL: zipURL)
                         }
                     }
                     if let digest = pendingFileDigest {
@@ -1170,7 +1369,7 @@ private enum SortWork {
 
                 if snapshot.assignFinderTagsOnSortEnabled {
                     let okTag = FinderTagApplicator.merge(
-                        composedFinderTagsForSort(snapshot: snapshot, naturalCategory: naturalCategoryForTags, preset: preset, matchedRule: matchedRule),
+                        composedFinderTagsForSort(snapshot: snapshot, naturalCategory: naturalCategoryForTags, presets: presets, matchedRule: matchedRule),
                         onto: target
                     )
                     if !okTag {
@@ -1179,15 +1378,16 @@ private enum SortWork {
                 }
 
                 if snapshot.assignFinderTagsOnSortEnabled, snapshot.sortAppendNewSemanticTagEnabled,
-                   let preset, preset.newTagExpiryDays > 0 {
+                   newTagExpiryDays(from: presets) > 0 {
                     await MainActor.run {
-                        NewTagExpiryService.shared.register(file: target, expiryDays: preset.newTagExpiryDays)
+                        NewTagExpiryService.shared.register(file: target, expiryDays: newTagExpiryDays(from: presets))
                     }
                 }
 
-                if let preset, !preset.postSortShortcutName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                let shortcut = postSortShortcutName(from: presets)
+                if !shortcut.isEmpty {
                     await MainActor.run {
-                        PostSortShortcutRunner.run(shortcutName: preset.postSortShortcutName, fileURL: target)
+                        PostSortShortcutRunner.run(shortcutName: shortcut, fileURL: target)
                     }
                 }
 
@@ -1233,6 +1433,9 @@ private enum SortWork {
         var mergedTagFails = 0
         let n = batchSize
         var slots: [SortIndexedFileResult?] = Array(repeating: nil, count: n)
+        // 700ms reads as deliberate without feeling sluggish. Synced with `progress?(.fileStarted)`
+        // animations so each file's bucket icon has time to flash.
+        let slowModeNanos: UInt64 = 700_000_000
         await withTaskGroup(of: (Int, SortIndexedFileResult).self) { group in
             var nextIndex = 0
             for _ in 0..<min(maxConcurrent, n) {
@@ -1246,6 +1449,10 @@ private enum SortWork {
             }
             for await (idx, res) in group {
                 slots[idx] = res
+                if snapshot.slowMode, nextIndex < n {
+                    try? await Task.sleep(nanoseconds: slowModeNanos)
+                    guard await gate.continueWhenSortPermitsProgress() else { continue }
+                }
                 if nextIndex < n {
                     let j = nextIndex
                     nextIndex += 1
@@ -1409,6 +1616,18 @@ final class DownloadsSortOrchestrator {
 
             let snapshot = prefs.makeSortPreferencesSnapshot()
 
+            if fileURLMatchesGlobalSkipTags(standardized, snapshot: snapshot) {
+                let sum = String(localized: "Skipped — protected Finder tag.", comment: "Sort preview row.")
+                out.append(SortPreviewEntry(
+                    id: UUID(),
+                    sourceLastPathComponent: standardized.lastPathComponent,
+                    proposedDestinationPath: "—",
+                    summary: sum,
+                    whyLine: String(localized: "This file has a tag on your “never sort” list.", comment: "Preview why: skip tag.")
+                ))
+                continue
+            }
+
             let signals = SortRulesEvaluator.loadSignals(url: standardized)
                 ?? SortRulesEvaluator.FileSignals(
                     ext: standardized.pathExtension.lowercased(),
@@ -1420,9 +1639,11 @@ final class DownloadsSortOrchestrator {
                     originHosts: WhereFromsReader.originHosts(forFileAt: standardized)
                 )
 
-            let (defaultRoot, preset) = sortInboxContext(for: standardized, snapshot: snapshot)
+            let fileTags = FinderTagApplicator.readTagNames(for: standardized)
+
+            let (defaultRoot, presets) = sortInboxContext(for: standardized, snapshot: snapshot)
             let inboxRoot = rootOverride[standardized] ?? defaultRoot
-            let activeRules = activeSortRulesForSnapshot(snapshot: snapshot, preset: preset)
+            let activeRules = activeSortRulesForSnapshot(snapshot: snapshot, presets: presets)
 
             var pendingDigestSHA: String?
             if snapshot.sortDuplicateMode != .off {
@@ -1483,7 +1704,7 @@ final class DownloadsSortOrchestrator {
                 hasSignificantOCR: inspection.hasSignificantOCR,
                 isReceiptLike: inspection.isReceiptLike
             )
-            let matchedRule = SortRulesEvaluator.firstMatchingRule(in: activeRules, signals: signals, content: contentInput)
+            let matchedRule = SortRulesEvaluator.firstMatchingRule(in: activeRules, signals: signals, content: contentInput, fileTags: fileTags)
             let originHost = signals.originHosts.first
 
             if let rule = matchedRule, rule.matchAction == .moveToTrash {
@@ -1538,6 +1759,13 @@ final class DownloadsSortOrchestrator {
                 category = SortRulesEvaluator.customRuleTagCategory
                 if rule.matchAction == .renameInPlace {
                     destinationDir = standardized.deletingLastPathComponent().standardizedFileURL
+                } else if rule.matchAction == .tagFanout {
+                    destinationDir = SortRulesEvaluator.tagFanoutDestinationDirectory(
+                        rule: rule,
+                        inboxRoot: inboxRoot,
+                        fileTags: fileTags,
+                        priority: combinedTagFanoutPriority(presets: presets)
+                    )
                 } else {
                     destinationDir = SortRulesEvaluator.destinationDirectory(rule: rule, category: category, inboxRoot: inboxRoot)
                 }
@@ -1700,7 +1928,7 @@ final class DownloadsSortOrchestrator {
     }
 
     /// Files directly under `root`, plus regular files one level inside immediate subfolders when `recursiveOneLevel` is true.
-    static func collectSweepFiles(in root: URL, recursiveOneLevel: Bool, fileManager fm: FileManager = .default) -> [URL] {
+    nonisolated static func collectSweepFiles(in root: URL, recursiveOneLevel: Bool, fileManager fm: FileManager = .default) -> [URL] {
         guard let urls = try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]) else {
             return []
         }
@@ -1788,7 +2016,7 @@ final class DownloadsSortOrchestrator {
 
         let activity = ProcessInfo.processInfo.beginActivity(
             options: .userInitiated,
-            reason: String(localized: "Binky is sorting files.", comment: "Process activity reason while sorting inbox files.")
+            reason: String(localized: "Binky is sorting files.", comment: "Process activity reason while sorting watched-folder files.")
         )
         defer {
             ProcessInfo.processInfo.endActivity(activity)
@@ -1936,13 +2164,24 @@ struct SortOutcomeSheet: View {
         self.onTransientStatus = onTransientStatus
     }
 
+    @EnvironmentObject private var prefs: BinkyPreferences
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var sortProgress = SortProgressTracker.shared
     @State private var undoFootnote: String?
 
+    private var titleString: String {
+        if let preset = outcome.matchedAutomation(in: prefs.savedPresets) {
+            return String.localizedStringWithFormat(
+                String(localized: "Sorted “%@”", comment: "Sort summary title; arg is automation name."),
+                preset.name
+            )
+        }
+        return String(localized: "Move / review summary", comment: "Automated sort audit title; fallback when no automation matches.")
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(String(localized: "Move / review summary", comment: "Automated sort audit title."))
+            Text(titleString)
                 .font(.title2)
 
             HStack(spacing: 12) {

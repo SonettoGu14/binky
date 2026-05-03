@@ -19,8 +19,10 @@ extension Notification.Name {
     /// `object` is `PreferencesTab.rawValue` (Int)
     static let binkySelectPreferencesTab = Notification.Name("binkySelectPreferencesTab")
     static let binkyToggleSidebar       = Notification.Name("binkyToggleSidebar")
-    /// User asked to run the Downloads / inbox sweep (`Sort Downloads Now` menu, shortcuts, menu bar).
+    /// User asked to run the Downloads / default folder sweep (`Sort Downloads Now` menu, shortcuts, menu bar).
     static let binkyStartSort = Notification.Name("binkyStartSort")
+    /// Sweep one automation by id (`userInfo`: ``BinkyNotificationUserInfoKey/sortAutomationPresetID`` → `UUID`).
+    static let binkyStartSortForAutomation = Notification.Name("binkyStartSortForAutomation")
     /// Another sort couldn’t start because one is already in flight.
     static let binkySortRejectedBecauseBusy = Notification.Name("binkySortRejectedBecauseBusy")
     /// Posted before quit so SwiftUI can dismiss sheets; used with `applicationShouldTerminate` / `terminateLater`.
@@ -36,12 +38,18 @@ extension Notification.Name {
     static let binkyRoutingRulesDidChange = Notification.Name("binkyRoutingRulesDidChange")
 }
 
+/// Keys for `Notification.userInfo` payloads used across the app.
+enum BinkyNotificationUserInfoKey {
+    /// Value: `UUID` of the ``CompressionPreset`` / automation to sweep.
+    static let sortAutomationPresetID = "presetID"
+}
+
 enum S {
     // Drop zone — idle taglines cycle with each animation loop (English brand voice)
     static let dropIdleTaglines: [String] = [
         "Binky Free keeps your folders tidy.",
         "Sorted. Tagged. Findable.",
-        "Your inbox, quietly handled.",
+        "Your folders, quietly handled.",
         "Trust the trail.",
         "Folder calm.",
         "Less clutter, same files.",
@@ -53,7 +61,7 @@ enum S {
     /// Organizer main window — empty activity area; cycles with each idle animation loop (or a timer when reduced motion is on).
     static func organizerEmptyTagline(loop: Int) -> String {
         let lines: [String] = [
-            String(localized: "Fussy inbox. Meet Binky.", comment: "Organizer empty state: rotating playful tagline."),
+            String(localized: "Fussy folder. Meet Binky.", comment: "Organizer empty state: rotating playful tagline."),
             String(localized: "Files acting up? Pop in a Binky.", comment: "Organizer empty state: rotating playful tagline."),
             String(localized: "Quiets the mess right down.", comment: "Organizer empty state: rotating playful tagline."),
             String(localized: "Files were screaming. Binky helped.", comment: "Organizer empty state: rotating playful tagline."),
@@ -63,7 +71,7 @@ enum S {
         return lines[loop % lines.count]
     }
 
-    /// Organizer inbox hint (shown under drop zone).
+    /// Organizer watched-folder hint (shown under drop zone).
     static let organizerDropHint = String(localized: "Only files inside your watch folder can be sorted from here.", comment: "Organizer drop zone footnote.")
 
     static let dropHover     = "Let go."
@@ -157,7 +165,7 @@ enum S {
         String(localized: "Assign shortcuts for Finder’s “Sort with Binky” in System Settings → Keyboard → Keyboard Shortcuts → Services.", comment: "Settings Shortcuts tab footer.")
     }
     static func shortcutsTabHelpFooter(helpMenuShortcut: String) -> String {
-        String(localized: "For watch folders, profiles, and full troubleshooting, open Binky Help from the Help menu (\(helpMenuShortcut)).", comment: "Settings Shortcuts tab footer; argument is help shortcut.")
+        String(localized: "For watch folders, automations, and full troubleshooting, open Binky Help from the Help menu (\(helpMenuShortcut)).", comment: "Settings Shortcuts tab footer; argument is help shortcut.")
     }
     static var shortcutsAppDescription: String {
         String(localized: "Binky exposes a Sort Files action in the Shortcuts app. Hand files from Finder or other actions through Binky — same routing rules as the main window.", comment: "Settings: Shortcuts app integration description.")

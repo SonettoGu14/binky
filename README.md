@@ -1,6 +1,8 @@
 # Binky
 
-A native macOS app that calms a fussy Downloads folder. Binky watches your inbox (defaults to `~/Downloads`), waits for files to finish downloading, then routes them into clear sorted folders — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, and Misc.
+A native macOS app that calms whatever folder is fussy — Downloads, Desktop, a Dropbox inbox, a screenshots dump, you name it. **Automations** are named, parallel workflows: each can watch its own source, run its own rules, and optional Finder tags. The default global inbox still points at `~/Downloads` if you like it there.
+
+Binky waits for files to finish landing, then routes them into clear sorted folders — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, and Misc — or runs the action you chose (extract an archive, install from a DMG, fan out by Finder tag, and more).
 
 Unknown or sketchy extensions do not disappear silently: they land in **Review** first. Optional Finder tags, move summaries, and session history make it easy to verify what happened and undo where possible.
 
@@ -9,7 +11,7 @@ Unknown or sketchy extensions do not disappear silently: they land in **Review**
 <table>
   <tr>
     <td><img src="site/screenshots/sorting.png" alt="Binky sorting dashboard" width="100%" /></td>
-    <td><img src="site/screenshots/profiles.webp" alt="Binky profiles and rules" width="100%" /></td>
+    <td><img src="site/screenshots/profiles.webp" alt="Binky automations and rules" width="100%" /></td>
   </tr>
   <tr>
     <td><img src="site/screenshots/sorting-breakdown.webp" alt="Binky sorting breakdown" width="100%" /></td>
@@ -37,8 +39,9 @@ Hey! I'm [Derek Castelli](https://www.heyderekj.com), a full-time freelance web 
 ## Features
 
 - **Sort Downloads Now** - one-click sort with stable-file checks and collision-safe moves
-- **Watch folder** - monitor Downloads continuously and route new files as they settle
-- **Profiles and rules** - define destination behavior per profile with predictable routing
+- **Automations** - multiple named watchers (each with its own source folder and rules) plus a global inbox fallback
+- **Watch** - monitor folders continuously and route new files as they settle
+- **Rules** - extensions, names, origins, OCR/receipt hints, Finder tag predicates, actions (move, zip, extract, DMG install, tag fan-out, trash, rename)
 - **Review folder** — unknown or ambiguous extensions get held for inspection first
 - **History and undo-friendly flow** - batch summaries with moved, skipped, and review counts
 - **Finder Quick Action and Services** - run "Sort with Binky" on selected files
@@ -50,7 +53,7 @@ Hey! I'm [Derek Castelli](https://www.heyderekj.com), a full-time freelance web 
 ## What others don't do
 
 - **Treat uncertainty safely** - questionable files go to **Review** instead of being buried in the wrong folder
-- **Sort with context, not just extension lists** - profiles and routing logic keep behavior consistent across different workflows
+- **Sort with context, not just extension lists** - automations and routing logic keep behavior consistent across different workflows
 - **Keep a readable paper trail** - clear per-batch outcomes so you can verify what moved and what did not
 - **Fit native Mac workflows** - Finder Services, Shortcuts, and login-item support out of the box
 - **Stay lightweight** - organizer-first UX on Apple frameworks with strict bundle-size discipline

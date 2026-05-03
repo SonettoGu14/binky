@@ -54,7 +54,7 @@ final class FinderTagCompositionTests: XCTestCase {
     func testReplaceCategoryDefaultPolicy() {
         var preset = CompressionPreset(name: "T")
         preset.customFinderTags = ["Profile"]
-        let rule = InboxSortRule(
+        let rule = SortRule(
             id: UUID(),
             isEnabled: true,
             name: "R",
@@ -81,15 +81,15 @@ final class FinderTagCompositionTests: XCTestCase {
         XCTAssertEqual(tags, ["FolderA", "Profile", "Extra"])
     }
 
-    func testInboxSortRuleDecodesWhenOmittingNewFinderTagKeys() throws {
+    func testSortRuleDecodesWhenOmittingNewFinderTagKeys() throws {
         let encoder = JSONEncoder()
-        let baseline = InboxSortRule.fresh(order: 1)
+        let baseline = SortRule.fresh(order: 1)
         var data = try encoder.encode(baseline)
         var raw = try XCTUnwrap(try JSONSerialization.jsonObject(with: data) as? [String: Any])
         raw.removeValue(forKey: "finderTagPolicy")
         raw.removeValue(forKey: "categoryDefaultReplacementTags")
         data = try JSONSerialization.data(withJSONObject: raw)
-        let decoded = try JSONDecoder().decode(InboxSortRule.self, from: data)
+        let decoded = try JSONDecoder().decode(SortRule.self, from: data)
         XCTAssertEqual(decoded.finderTagPolicy, .additive)
         XCTAssertEqual(decoded.categoryDefaultReplacementTags, [])
     }

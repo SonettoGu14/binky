@@ -41,7 +41,7 @@ final class SortDailyDigestAccumulator {
             agingMoves = 0
         }
         if sortedMoves == 0, reviewCount == 0, duplicateSkips == 0, receiptMoves == 0, agingMoves == 0 {
-            return String(localized: "Quiet inbox. Nothing to report.", comment: "Daily digest empty.")
+            return String(localized: "Quiet folders. Nothing to report.", comment: "Daily digest empty.")
         }
         return String.localizedStringWithFormat(
             String(

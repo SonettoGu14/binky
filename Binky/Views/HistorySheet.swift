@@ -64,8 +64,27 @@ struct HistorySheet: View {
         List(prefs.sessionHistory) { record in
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(dateFormatter.string(from: record.timestamp))
-                        .font(.caption.weight(.medium))
+                    HStack(spacing: 6) {
+                        Text(dateFormatter.string(from: record.timestamp))
+                            .font(.caption.weight(.medium))
+                        if let automationName = automationName(for: record) {
+                            HStack(spacing: 3) {
+                                Image(systemName: "gearshape.2")
+                                    .font(.system(size: 8, weight: .semibold))
+                                Text(automationName)
+                                    .font(.system(size: 9, weight: .medium))
+                                    .lineLimit(1)
+                            }
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill(binkyTintColor.opacity(0.12))
+                            )
+                            .foregroundStyle(binkyTintColor)
+                            .accessibilityLabel(String(localized: "Automation: \(automationName)", comment: "VoiceOver: history row chip naming the automation."))
+                        }
+                    }
                     Text(record.formats.joined(separator: ", "))
                         .font(.system(size: 10))
                         .foregroundStyle(.tertiary)
@@ -118,6 +137,12 @@ struct HistorySheet: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+    }
+
+    private func automationName(for record: SessionRecord) -> String? {
+        guard let data = record.batchSummaryData,
+              let outcome = try? JSONDecoder().decode(SortBatchOutcome.self, from: data) else { return nil }
+        return outcome.matchedAutomation(in: prefs.savedPresets)?.name
     }
 
     private func sessionCompressibleURLs(_ record: SessionRecord) -> [URL] {

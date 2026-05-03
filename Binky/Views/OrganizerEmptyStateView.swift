@@ -57,6 +57,7 @@ struct OrganizerEmptyStateView: View {
                 .foregroundStyle(.quaternary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 320)
+
         }
         .padding(.vertical, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

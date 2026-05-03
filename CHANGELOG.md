@@ -2,7 +2,18 @@
 
 ## Unreleased
 
-_(Nothing yet.)_
+### Added — v2.0 Automations
+
+- **Automations** replace Profiles: each automation has its own source folder, enable toggle, rules, tag defaults, DMG install destination, and tag fan-out priority list. Multiple automations can run in parallel; the watch pipeline dedupes shared sources.
+- **Global inbox + protected tags**: default watched folder plus **Protected Finder tags** (e.g. DoNotMove) so tagged files are never touched.
+- **Rule upgrades**: match by Finder tag; forced **output extension** and `{newExt}` rename token; actions **Extract archive then trash**, **Install app from disk image**, **Sort into subfolder by Finder tag**.
+- **Templates** when adding an automation (Downloads, Desktop, DMG install, archive extract, tag fan-out, screenshot archive, notes to Markdown, blank) plus empty-state onboarding for **Calm my Desktop**.
+- **Services**: `ArchiveExtractionService` (ditto/tar), `DMGInstallerService` (hdiutil + copy `.app`), tag read for predicates/skip list.
+- **Tests**: `AutomationsOverhaulTests` (tag predicate, fan-out priority, rename/`{newExt}`, zip extract, shared watch root routing).
+
+### Changed
+
+- Settings tabs: **Automations** merges the old Watch + Profiles surface; sidebar links and copy use Automation terminology.
 
 ## 1.2.0 — 2026-05-02
 

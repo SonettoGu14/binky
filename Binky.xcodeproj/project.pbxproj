@@ -61,10 +61,13 @@
 		XTBLD00000000000000002 /* DownloadSortClassificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = XTREF00000000000000002 /* DownloadSortClassificationTests.swift */; };
 		WFTSTBLD000000000000001 /* WhereFromsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WFTSTREF000000000000001 /* WhereFromsTests.swift */; };
 		FTTST200001BK000001 /* FinderTagCompositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FTTST100001FR000001 /* FinderTagCompositionTests.swift */; };
+		ATOBKB00000000000000001 /* AutomationsOverhaulTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ATOBKF00000000000000001 /* AutomationsOverhaulTests.swift */; };
 		SPTKR200001BK000002 /* SortProgressTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = SPTKR100001FR000001 /* SortProgressTracker.swift */; };
 		BBAR200001BK000002 /* BinkySortProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBAR100001FR000001 /* BinkySortProgressBar.swift */; };
 		CURS200001BK000002 /* CurrentlySortingSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CURS100001FR000001 /* CurrentlySortingSheet.swift */; };
 		SRTVC00001BR000001 /* SortVoiceCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = SRTVC10001FR000001 /* SortVoiceCopy.swift */; };
+		ARCHXTR200001BK000001 /* ArchiveExtractionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ARCHXTR100001FR000001 /* ArchiveExtractionService.swift */; };
+		DMGXTR200001BK000001 /* DMGInstallerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DMGXTR100001FR000001 /* DMGInstallerService.swift */; };
 		RVTRI00001BR000001 /* ReviewFolderTriageSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = RVTRI10001FR000001 /* ReviewFolderTriageSheet.swift */; };
 /* End PBXBuildFile section */
 
@@ -106,6 +109,8 @@
 		SREM0010000000000000001 /* SortRoutingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortRoutingModels.swift; sourceTree = "<group>"; };
 		SREV0010000000000000001 /* SortRulesEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortRulesEvaluator.swift; sourceTree = "<group>"; };
 		SRTVC10001FR000001 /* SortVoiceCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortVoiceCopy.swift; sourceTree = "<group>"; };
+		ARCHXTR100001FR000001 /* ArchiveExtractionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExtractionService.swift; sourceTree = "<group>"; };
+		DMGXTR100001FR000001 /* DMGInstallerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMGInstallerService.swift; sourceTree = "<group>"; };
 		RVTRI10001FR000001 /* ReviewFolderTriageSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewFolderTriageSheet.swift; sourceTree = "<group>"; };
 		SPSH0010000000000000001 /* SortPreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortPreviewSheet.swift; sourceTree = "<group>"; };
 		E71A34AFC5CA41FDACAEE19D /* Preview Content/Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Content/Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -152,6 +157,7 @@
 		XTREF00000000000000002 /* DownloadSortClassificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadSortClassificationTests.swift; sourceTree = "<group>"; };
 		WFTSTREF000000000000001 /* WhereFromsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhereFromsTests.swift; sourceTree = "<group>"; };
 		FTTST100001FR000001 /* FinderTagCompositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderTagCompositionTests.swift; sourceTree = "<group>"; };
+		ATOBKF00000000000000001 /* AutomationsOverhaulTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationsOverhaulTests.swift; sourceTree = "<group>"; };
 		SPTKR100001FR000001 /* SortProgressTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortProgressTracker.swift; sourceTree = "<group>"; };
 		BBAR100001FR000001 /* BinkySortProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinkySortProgressBar.swift; sourceTree = "<group>"; };
 		CURS100001FR000001 /* CurrentlySortingSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentlySortingSheet.swift; sourceTree = "<group>"; };
@@ -306,6 +312,8 @@
 				SREV0010000000000000001 /* SortRulesEvaluator.swift */,
 				SRTVC10001FR000001 /* SortVoiceCopy.swift */,
 				DST10009900000000000001 /* DownloadSortServices.swift */,
+				ARCHXTR100001FR000001 /* ArchiveExtractionService.swift */,
+				DMGXTR100001FR000001 /* DMGInstallerService.swift */,
 				FTCMP100001FR000001 /* FinderTagComposition.swift */,
 				DNKBRG1000010000000001 /* DinkyBridge.swift */,
 				NTEXP102000000000000001 /* NewTagExpiry.swift */,
@@ -321,6 +329,7 @@
 				XTREF00000000000000002 /* DownloadSortClassificationTests.swift */,
 				WFTSTREF000000000000001 /* WhereFromsTests.swift */,
 				FTTST100001FR000001 /* FinderTagCompositionTests.swift */,
+				ATOBKF00000000000000001 /* AutomationsOverhaulTests.swift */,
 			);
 			path = BinkyTests;
 			sourceTree = "<group>";
@@ -460,6 +469,8 @@
 				BMBC0020000000000000001 /* BinkyMenuBarController.swift in Sources */,
 				SPTKR200001BK000002 /* SortProgressTracker.swift in Sources */,
 				DST00009900000000000001 /* DownloadSortServices.swift in Sources */,
+				ARCHXTR200001BK000001 /* ArchiveExtractionService.swift in Sources */,
+				DMGXTR200001BK000001 /* DMGInstallerService.swift in Sources */,
 				FTCMP200001BK000001 /* FinderTagComposition.swift in Sources */,
 				DNKBLD1000010000000001 /* DinkyBridge.swift in Sources */,
 				SREM0020000000000000001 /* SortRoutingModels.swift in Sources */,
@@ -492,6 +503,7 @@
 				XTBLD00000000000000002 /* DownloadSortClassificationTests.swift in Sources */,
 				WFTSTBLD000000000000001 /* WhereFromsTests.swift in Sources */,
 				FTTST200001BK000001 /* FinderTagCompositionTests.swift in Sources */,
+				ATOBKB00000000000000001 /* AutomationsOverhaulTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -657,6 +669,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Binky/Binky.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -687,6 +700,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Binky/Binky.entitlements;
 				CODE_SIGN_STYLE = Automatic;

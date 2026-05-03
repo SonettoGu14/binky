@@ -104,13 +104,22 @@ private struct LastSortSummaryCommands: View {
 private struct BinkyShortcutCommands: View {
     @ObservedObject var prefs: BinkyPreferences
 
+    private var sortNowMenuTitle: String {
+        let enabledCount = prefs.savedPresets.filter {
+            $0.isEnabled && !$0.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }.count
+        return enabledCount > 1
+            ? String(localized: "Sort All", comment: "File menu: run sort across every enabled automation.")
+            : String(localized: "Sort Now", comment: "File menu: run an immediate sort for the watched folder.")
+    }
+
     var body: some View {
         Button(String(localized: "Open Files…", comment: "File menu: open file picker.")) {
             NotificationCenter.default.post(name: .binkyOpenPanel, object: nil)
         }
         .keyboardShortcut(prefs.shortcut(for: .openFiles).swiftUIKeyboardShortcut)
 
-        Button(String(localized: "Sort Now", comment: "File menu: run an immediate sort for the watched folder.")) {
+        Button(sortNowMenuTitle) {
             NotificationCenter.default.post(name: .binkyStartSort, object: nil)
         }
         .keyboardShortcut(prefs.shortcut(for: .sortNow).swiftUIKeyboardShortcut)

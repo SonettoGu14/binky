@@ -42,12 +42,20 @@ Optional: After a sort, use **Send to Dinky** on the summary sheet (or **Watch i
 
 Dropping **folders** or **files** onto Binky's **Dock icon** follows the same rules.
 
+## Automations
+
+An **Automation** pairs a watched folder with its own set of sort rules and optional Finder tags.
+
+- Add automations in **Settings -> Sorting -> Automations**.
+- Each automation watches its own folder independently. Rules in one automation don't affect other folders.
+- With one automation, the menu bar and keyboard shortcut run **Sort Now** for that folder. With two or more, they become **Sort ▶** (a submenu): pick **Sort All Folders** to sweep every automation at once, or pick a specific automation by name to sweep just that folder.
+
 ## Menu bar mode
 
 In **Settings -> Appearance**, keep **Show menu bar icon** on for quick access even when the window is closed.
 
 - Turn on **Menu bar only (hide Dock icon)** if you want Binky to run from the menu bar.
-- The menu bar lets you run **Sort Now**, pause/resume watching, open **History**, and jump to **Settings**.
+- The menu bar lets you sort watched folders, pause/resume watching, open **History**, and jump to **Settings**.
 - Watching continues while Binky is running in menu bar mode.
 
 ## History & undo

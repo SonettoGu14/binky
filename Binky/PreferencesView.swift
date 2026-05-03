@@ -34,10 +34,9 @@ private struct PreferencesRelatedTabLink: View {
 enum PreferencesTab: Int, CaseIterable, Hashable {
     case general = 0
     case destinations = 1
-    case watch = 2
-    case profiles = 3
-    case shortcuts = 4
-    case appearance = 5
+    case automations = 2
+    case shortcuts = 3
+    case appearance = 4
 
     static let pendingTabUserDefaultsKey = "prefs.pendingTab"
 
@@ -52,7 +51,23 @@ enum PreferencesTab: Int, CaseIterable, Hashable {
         guard UserDefaults.standard.object(forKey: pendingTabUserDefaultsKey) != nil else { return nil }
         let raw = UserDefaults.standard.integer(forKey: pendingTabUserDefaultsKey)
         UserDefaults.standard.removeObject(forKey: pendingTabUserDefaultsKey)
-        return PreferencesTab(rawValue: raw)
+        switch raw {
+        case 2, 3:
+            // Legacy: "Watch" (2) and "Profiles" (3) both land on Automations.
+            return .automations
+        case 4:
+            return .shortcuts
+        case 5:
+            return .appearance
+        default:
+            return PreferencesTab(rawValue: raw)
+        }
+    }
+
+    /// Onboarding: open Automations and auto-create the Calm Desktop template once the tab appears.
+    static func stageAutomationsWithCalmDesktopTemplate() {
+        UserDefaults.standard.set(AutomationTemplate.calmDesktop.rawValue, forKey: AutomationTemplate.pendingUserDefaultsKey)
+        stagePendingTab(.automations)
     }
 }
 
@@ -70,13 +85,9 @@ struct PreferencesView: View {
                 .tabItem { Label(String(localized: "Sorting", comment: "Settings tab: sort sorted folders and routing rules."), systemImage: "line.3.horizontal.decrease") }
                 .tag(PreferencesTab.destinations)
                 .environmentObject(prefs)
-            WatchFoldersTab()
-                .tabItem { Label(String(localized: "Watch Folder", comment: "Settings UI."), systemImage: "eye") }
-                .tag(PreferencesTab.watch)
-                .environmentObject(prefs)
-            ProfilesOrganizerTab()
-                .tabItem { Label(String(localized: "Profiles", comment: "Settings UI."), systemImage: "person.crop.circle") }
-                .tag(PreferencesTab.profiles)
+            AutomationsOrganizerTab()
+                .tabItem { Label(String(localized: "Automations", comment: "Settings UI: automations tab."), systemImage: "gearshape.2") }
+                .tag(PreferencesTab.automations)
                 .environmentObject(prefs)
             ShortcutsTab()
                 .tabItem { Label(String(localized: "Shortcuts", comment: "Settings UI."), systemImage: "keyboard") }
@@ -87,6 +98,7 @@ struct PreferencesView: View {
                 .tag(PreferencesTab.appearance)
                 .environmentObject(prefs)
         }
+        .tint(binkyTintColor)
         .environment(\.openPreferencesRelatedTab, { selectedTab = $0 })
         .frame(width: 540, height: 720)
         .onAppear {
@@ -170,7 +182,7 @@ private struct GeneralTab: View {
                     } label: {
                         Text(String(localized: "Default tags by type", comment: "Settings: Finder tag defaults per sort category."))
                     }
-                    Text(String(localized: "Leave blank to use Binky’s built-in hint for each type. Profile settings can override these per organizer.", comment: "Settings: Finder tag defaults footer."))
+                    Text(String(localized: "Leave blank to use Binky’s built-in hint for each type. Automation settings can override these per workflow.", comment: "Settings: Finder tag defaults footer."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -388,7 +400,7 @@ private struct AppearanceTab: View {
                 .pickerStyle(.radioGroup)
 
                 if !prefs.sidebarSimpleMode {
-                    Text(String(localized: "Expanded keeps profile selection, watch-folder controls, and quick settings visible at once.", comment: "Settings UI: organizer expanded sidebar summary."))
+                    Text(String(localized: "Expanded keeps automation selection, folder controls, and quick settings visible at once.", comment: "Settings UI: organizer expanded sidebar summary."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -401,7 +413,7 @@ private struct AppearanceTab: View {
             } header: {
                 Text(String(localized: "Layout", comment: "Settings UI."))
             } footer: {
-                PreferencesRelatedTabLink(title: String(localized: "Open Profiles…", comment: "Settings UI."), tab: .profiles)
+                PreferencesRelatedTabLink(title: String(localized: "Open Automations…", comment: "Settings UI."), tab: .automations)
             }
 
             Section {
@@ -461,7 +473,7 @@ private struct AppearanceTab: View {
     }
 }
 
-// MARK: - Destinations (inbox layout)
+// MARK: - Destinations (default folder layout)
 
 private struct DestinationsTab: View {
     @EnvironmentObject var prefs: BinkyPreferences
@@ -480,8 +492,61 @@ private struct DestinationsTab: View {
         )
     }
 
+    private var globalSkipTagsCSVBinding: Binding<String> {
+        Binding(
+            get: { prefs.globalSkipTags.joined(separator: ", ") },
+            set: { raw in
+                let parts = raw
+                    .split(separator: ",")
+                    .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+                prefs.globalSkipTags = parts
+            }
+        )
+    }
+
+    private func pickGlobalDefaultFolder() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.prompt = String(localized: "Choose folder", comment: "Open panel: choose global default folder.")
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        prefs.watchedFolderPath = url.path
+        if let bookmark = try? url.bookmarkData(options: .withSecurityScope) {
+            prefs.watchedFolderBookmark = bookmark
+        }
+    }
+
     var body: some View {
         Form {
+
+            Section {
+                Toggle(String(localized: "Watch for new files", comment: "Global folder watch."), isOn: Binding(
+                    get: { prefs.folderWatchEnabled },
+                    set: { prefs.folderWatchEnabled = $0 }
+                ))
+                if prefs.folderWatchEnabled {
+                    HStack {
+                        Text(prefs.watchedFolderPath.isEmpty
+                             ? String(localized: "Downloads (default)", comment: "Settings UI: default folder label.")
+                             : URL(fileURLWithPath: prefs.watchedFolderPath).lastPathComponent)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        Spacer()
+                        Button(String(localized: "Choose…", comment: "Settings UI.")) { pickGlobalDefaultFolder() }
+                            .buttonStyle(.bordered)
+                    }
+                }
+                Toggle(String(localized: "Also watch inside immediate subfolders (one level)", comment: "Settings: shallow recursive watch."), isOn: $prefs.watchRecursiveOneLevel)
+            } header: {
+                Text(String(localized: "Default folder", comment: "Sorting tab: default folder section header."))
+            } footer: {
+                Text(String(localized: "The fallback folder when no automation's path matches. Add automations for Desktop, Dropbox, or anything else fussy.", comment: "Sorting tab: global default folder footer."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
 
             Section {
                 Toggle(String(localized: "Smart screenshot names (OCR)", comment: "Settings."), isOn: $prefs.sortSmartScreenshotNamesEnabled)
@@ -492,6 +557,16 @@ private struct DestinationsTab: View {
                     .fixedSize(horizontal: false, vertical: true)
             } header: {
                 Text(String(localized: "Smart sorting", comment: "Settings section."))
+            }
+
+            Section {
+                Toggle(String(localized: "Slow mode", comment: "Sorting tab: deliberate per-file pacing."), isOn: $prefs.sortSlowModeEnabled)
+                Text(String(localized: "Sort one file at a time, with a small pause between each, so you can actually watch where things land. Calmer than fast.", comment: "Slow mode footer; brand voice."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } header: {
+                Text(String(localized: "Pace", comment: "Settings section: sort speed."))
             }
 
             Section {
@@ -531,7 +606,7 @@ private struct DestinationsTab: View {
             }
 
             Section {
-                Toggle(String(localized: "Re-sort watched inboxes when rules change", comment: "Settings: auto sweep after saving routing rules."), isOn: $prefs.sortAutoRunWhenRulesChange)
+                Toggle(String(localized: "Re-sort watched folders when rules change", comment: "Settings: auto sweep after saving routing rules."), isOn: $prefs.sortAutoRunWhenRulesChange)
                 Text(String(localized: "Quiet pass across every watch root — useful when you tighten a rule and want what’s already there to move.", comment: "Auto re-sort footer."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -552,6 +627,19 @@ private struct DestinationsTab: View {
                 TextEditor(text: excludeFragmentsBinding)
                     .frame(minHeight: 72)
                     .font(.system(.body, design: .monospaced))
+                Divider()
+                LabeledContent(String(localized: "Leave files tagged:", comment: "Skip tags row label in Never sort section.")) {
+                    TextField(
+                        String(localized: "DoNotMove, Keep…", comment: "Skip tags placeholder."),
+                        text: globalSkipTagsCSVBinding
+                    )
+                    .textFieldStyle(.roundedBorder)
+                    .frame(maxWidth: 200)
+                }
+                Text(String(localized: "Binky won't touch any file carrying one of these Finder tags — handy for shortcuts or files you've parked on purpose.", comment: "Skip tags footer."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             } header: {
                 Text(String(localized: "Never sort", comment: "Output settings."))
             }
@@ -580,7 +668,7 @@ private struct DestinationsTab: View {
     }
 }
 
-// MARK: - Inbox aging rules
+// MARK: - Folder aging rules
 
 private struct FileAgingPreviewSheet: View {
     @EnvironmentObject private var prefs: BinkyPreferences
@@ -736,16 +824,31 @@ private struct FileAgingRulesList: View {
 // MARK: - Routing rules (list + sheet editor)
 
 struct RuleEditorSheetState: Identifiable {
-    var draft: InboxSortRule
+    var draft: SortRule
     let isNew: Bool
     let showDescribeSection: Bool
     var id: UUID { draft.id }
 }
 
-private func ruleSummaryLine(_ rule: InboxSortRule) -> String {
+private func ruleSummaryLine(_ rule: SortRule) -> String {
     var parts: [String] = []
     if !rule.matchExtensions.isEmpty {
         parts.append(rule.matchExtensions.joined(separator: ", "))
+    }
+    if !rule.matchTags.isEmpty {
+        let shown = rule.matchTags.joined(separator: ", ")
+        parts.append(String.localizedStringWithFormat(
+            String(localized: "Finder tag: %@", comment: "Rule summary: tag predicate."),
+            shown
+        ))
+    }
+    if let outRaw = rule.outputExtension?.trimmingCharacters(in: .whitespacesAndNewlines),
+       !outRaw.replacingOccurrences(of: ".", with: "").isEmpty {
+        let ext = outRaw.replacingOccurrences(of: ".", with: "")
+        parts.append(String.localizedStringWithFormat(
+            String(localized: "extension → .%@", comment: "Rule summary: output extension."),
+            ext
+        ))
     }
     if !rule.nameContains.isEmpty {
         parts.append(
@@ -799,7 +902,7 @@ private func ruleSummaryLine(_ rule: InboxSortRule) -> String {
 
 private struct SortRulesListEditor: View {
     @EnvironmentObject private var prefs: BinkyPreferences
-    @Binding var rules: [InboxSortRule]
+    @Binding var rules: [SortRule]
     var enableGlobalCustomRulesOnAdd: Bool = false
     @State private var editorSheet: RuleEditorSheetState?
 
@@ -824,7 +927,7 @@ private struct SortRulesListEditor: View {
                 Button(String(localized: "Describe a rule…", comment: "Routing rules: add via natural language.")) {
                     let next = rules.count + 1
                     editorSheet = RuleEditorSheetState(
-                        draft: InboxSortRule.fresh(order: next),
+                        draft: SortRule.fresh(order: next),
                         isNew: true,
                         showDescribeSection: true
                     )
@@ -833,7 +936,7 @@ private struct SortRulesListEditor: View {
                 Button(String(localized: "Add manually", comment: "Routing rules: add blank rule.")) {
                     let next = rules.count + 1
                     editorSheet = RuleEditorSheetState(
-                        draft: InboxSortRule.fresh(order: next),
+                        draft: SortRule.fresh(order: next),
                         isNew: true,
                         showDescribeSection: false
                     )
@@ -877,7 +980,7 @@ private struct SortRulesListEditor: View {
     }
 
     @ViewBuilder
-    private func ruleRow(rule: InboxSortRule) -> some View {
+    private func ruleRow(rule: SortRule) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Toggle(
                 String(),
@@ -917,18 +1020,18 @@ private struct SortRulesListEditor: View {
 
 struct RuleEditorSheet: View {
     @EnvironmentObject private var prefs: BinkyPreferences
-    @State private var draft: InboxSortRule
+    @State private var draft: SortRule
     private let showDescribeSection: Bool
     private let isNew: Bool
     private let onCancel: () -> Void
-    private let onSave: (InboxSortRule) -> Void
+    private let onSave: (SortRule) -> Void
 
     @State private var nlPhrase: String = ""
     @State private var nlWorking: Bool = false
-    @State private var nlParsedDraft: InboxSortRule?
+    @State private var nlParsedDraft: SortRule?
     @FocusState private var nlFieldFocused: Bool
 
-    init(state: RuleEditorSheetState, onCancel: @escaping () -> Void, onSave: @escaping (InboxSortRule) -> Void) {
+    init(state: RuleEditorSheetState, onCancel: @escaping () -> Void, onSave: @escaping (SortRule) -> Void) {
         _draft = State(initialValue: state.draft)
         showDescribeSection = state.showDescribeSection
         isNew = state.isNew
@@ -950,6 +1053,35 @@ struct RuleEditorSheet: View {
                         .replacingOccurrences(of: ".", with: "")
                 }.filter { !$0.isEmpty }
                 c.matchExtensions = parts
+                draft = c
+            }
+        )
+    }
+
+    private var matchTagsBinding: Binding<String> {
+        Binding(
+            get: { draft.matchTags.joined(separator: ", ") },
+            set: { newVal in
+                var c = draft
+                let parts = newVal.split(separator: ",").map { chunk in
+                    String(chunk).trimmingCharacters(in: .whitespacesAndNewlines)
+                }.filter { !$0.isEmpty }
+                c.matchTags = parts
+                draft = c
+            }
+        )
+    }
+
+    private var outputExtensionBinding: Binding<String> {
+        Binding(
+            get: {
+                draft.outputExtension?.trimmingCharacters(in: .whitespacesAndNewlines)
+                    .replacingOccurrences(of: ".", with: "") ?? ""
+            },
+            set: { raw in
+                var c = draft
+                let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ".", with: "")
+                c.outputExtension = trimmed.isEmpty ? nil : trimmed
                 draft = c
             }
         )
@@ -1008,7 +1140,7 @@ struct RuleEditorSheet: View {
         )
     }
 
-    private func binding<T>(_ keyPath: WritableKeyPath<InboxSortRule, T>) -> Binding<T> {
+    private func binding<T>(_ keyPath: WritableKeyPath<SortRule, T>) -> Binding<T> {
         Binding(
             get: { draft[keyPath: keyPath] },
             set: { newVal in
@@ -1180,6 +1312,8 @@ struct RuleEditorSheet: View {
                             Text(String.localizedStringWithFormat(String(localized: "Days: %lld", comment: "Rule editor."), Int64(dateDaysBinding.wrappedValue)))
                         }
                     }
+                    TextField(String(localized: "Has Finder tag (comma-separated, any match)", comment: "Rule editor: tag predicate."), text: matchTagsBinding)
+                        .textFieldStyle(.roundedBorder)
                 } header: {
                     Text(String(localized: "When this matches", comment: "Rule editor sheet section."))
                 }
@@ -1190,11 +1324,11 @@ struct RuleEditorSheet: View {
                             Text(action.localizedTitle).tag(action)
                         }
                     }
-                    .accessibilityHint(String(localized: "Move, trash, rename in place, or zip into the destination folder.", comment: "VoiceOver: rule action picker."))
+                    .accessibilityHint(String(localized: "Move, extract, install a disk image, fan out by tag, zip, trash, or rename in place.", comment: "VoiceOver: rule action picker."))
                 } header: {
                     Text(String(localized: "Then", comment: "Rule editor section title."))
                 } footer: {
-                    Text(String(localized: "Runs before automatic sorted folders. Trash skips the destination path.", comment: "Rule action footer."))
+                    Text(String(localized: "Runs before automatic sorted folders. Trash and some actions ignore the destination path.", comment: "Rule action footer."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -1227,10 +1361,12 @@ struct RuleEditorSheet: View {
                     if draft.renameStyle == .template {
                         TextField("{date} {stem}{ext}", text: binding(\.renameTemplate))
                             .textFieldStyle(.roundedBorder)
-                        Text(String(localized: "Tokens: {date}, {stem}, {ext}, {n}, {origin}, {ocr}, {vendor}, {amount}", comment: "Rule editor rename hint."))
+                        Text(String(localized: "Tokens: {date}, {stem}, {ext}, {newExt}, {n}, {origin}, {ocr}, {vendor}, {amount}", comment: "Rule editor rename hint."))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
+                    TextField(String(localized: "Force extension (e.g. md, leave empty to keep)", comment: "Rule editor: output file extension."), text: outputExtensionBinding)
+                        .textFieldStyle(.roundedBorder)
                 } header: {
                     Text(String(localized: "Then rename", comment: "Rule editor sheet section."))
                 }
@@ -1245,7 +1381,7 @@ struct RuleEditorSheet: View {
                     if draft.finderTagPolicy == .replaceCategoryDefault {
                         TextField(String(localized: "Replacement tags (comma-separated)", comment: "Rule editor: tags that replace category defaults."), text: categoryDefaultReplacementTagsBinding)
                             .textFieldStyle(.roundedBorder)
-                        Text(String(localized: "Replaces only the type-based tags. Profile tags and “Tags on match” still apply after.", comment: "Rule editor: replace tags hint."))
+                        Text(String(localized: "Replaces only the type-based tags. Automation tags and “Tags on match” still apply after.", comment: "Rule editor: replace tags hint."))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -1288,7 +1424,7 @@ struct RuleEditorSheet: View {
         }
     }
 
-    private func applyNLProposed(_ proposed: InboxSortRule) {
+    private func applyNLProposed(_ proposed: SortRule) {
         var merged = proposed
         merged.id = draft.id
         draft = merged
@@ -1296,7 +1432,7 @@ struct RuleEditorSheet: View {
         nlPhrase = ""
     }
 
-    private static func nlPreviewDetailLines(_ rule: InboxSortRule) -> String {
+    private static func nlPreviewDetailLines(_ rule: SortRule) -> String {
         var lines: [String] = []
         lines.append(String.localizedStringWithFormat(String(localized: "Name: %@", comment: "NL preview field."), rule.name))
         if rule.originDomains.isEmpty {
@@ -1324,12 +1460,70 @@ struct RuleEditorSheet: View {
             String(localized: "Content: %@", comment: "NL preview field."),
             rule.contentMatch.kind.localizedTitle
         ))
+        if !rule.matchTags.isEmpty {
+            lines.append(String.localizedStringWithFormat(
+                String(localized: "Finder tags: %@", comment: "NL preview field."),
+                rule.matchTags.joined(separator: ", ")
+            ))
+        }
+        if let ext = rule.outputExtension?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !ext.replacingOccurrences(of: ".", with: "").isEmpty {
+            lines.append(String.localizedStringWithFormat(
+                String(localized: "Output extension: .%@", comment: "NL preview field."),
+                ext.replacingOccurrences(of: ".", with: "")
+            ))
+        }
         return lines.joined(separator: "\n")
     }
 }
-// MARK: - Profiles (organizer)
+// MARK: - Automations (organizer)
 
-private struct ProfilesOrganizerTab: View {
+private enum AutomationTemplate: String, CaseIterable, Hashable {
+    case blank
+    case sortDownloads
+    case calmDesktop
+    case autoInstallDMG
+    case autoExtractArchives
+    case sortByFinderTag
+    case archiveScreenshots
+    case emailToObsidian
+
+    fileprivate static let pendingUserDefaultsKey = "binky.pendingAutomationTemplate"
+
+    /// Staged before ``SettingsLink`` so ``AutomationsOrganizerTab`` can create on appear.
+    fileprivate static func stagePending(_ template: AutomationTemplate) {
+        UserDefaults.standard.set(template.rawValue, forKey: pendingUserDefaultsKey)
+    }
+
+    fileprivate static func consumePending() -> AutomationTemplate? {
+        guard let raw = UserDefaults.standard.string(forKey: pendingUserDefaultsKey) else { return nil }
+        UserDefaults.standard.removeObject(forKey: pendingUserDefaultsKey)
+        return AutomationTemplate(rawValue: raw)
+    }
+
+    fileprivate var suggestedAutomationName: String {
+        switch self {
+        case .blank:
+            return String(localized: "New automation", comment: "Default name for blank automation.")
+        case .sortDownloads:
+            return String(localized: "Sort my Downloads", comment: "Automation template name.")
+        case .calmDesktop:
+            return String(localized: "Calm my Desktop", comment: "Automation template name.")
+        case .autoInstallDMG:
+            return String(localized: "Auto-install DMGs", comment: "Automation template name.")
+        case .autoExtractArchives:
+            return String(localized: "Auto-extract archives", comment: "Automation template name.")
+        case .sortByFinderTag:
+            return String(localized: "Sort by Finder tag", comment: "Automation template name.")
+        case .archiveScreenshots:
+            return String(localized: "Archive old screenshots", comment: "Automation template name.")
+        case .emailToObsidian:
+            return String(localized: "Notes to Obsidian", comment: "Automation template name.")
+        }
+    }
+}
+
+private struct AutomationsOrganizerTab: View {
     @EnvironmentObject var prefs: BinkyPreferences
     @State private var selectedPresetID: UUID?
     @State private var newCustomTagDraft: String = ""
@@ -1348,19 +1542,19 @@ private struct ProfilesOrganizerTab: View {
 
     var body: some View {
         Form {
-            Section(String(localized: "Profiles", comment: "Settings Profiles list header.")) {
+            Section(String(localized: "Automations", comment: "Automations list header.")) {
                 ForEach(Array(prefs.savedPresets.enumerated()), id: \.element.id) { _, preset in
                     profileListRow(preset)
                 }
 
                 Button {
-                    createNewProfile()
+                    createNewAutomation(.blank)
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus")
                             .frame(width: 16, alignment: .center)
                             .foregroundStyle(.secondary)
-                        Text(String(localized: "Add", comment: "Profiles list: add a new profile row."))
+                        Text(String(localized: "Add automation", comment: "Automations list: add row."))
                             .foregroundStyle(.primary)
                         Spacer(minLength: 0)
                     }
@@ -1373,14 +1567,47 @@ private struct ProfilesOrganizerTab: View {
                 HStack(spacing: 18) {
                     profileToolbarButton(
                         systemImage: "plus",
-                        title: String(localized: "Add", comment: "Profiles toolbar: create profile.")
+                        title: String(localized: "Add", comment: "Added automation toolbar: create.")
                     ) {
-                        createNewProfile()
+                        createNewAutomation(.blank)
                     }
+
+                    Menu {
+                        Button(String(localized: "Blank automation", comment: "Automation template.")) {
+                            createNewAutomation(.blank)
+                        }
+                        Button(String(localized: "Sort my Downloads", comment: "Automation template.")) {
+                            createNewAutomation(.sortDownloads)
+                        }
+                        Button(String(localized: "Calm my Desktop", comment: "Automation template.")) {
+                            createNewAutomation(.calmDesktop)
+                        }
+                        Button(String(localized: "Auto-install DMGs", comment: "Automation template.")) {
+                            createNewAutomation(.autoInstallDMG)
+                        }
+                        Button(String(localized: "Auto-extract archives", comment: "Automation template.")) {
+                            createNewAutomation(.autoExtractArchives)
+                        }
+                        Button(String(localized: "Sort by Finder tag", comment: "Automation template.")) {
+                            createNewAutomation(.sortByFinderTag)
+                        }
+                        Button(String(localized: "Archive old screenshots", comment: "Automation template.")) {
+                            createNewAutomation(.archiveScreenshots)
+                        }
+                        Button(String(localized: "Notes to Obsidian", comment: "Automation template; txt → md style routing.")) {
+                            createNewAutomation(.emailToObsidian)
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "wand.and.stars")
+                            Text(String(localized: "Templates", comment: "Automation templates menu."))
+                        }
+                    }
+                    .menuStyle(.borderlessButton)
 
                     profileToolbarButton(
                         systemImage: "doc.on.doc",
-                        title: String(localized: "Duplicate", comment: "Profiles toolbar: duplicate selected profile.")
+                        title: String(localized: "Duplicate", comment: "Automations toolbar: duplicate.")
                     ) {
                         duplicateSelectedProfile()
                     }
@@ -1388,7 +1615,7 @@ private struct ProfilesOrganizerTab: View {
 
                     profileToolbarButton(
                         systemImage: "trash",
-                        title: String(localized: "Delete", comment: "Profiles toolbar: delete selected profile.")
+                        title: String(localized: "Delete", comment: "Automations toolbar: delete.")
                     ) {
                         confirmDeleteProfile = true
                     }
@@ -1399,63 +1626,76 @@ private struct ProfilesOrganizerTab: View {
             }
 
             if let idx = selectedPresetIndex {
-                Section(String(localized: "Name", comment: "Profile editor section.")) {
+                Section(String(localized: "Name", comment: "Automation editor section.")) {
                     TextField(
-                        String(localized: "Profile name", comment: "Profile editor: name field placeholder."),
+                        String(localized: "Automation name", comment: "Automation editor: name field."),
                         text: profileNameBinding(presetIndex: idx)
                     )
                     .textFieldStyle(.roundedBorder)
                 }
 
-                Section(String(localized: "Watch folder", comment: "Profile editor section: watch folder.")) {
-                    Toggle(
-                        String(localized: "Use a per-profile watch folder", comment: "Profile editor: enable per-profile watch folder."),
-                        isOn: watchEnabledBinding(presetIndex: idx)
-                    )
-                    if prefs.savedPresets[idx].watchFolderEnabled {
-                        Picker(
-                            String(localized: "Folder source", comment: "Profile editor: per-profile vs global watch folder source."),
-                            selection: watchModeBinding(presetIndex: idx)
-                        ) {
-                            Text(String(localized: "Use global watch folder", comment: "Profile editor: global watch source.")).tag("global")
-                            Text(String(localized: "Use a unique folder", comment: "Profile editor: unique watch source.")).tag("unique")
-                        }
-                        .pickerStyle(.radioGroup)
-
-                        if prefs.savedPresets[idx].watchFolderModeRaw == "unique" {
-                            HStack {
-                                Text(prefs.savedPresets[idx].watchFolderPath.isEmpty
-                                     ? String(localized: "No folder selected", comment: "Profile editor: no per-profile watch folder.")
-                                     : URL(fileURLWithPath: prefs.savedPresets[idx].watchFolderPath).lastPathComponent)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                                    .truncationMode(.middle)
-                                Spacer()
-                                Button(String(localized: "Choose…", comment: "Profile editor: pick per-profile watch folder.")) {
-                                    pickWatchFolder(presetIndex: idx)
-                                }
-                                .buttonStyle(.bordered)
-                            }
-                        }
-                    } else {
-                        Text(String(localized: "This profile uses the global watch folder settings.", comment: "Profile editor: watch off helper."))
-                            .font(.caption)
+                Section(String(localized: "When", comment: "Automation source folder section.")) {
+                    Toggle(String(localized: "Enable this automation", comment: "Automation on."), isOn: isEnabledBinding(presetIndex: idx))
+                    HStack {
+                        Text(prefs.savedPresets[idx].watchFolderPath.isEmpty
+                             ? String(localized: "No folder selected", comment: "Automation: watch path empty.")
+                             : URL(fileURLWithPath: prefs.savedPresets[idx].watchFolderPath).lastPathComponent)
                             .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        Spacer()
+                        Button(String(localized: "Choose…", comment: "Pick automation source folder.")) {
+                            pickWatchFolder(presetIndex: idx)
+                        }
+                        .buttonStyle(.bordered)
                     }
+                    Text(String(localized: "Binky watches here and runs the rules below. Different folder than the default? That’s the point.", comment: "Automation watch hint; brand voice."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
-                Section(String(localized: "Default tags by type", comment: "Profile editor: per-category Finder tag overrides.")) {
-                    Text(String(localized: "Overrides global defaults for files sorted under this profile. Leave blank to inherit.", comment: "Profile editor: per-type tag hint."))
+                Section(String(localized: "Install from disk images", comment: "DMG install target section.")) {
+                    HStack {
+                        Text(applicationsInstallSummary(presetIndex: idx))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        Spacer()
+                        Button(String(localized: "Choose…", comment: "Pick Applications folder for DMG installs.")) {
+                            pickApplicationsInstallFolder(presetIndex: idx)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    Text(String(localized: "Rules that “Install app from disk image” copy .app bundles here. Leave default for ~/Applications.", comment: "DMG install hint."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Section(String(localized: "Tag fan-out priority", comment: "Tag priority for fan-out rules.")) {
+                    TextField(
+                        String(localized: "Comma-separated tag names (first match wins)", comment: "Tag priority placeholder."),
+                        text: tagFanoutPriorityCSVBinding(presetIndex: idx)
+                    )
+                    .textFieldStyle(.roundedBorder)
+                    Text(String(localized: "Used when a rule sends files into subfolders by Finder tag.", comment: "Tag priority footer."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Section(String(localized: "Default tags by type", comment: "Automation editor: per-category Finder tag overrides.")) {
+                    Text(String(localized: "Overrides global defaults for files sorted under this automation. Leave blank to inherit.", comment: "Per-type tag hint."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                     FinderTagDefaultsByCategoryMapEditor(map: finderTagDefaultsBinding(presetIndex: idx))
                 }
 
-                Section(String(localized: "Custom tags", comment: "Profile editor section: custom Finder tags.")) {
+                Section(String(localized: "Custom tags", comment: "Automation editor section: custom Finder tags.")) {
                     if prefs.savedPresets[idx].customFinderTags.isEmpty {
-                        Text(String(localized: "No custom tags. Sorted files only get Binky's category tags.", comment: "Profile editor: no custom tags."))
+                        Text(String(localized: "No custom tags. Sorted files only get Binky's category tags.", comment: "Automation editor: no custom tags."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -1464,7 +1704,7 @@ private struct ProfilesOrganizerTab: View {
                         HStack {
                             Text(tag)
                             Spacer()
-                            Button(String(localized: "Remove", comment: "Profile editor: remove custom Finder tag.")) {
+                            Button(String(localized: "Remove", comment: "Automation editor: remove custom Finder tag.")) {
                                 removeCustomTag(tag, presetIndex: idx)
                             }
                             .buttonStyle(.borderless)
@@ -1472,20 +1712,20 @@ private struct ProfilesOrganizerTab: View {
                     }
                     HStack(alignment: .firstTextBaseline) {
                         TextField(
-                            String(localized: "Tag name", comment: "Profile editor: add custom Finder tag placeholder."),
+                            String(localized: "Tag name", comment: "Automation editor: add custom Finder tag placeholder."),
                             text: $newCustomTagDraft
                         )
                         .textFieldStyle(.roundedBorder)
-                        Button(String(localized: "Add", comment: "Profile editor: add custom Finder tag.")) {
+                        Button(String(localized: "Add", comment: "Automation editor: add custom Finder tag.")) {
                             addCustomTag(presetIndex: idx)
                         }
                         .buttonStyle(.bordered)
                     }
                 }
 
-                Section(String(localized: "\u{201C}New\u{201D} tag expiry", comment: "Profile editor section: New tag expiry.")) {
+                Section(String(localized: "\u{201C}New\u{201D} tag expiry", comment: "Automation editor section: New tag expiry.")) {
                     Picker(
-                        String(localized: "Expires after", comment: "Profile editor: New tag expiry picker."),
+                        String(localized: "Expires after", comment: "Automation editor: New tag expiry picker."),
                         selection: newTagExpiryBinding(presetIndex: idx)
                     ) {
                         ForEach(Self.newTagExpiryChoices, id: \.self) { days in
@@ -1495,28 +1735,28 @@ private struct ProfilesOrganizerTab: View {
                     .pickerStyle(.menu)
                 }
 
-                Section(String(localized: "Sort rules", comment: "Profile editor section: sort rules.")) {
-                    if prefs.savedPresets[idx].inboxSortRules.isEmpty {
-                        Text(String(localized: "No rules. Binky uses default sorted folders.", comment: "Profile editor: empty rules."))
+                Section(String(localized: "Sort rules", comment: "Automation editor section: sort rules.")) {
+                    if prefs.savedPresets[idx].sortRules.isEmpty {
+                        Text(String(localized: "No rules. Binky uses default sorted folders.", comment: "Automation editor: empty rules."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    Text(String(localized: "When this profile has rules, they replace global custom routing for files from its watch folder.", comment: "Profile editor: rules hint."))
+                    Text(String(localized: "When this automation has rules, they apply to files from its source folder (combined with other automations on the same path in list order).", comment: "Automation editor: rules hint."))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
-                    SortRulesListEditor(rules: inboxSortRulesBinding(presetIndex: idx))
+                    SortRulesListEditor(rules: sortRulesBinding(presetIndex: idx))
                         .frame(minHeight: 200)
                 }
 
-                Section(String(localized: "After sorting", comment: "Profile editor section: post-sort shortcut.")) {
+                Section(String(localized: "After sorting", comment: "Automation editor section: post-sort shortcut.")) {
                     TextField(
-                        String(localized: "Shortcut name (e.g. \u{201C}Notify Slack\u{201D})", comment: "Profile editor: post-sort shortcut."),
+                        String(localized: "Shortcut name (e.g. \u{201C}Notify Slack\u{201D})", comment: "Automation editor: post-sort shortcut."),
                         text: postSortShortcutBinding(presetIndex: idx)
                     )
                     .textFieldStyle(.roundedBorder)
-                    Text(String(localized: "Runs this Shortcut with the moved file as input.", comment: "Profile editor: shortcut hint."))
+                    Text(String(localized: "Runs this Shortcut with the moved file as input.", comment: "Automation editor: shortcut hint."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1526,6 +1766,9 @@ private struct ProfilesOrganizerTab: View {
         .formStyle(.grouped)
         .onAppear {
             syncSelectedPresetSelection()
+            if let pending = AutomationTemplate.consumePending() {
+                createNewAutomation(pending)
+            }
         }
         .onChange(of: prefs.savedPresets.map(\.id)) { _, _ in
             syncSelectedPresetSelection()
@@ -1535,19 +1778,19 @@ private struct ProfilesOrganizerTab: View {
             isPresented: $confirmDeleteProfile,
             titleVisibility: .visible
         ) {
-            Button(String(localized: "Delete", comment: "Profile editor: confirm delete."), role: .destructive) {
+            Button(String(localized: "Delete", comment: "Automation editor: confirm delete."), role: .destructive) {
                 deleteSelectedProfile()
             }
-            Button(String(localized: "Cancel", comment: "Profile editor: cancel delete."), role: .cancel) {}
+            Button(String(localized: "Cancel", comment: "Automation editor: cancel delete."), role: .cancel) {}
         }
     }
 
     private var deleteConfirmationTitle: String {
         guard let idx = selectedPresetIndex else {
-            return String(localized: "Delete profile?", comment: "Profile editor: generic delete title.")
+            return String(localized: "Delete automation?", comment: "Automation editor: generic delete title.")
         }
         return String.localizedStringWithFormat(
-            String(localized: "Delete \u{201C}%@\u{201D}?", comment: "Profile editor: delete title; argument is profile name."),
+            String(localized: "Delete \u{201C}%@\u{201D}?", comment: "Automation editor: delete title."),
             prefs.savedPresets[idx].name
         )
     }
@@ -1563,7 +1806,7 @@ private struct ProfilesOrganizerTab: View {
                     Text(preset.name)
                         .font(.body.weight(.medium))
                         .foregroundStyle(.primary)
-                    Text(profileSubtitle(preset))
+                    Text(preset.organizerListSubtitle)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
@@ -1582,7 +1825,7 @@ private struct ProfilesOrganizerTab: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(preset.name). \(profileSubtitle(preset))\(isSelected ? ", selected" : "")")
+        .accessibilityLabel("\(preset.name). \(preset.organizerListSubtitle)\(isSelected ? ", selected" : "")")
     }
 
     private func profileToolbarButton(
@@ -1601,61 +1844,6 @@ private struct ProfilesOrganizerTab: View {
         .foregroundStyle(binkyTintColor)
     }
 
-    private func profileSubtitle(_ preset: CompressionPreset) -> String {
-        var parts: [String] = []
-
-        if preset.watchFolderEnabled {
-            if preset.watchFolderModeRaw == "unique" {
-                if preset.watchFolderPath.isEmpty {
-                    parts.append(String(localized: "Unique folder (not set)", comment: "Profile subtitle: unique watch folder not chosen."))
-                } else {
-                    parts.append(URL(fileURLWithPath: preset.watchFolderPath).lastPathComponent)
-                }
-            } else {
-                parts.append(String(localized: "Global watch", comment: "Profile subtitle: uses global watch folder."))
-            }
-        } else {
-            parts.append(String(localized: "Watch off", comment: "Profile subtitle: watch disabled."))
-        }
-
-        let tagCount = preset.customFinderTags.count
-        if tagCount == 1 {
-            parts.append(String(localized: "1 tag", comment: "Profile subtitle: single custom tag."))
-        } else if tagCount > 1 {
-            parts.append(String.localizedStringWithFormat(
-                String(localized: "%lld tags", comment: "Profile subtitle: multiple custom tags."),
-                Int64(tagCount)
-            ))
-        }
-
-        let ruleCount = preset.inboxSortRules.count
-        if ruleCount == 1 {
-            parts.append(String(localized: "1 rule", comment: "Profile subtitle: single sort rule."))
-        } else if ruleCount > 1 {
-            parts.append(String.localizedStringWithFormat(
-                String(localized: "%lld rules", comment: "Profile subtitle: multiple sort rules."),
-                Int64(ruleCount)
-            ))
-        }
-
-        if preset.newTagExpiryDays > 0 {
-            parts.append(String.localizedStringWithFormat(
-                String(localized: "%lldd \u{201C}New\u{201D}", comment: "Profile subtitle: New-tag expiry in days."),
-                Int64(preset.newTagExpiryDays)
-            ))
-        }
-
-        let trimmedShortcut = preset.postSortShortcutName.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmedShortcut.isEmpty {
-            parts.append("→ \(trimmedShortcut)")
-        }
-
-        if parts.isEmpty {
-            return String(localized: "Default routing", comment: "Profile subtitle when no overrides set.")
-        }
-        return parts.joined(separator: " · ")
-    }
-
     private func syncSelectedPresetSelection() {
         guard !prefs.savedPresets.isEmpty else {
             selectedPresetID = nil
@@ -1671,17 +1859,123 @@ private struct ProfilesOrganizerTab: View {
         }
     }
 
-    private func createNewProfile() {
+    private func createNewAutomation(_ template: AutomationTemplate) {
         var copy = prefs.savedPresets
-        let preset = CompressionPreset(
-            name: uniqueProfileName(
-                baseName: String(localized: "New Profile", comment: "Default name for a newly created profile."),
-                existingNames: Set(copy.map(\.name))
-            )
+        let baseName = template.suggestedAutomationName
+        let name = uniqueAutomationName(
+            baseName: baseName,
+            existingNames: Set(copy.map(\.name))
         )
+        var preset = CompressionPreset(name: name)
+        apply(template, to: &preset)
         copy.append(preset)
         prefs.savedPresets = copy
         selectedPresetID = preset.id
+    }
+
+    /// Applies template defaults (paths, starter rules). Caller sets name and appends to `savedPresets`.
+    private func apply(_ template: AutomationTemplate, to preset: inout CompressionPreset) {
+        func bookmarkDirectory(_ url: URL) {
+            let normalized = url.standardizedFileURL
+            preset.watchFolderPath = normalized.path
+            preset.watchFolderBookmark = (try? normalized.bookmarkData(options: .withSecurityScope)) ?? Data()
+        }
+
+        switch template {
+        case .blank:
+            break
+
+        case .sortDownloads:
+            preset.isEnabled = true
+            let dl = FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Downloads", isDirectory: true)
+            bookmarkDirectory(dl)
+
+        case .calmDesktop:
+            preset.isEnabled = true
+            let desk = FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Desktop", isDirectory: true)
+            bookmarkDirectory(desk)
+            mergeGlobalSkipTag("DoNotMove")
+
+        case .autoInstallDMG:
+            preset.isEnabled = true
+            let dl = FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Downloads", isDirectory: true)
+            bookmarkDirectory(dl)
+            var rule = SortRule.fresh(order: 1)
+            rule.name = String(localized: "Install disk images", comment: "Starter rule for DMG template.")
+            rule.matchExtensions = ["dmg"]
+            rule.matchAction = .installFromDMG
+            rule.destinationRelativePath = FileSortCategory.apps.downloadsSubfolder
+            preset.sortRules = [rule]
+
+        case .autoExtractArchives:
+            preset.isEnabled = true
+            let dl = FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Downloads", isDirectory: true)
+            bookmarkDirectory(dl)
+            var rule = SortRule.fresh(order: 1)
+            rule.name = String(localized: "Unpack archives", comment: "Starter rule for extract template.")
+            rule.fileKindFilter = .archive
+            rule.matchAction = .extractAndTrash
+            rule.destinationRelativePath = FileSortCategory.archives.downloadsSubfolder
+            preset.sortRules = [rule]
+
+        case .sortByFinderTag:
+            preset.isEnabled = true
+            let dl = FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Downloads", isDirectory: true)
+            bookmarkDirectory(dl)
+            var rule = SortRule.fresh(order: 1)
+            rule.name = String(localized: "Fan out by tag", comment: "Starter rule for tag fan-out template.")
+            rule.matchAction = .tagFanout
+            rule.destinationRelativePath = "By tag"
+            preset.sortRules = [rule]
+
+        case .archiveScreenshots:
+            preset.isEnabled = true
+            let dl = FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Downloads", isDirectory: true)
+            bookmarkDirectory(dl)
+            var r1 = SortRule.fresh(order: 1)
+            r1.name = String(localized: "Old Screen Shot images", comment: "Screenshot archive rule name.")
+            r1.fileKindFilter = .image
+            r1.nameContains = "Screen Shot"
+            r1.dateAddedPredicate = SortDateAddedPredicate(kind: .olderThanDays, days: 30)
+            r1.destinationRelativePath = "Archive/Screenshots"
+            var r2 = SortRule.fresh(order: 2)
+            r2.name = String(localized: "Old Screenshot images", comment: "Screenshot archive rule name (alternate spelling).")
+            r2.fileKindFilter = .image
+            r2.nameContains = "Screenshot"
+            r2.dateAddedPredicate = SortDateAddedPredicate(kind: .olderThanDays, days: 30)
+            r2.destinationRelativePath = "Archive/Screenshots"
+            preset.sortRules = [r1, r2]
+
+        case .emailToObsidian:
+            preset.isEnabled = true
+            let dl = FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Downloads", isDirectory: true)
+            bookmarkDirectory(dl)
+            var rule = SortRule.fresh(order: 1)
+            rule.name = String(localized: "Plain text to Markdown", comment: "Starter rule for notes template.")
+            rule.matchExtensions = ["txt"]
+            rule.outputExtension = "md"
+            rule.renameStyle = .template
+            rule.renameTemplate = "{stem}{ext}"
+            rule.destinationRelativePath = "Obsidian Inbox"
+            rule.matchAction = .moveToDestination
+            preset.sortRules = [rule]
+        }
+    }
+
+    private func mergeGlobalSkipTag(_ tag: String) {
+        let t = tag.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty else { return }
+        var tags = prefs.globalSkipTags
+        guard !tags.contains(where: { $0.caseInsensitiveCompare(t) == .orderedSame }) else { return }
+        tags.append(t)
+        prefs.globalSkipTags = tags
     }
 
     private func duplicateSelectedProfile() {
@@ -1710,14 +2004,14 @@ private struct ProfilesOrganizerTab: View {
         }
     }
 
-    private func uniqueProfileName(baseName: String, existingNames: Set<String>) -> String {
+    private func uniqueAutomationName(baseName: String, existingNames: Set<String>) -> String {
         if !existingNames.contains(baseName) {
             return baseName
         }
         var index: Int64 = 2
         while true {
             let candidate = String.localizedStringWithFormat(
-                String(localized: "%1$@ %2$lld", comment: "Auto-generated profile name with numeric suffix."),
+                String(localized: "%1$@ %2$lld", comment: "Auto-generated automation name with numeric suffix."),
                 baseName,
                 index
             )
@@ -1728,12 +2022,12 @@ private struct ProfilesOrganizerTab: View {
         }
     }
 
-    private func inboxSortRulesBinding(presetIndex: Int) -> Binding<[InboxSortRule]> {
+    private func sortRulesBinding(presetIndex: Int) -> Binding<[SortRule]> {
         Binding(
-            get: { prefs.savedPresets[presetIndex].inboxSortRules },
+            get: { prefs.savedPresets[presetIndex].sortRules },
             set: { newVal in
                 var copy = prefs.savedPresets
-                copy[presetIndex].inboxSortRules = newVal
+                copy[presetIndex].sortRules = newVal
                 prefs.savedPresets = copy
             }
         )
@@ -1788,32 +2082,85 @@ private struct ProfilesOrganizerTab: View {
         )
     }
 
-    private func watchEnabledBinding(presetIndex: Int) -> Binding<Bool> {
+    private var globalSkipTagsCSVBinding: Binding<String> {
         Binding(
-            get: { prefs.savedPresets[presetIndex].watchFolderEnabled },
+            get: { prefs.globalSkipTags.joined(separator: ", ") },
+            set: { raw in
+                let parts = raw
+                    .split(separator: ",")
+                    .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+                prefs.globalSkipTags = parts
+            }
+        )
+    }
+
+    private func isEnabledBinding(presetIndex: Int) -> Binding<Bool> {
+        Binding(
+            get: { prefs.savedPresets[presetIndex].isEnabled },
             set: { newVal in
                 var copy = prefs.savedPresets
-                copy[presetIndex].watchFolderEnabled = newVal
-                if newVal && copy[presetIndex].watchFolderModeRaw.isEmpty {
-                    copy[presetIndex].watchFolderModeRaw = "global"
-                }
+                copy[presetIndex].isEnabled = newVal
                 prefs.savedPresets = copy
             }
         )
     }
 
-    private func watchModeBinding(presetIndex: Int) -> Binding<String> {
+    private func tagFanoutPriorityCSVBinding(presetIndex: Int) -> Binding<String> {
         Binding(
-            get: {
-                let raw = prefs.savedPresets[presetIndex].watchFolderModeRaw
-                return raw.isEmpty ? "global" : raw
-            },
-            set: { newVal in
+            get: { prefs.savedPresets[presetIndex].tagFanoutPriority.joined(separator: ", ") },
+            set: { raw in
+                let parts = raw
+                    .split(separator: ",")
+                    .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
                 var copy = prefs.savedPresets
-                copy[presetIndex].watchFolderModeRaw = newVal
+                copy[presetIndex].tagFanoutPriority = parts
                 prefs.savedPresets = copy
             }
         )
+    }
+
+    private func applicationsInstallSummary(presetIndex: Int) -> String {
+        let url = prefs.savedPresets[presetIndex].resolvedApplicationsInstallDirectory()
+        let path = url.path
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        let homeApps = (home as NSString).appendingPathComponent("Applications")
+        if path == homeApps {
+            return String(localized: "~/Applications (default)", comment: "DMG install target summary.")
+        }
+        if path == "/Applications" {
+            return "/Applications"
+        }
+        return url.path
+    }
+
+    private func pickGlobalDefaultFolder() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.prompt = String(localized: "Choose folder", comment: "Open panel: choose global default folder.")
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        prefs.watchedFolderPath = url.path
+        if let bookmark = try? url.bookmarkData(options: .withSecurityScope) {
+            prefs.watchedFolderBookmark = bookmark
+        }
+    }
+
+    private func pickApplicationsInstallFolder(presetIndex: Int) {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.prompt = String(localized: "Choose Applications folder", comment: "Open panel for DMG install target.")
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        var copy = prefs.savedPresets
+        copy[presetIndex].applicationsInstallPath = url.path
+        if let bookmark = try? url.bookmarkData(options: .withSecurityScope) {
+            copy[presetIndex].applicationsInstallBookmark = bookmark
+        }
+        prefs.savedPresets = copy
     }
 
     private func pickWatchFolder(presetIndex: Int) {
@@ -1821,7 +2168,7 @@ private struct ProfilesOrganizerTab: View {
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
-        panel.prompt = String(localized: "Watch", comment: "Open panel: choose folder to watch.")
+        panel.prompt = String(localized: "Choose source folder", comment: "Open panel: automation source folder.")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         var copy = prefs.savedPresets
         copy[presetIndex].watchFolderPath = url.path
@@ -1859,138 +2206,6 @@ private struct ProfilesOrganizerTab: View {
         default:
             return String.localizedStringWithFormat(String(localized: "%lld days", comment: "New tag expiry choice."), Int64(days))
         }
-    }
-}
-
-// MARK: - Watch Folders
-
-private struct WatchFoldersTab: View {
-    @EnvironmentObject var prefs: BinkyPreferences
-
-    var body: some View {
-        Form {
-            Section {
-                Toggle(String(localized: "Watch folder", comment: "Settings UI."), isOn: Binding(
-                    get: { prefs.folderWatchEnabled },
-                    set: { prefs.folderWatchEnabled = $0 }
-                ))
-                if prefs.folderWatchEnabled {
-                    HStack {
-                        Text(prefs.watchedFolderPath.isEmpty
-                             ? String(localized: "Watching Downloads (default)", comment: "Settings UI.")
-                             : URL(fileURLWithPath: prefs.watchedFolderPath).lastPathComponent)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                        Spacer()
-                        Button(String(localized: "Choose…", comment: "Settings UI.")) { pickGlobalWatchFolder() }
-                            .buttonStyle(.bordered)
-                    }
-                    Text(String(localized: "This is the folder Binky monitors for new files. Where files are moved after sorting is configured in Sorted folders.", comment: "Settings UI."))
-                    .font(.caption)
-                        .foregroundStyle(.secondary)
-
-                    PreferencesRelatedTabLink(title: String(localized: "Sidebar sections in Appearance…", comment: "Settings UI."), tab: .appearance)
-                }
-            } header: {
-                Text(String(localized: "Watch Folder", comment: "Settings UI."))
-            }
-
-            Section {
-                Toggle(String(localized: "Also watch inside immediate subfolders (one level)", comment: "Settings: shallow recursive watch."), isOn: $prefs.watchRecursiveOneLevel)
-                Text(String(localized: "Files sitting one folder down still count as inbox noise. Deeper nesting stays out of it.", comment: "Recursive watch footer; brand voice."))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            } header: {
-                Text(String(localized: "Depth", comment: "Watch settings section."))
-            }
-
-            Section {
-                if prefs.savedPresets.isEmpty {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(String(localized: "No profiles yet. Create one under Profiles to attach another watched folder.", comment: "Settings UI."))
-                    .foregroundStyle(.secondary)
-                        PreferencesRelatedTabLink(title: String(localized: "Open Profiles…", comment: "Settings UI."), tab: .profiles)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 4)
-                } else {
-                    ForEach(prefs.savedPresets) { preset in
-                        WatchFolderPresetRow(preset: preset)
-                            .environmentObject(prefs)
-                    }
-                }
-            } header: {
-                Text(String(localized: "Profiles", comment: "Settings UI."))
-            }
-        }
-        .formStyle(.grouped)
-    }
-
-    private func pickGlobalWatchFolder() {
-        let panel = NSOpenPanel()
-        panel.canChooseFiles = false
-        panel.canChooseDirectories = true
-        panel.allowsMultipleSelection = false
-        panel.prompt = String(localized: "Watch", comment: "Open panel: choose folder to watch.")
-        if panel.runModal() == .OK, let url = panel.url {
-            prefs.watchedFolderPath = url.path
-            if let bookmark = try? url.bookmarkData(options: .withSecurityScope) {
-                prefs.watchedFolderBookmark = bookmark
-            }
-        }
-    }
-}
-
-private struct WatchFolderPresetRow: View {
-    @EnvironmentObject var prefs: BinkyPreferences
-    let preset: CompressionPreset
-
-    private var live: CompressionPreset {
-        prefs.savedPresets.first(where: { $0.id == preset.id }) ?? preset
-    }
-
-    var body: some View {
-        Toggle(live.name, isOn: enabledBinding)
-        if live.watchFolderEnabled {
-            HStack {
-                Image(systemName: "folder")
-                    .imageScale(.small)
-                    .foregroundStyle(.secondary)
-                Text(resolvedFolderLabel)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-            }
-            .padding(.leading, 20)
-        }
-    }
-
-    private var resolvedFolderLabel: String {
-        if live.watchFolderModeRaw == "unique" {
-            return live.watchFolderPath.isEmpty
-                ? String(localized: "No folder set — configure in Profiles", comment: "Watch row hint.")
-                : URL(fileURLWithPath: live.watchFolderPath).lastPathComponent
-        }
-        if !prefs.watchedFolderPath.isEmpty {
-            let folder = URL(fileURLWithPath: prefs.watchedFolderPath).lastPathComponent
-            return String(localized: "Global (\(folder))", comment: "Watch row: uses global folder; argument is folder name.")
-        }
-        return String(localized: "Global (Downloads default)", comment: "Watch row hint.")
-    }
-
-    private var enabledBinding: Binding<Bool> {
-        Binding(
-            get: { live.watchFolderEnabled },
-            set: { newValue in
-                guard let idx = prefs.savedPresets.firstIndex(where: { $0.id == preset.id }) else { return }
-                var list = prefs.savedPresets
-                list[idx].watchFolderEnabled = newValue
-                prefs.savedPresets = list
-            }
-        )
     }
 }
 

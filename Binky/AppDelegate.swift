@@ -76,7 +76,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Helpers
 
     /// Accepts files and folders. Folders are expanded into their top-level files by
-    /// ``OrganizerViewModel/sortIncomingFiles(_:prefs:)`` and treated as their own ad-hoc inbox.
+    /// ``OrganizerViewModel/sortIncomingFiles(_:prefs:)`` and treated as their own ad-hoc watch root.
     private func acceptedURLs(from urls: [URL]) -> [URL] {
         urls.filter { url in
             FileManager.default.fileExists(atPath: url.path)

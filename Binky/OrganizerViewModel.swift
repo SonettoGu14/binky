@@ -4,7 +4,7 @@ import Foundation
 import SwiftUI
 import UserNotifications
 
-/// Main-window state for Downloads inbox sorting (replaces the compression queue).
+/// Main-window state for Downloads folder sorting (replaces the compression queue).
 @MainActor
 final class OrganizerViewModel: ObservableObject {
     /// Latest automated / manual sort audit sheet.
@@ -12,7 +12,7 @@ final class OrganizerViewModel: ObservableObject {
     /// For **Last Sort Summary…** menu / shortcut.
     @Published var lastSortOutcome: SortBatchOutcome?
 
-    /// One-shot status line shown in the organizer (empty inbox, duplicate sort, filtering, etc.).
+    /// One-shot status line shown in the organizer (empty folder, duplicate sort, filtering, etc.).
     @Published var transientBannerMessage: String?
 
     private var transientResetTask: Task<Void, Never>?
@@ -98,13 +98,16 @@ final class OrganizerViewModel: ObservableObject {
             return
         }
         let root = prefs.activeSortSweepRootDirectory()
-        let files = DownloadsSortOrchestrator.collectSweepFiles(
-            in: root,
-            recursiveOneLevel: prefs.watchRecursiveOneLevel
-        )
+        let recursive = prefs.watchRecursiveOneLevel
+        let files = await Task.detached(priority: .utility) {
+            DownloadsSortOrchestrator.collectSweepFiles(
+                in: root,
+                recursiveOneLevel: recursive
+            )
+        }.value
         guard !files.isEmpty else {
             flashTransientStatus(
-                String(localized: "Inbox is quiet. Nothing to sort.", comment: "Organizer transient banner when Sweep finds no files.")
+                String(localized: "Binky'd. Already handled.", comment: "Organizer transient banner when Sweep finds no files in the watched folder.")
             )
             return
         }
@@ -117,54 +120,154 @@ final class OrganizerViewModel: ObservableObject {
         deliverCompletedSort(outcome, prefs: prefs)
     }
 
+    /// Sweep a single automation’s folder. Uses `rootOverride` so per-automation rules route
+    /// the same way as multi-folder batches.
+    func runInteractiveSweep(preset: CompressionPreset, prefs: BinkyPreferences) async {
+        transientBannerMessage = nil
+        guard !DownloadsSortOrchestrator.shared.isSorting else {
+            flashTransientStatus(
+                String(localized: "Sh. Binky's already on it.", comment: "Organizer transient banner when a sort is requested while one runs.")
+            )
+            return
+        }
+        let root = URL(fileURLWithPath: preset.watchFolderPath).standardizedFileURL
+        let recursive = prefs.watchRecursiveOneLevel
+        let (files, rootOverride) = await Task.detached(priority: .utility) {
+            let collected = DownloadsSortOrchestrator.collectSweepFiles(
+                in: root,
+                recursiveOneLevel: recursive
+            )
+            var override: [URL: URL] = [:]
+            for url in collected {
+                override[url] = root
+            }
+            return (collected, override)
+        }.value
+        guard !files.isEmpty else {
+            flashTransientStatus(
+                String(localized: "Binky'd. Already handled.", comment: "Organizer transient banner when Sweep finds no files in the watched folder.")
+            )
+            return
+        }
+        let outcome = await DownloadsSortOrchestrator.shared.sort(
+            files: files,
+            prefs: prefs,
+            rootOverride: rootOverride,
+            progress: SortProgressTracker.orchestratorClosure()
+        )
+        guard outcome.hasWork else { return }
+        deliverCompletedSort(outcome, prefs: prefs)
+    }
+
+    /// Sweep every enabled automation in one pass. Each file gets a `rootOverride` to its
+    /// own automation source, so the orchestrator routes per-automation rules correctly even
+    /// though we only run the sort engine once.
+    func runInteractiveSweepAllAutomations(prefs: BinkyPreferences) async {
+        transientBannerMessage = nil
+        guard !DownloadsSortOrchestrator.shared.isSorting else {
+            flashTransientStatus(
+                String(localized: "Sh. Binky's already on it.", comment: "Organizer transient banner when a sort is requested while one runs.")
+            )
+            return
+        }
+
+        let enabled = prefs.savedPresets.filter {
+            $0.isEnabled && !$0.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        guard enabled.count > 1 else {
+            await runInteractiveDownloadsSweep(prefs: prefs)
+            return
+        }
+
+        let roots = enabled.map { URL(fileURLWithPath: $0.watchFolderPath).standardizedFileURL }
+        let recursive = prefs.watchRecursiveOneLevel
+        let (allFiles, rootOverride) = await Task.detached(priority: .utility) {
+            var collected: [URL] = []
+            var override: [URL: URL] = [:]
+            var seenPaths: Set<String> = []
+            for root in roots {
+                let files = DownloadsSortOrchestrator.collectSweepFiles(
+                    in: root,
+                    recursiveOneLevel: recursive
+                )
+                for url in files {
+                    guard seenPaths.insert(url.standardizedFileURL.path).inserted else { continue }
+                    collected.append(url)
+                    override[url] = root
+                }
+            }
+            return (collected, override)
+        }.value
+
+        guard !allFiles.isEmpty else {
+            flashTransientStatus(
+                String(localized: "All quiet. Every folder is Binky'd.", comment: "Organizer transient banner when Sweep All finds no files across all automations.")
+            )
+            return
+        }
+
+        let outcome = await DownloadsSortOrchestrator.shared.sort(
+            files: allFiles,
+            prefs: prefs,
+            rootOverride: rootOverride,
+            progress: SortProgressTracker.orchestratorClosure()
+        )
+        guard outcome.hasWork else { return }
+        deliverCompletedSort(outcome, prefs: prefs)
+    }
+
     /// Sort explicit files (drop, Open panel, Finder Services / right-click).
     ///
-    /// - Files: must live under the active inbox root (kept from earlier behavior).
-    /// - Folders: expand to their top-level files; the folder itself becomes the ad-hoc inbox
-    ///   root for those files, even when it sits outside the watched inbox. Subfolders are not
+    /// - Files: must live under the active watch folder root (kept from earlier behavior).
+    /// - Folders: expand to their top-level files; the folder itself becomes the ad-hoc watch
+    ///   root for those files, even when it sits outside the watched folder. Subfolders are not
     ///   descended — matches the Sweep model.
     func sortIncomingFiles(_ urls: [URL], prefs: BinkyPreferences) async {
         transientBannerMessage = nil
-        let fm = FileManager.default
         let inboxRoot = prefs.activeSortSweepRootDirectory().standardizedFileURL
         let inboxPath = inboxRoot.path
+        let capturedUrls = urls
 
-        var files: [URL] = []
-        var rootOverride: [URL: URL] = [:]
-        var seen: Set<URL> = []
+        let (files, rootOverride) = await Task.detached(priority: .utility) {
+            let fm = FileManager.default
+            var files: [URL] = []
+            var rootOverride: [URL: URL] = [:]
+            var seen: Set<URL> = []
 
-        for raw in urls {
-            let std = raw.standardizedFileURL
-            guard std.isFileURL else { continue }
-            var isDir: ObjCBool = false
-            guard fm.fileExists(atPath: std.path, isDirectory: &isDir) else { continue }
+            for raw in capturedUrls {
+                let std = raw.standardizedFileURL
+                guard std.isFileURL else { continue }
+                var isDir: ObjCBool = false
+                guard fm.fileExists(atPath: std.path, isDirectory: &isDir) else { continue }
 
-            if isDir.boolValue {
-                guard let entries = try? fm.contentsOfDirectory(
-                    at: std,
-                    includingPropertiesForKeys: [.isDirectoryKey],
-                    options: [.skipsHiddenFiles]
-                ) else { continue }
-                for entry in entries {
-                    let entryStd = entry.standardizedFileURL
-                    var entryIsDir: ObjCBool = false
-                    guard fm.fileExists(atPath: entryStd.path, isDirectory: &entryIsDir),
-                          !entryIsDir.boolValue else { continue }
-                    guard seen.insert(entryStd).inserted else { continue }
-                    files.append(entryStd)
-                    rootOverride[entryStd] = std
+                if isDir.boolValue {
+                    guard let entries = try? fm.contentsOfDirectory(
+                        at: std,
+                        includingPropertiesForKeys: [.isDirectoryKey],
+                        options: [.skipsHiddenFiles]
+                    ) else { continue }
+                    for entry in entries {
+                        let entryStd = entry.standardizedFileURL
+                        var entryIsDir: ObjCBool = false
+                        guard fm.fileExists(atPath: entryStd.path, isDirectory: &entryIsDir),
+                              !entryIsDir.boolValue else { continue }
+                        guard seen.insert(entryStd).inserted else { continue }
+                        files.append(entryStd)
+                        rootOverride[entryStd] = std
+                    }
+                } else {
+                    let p = std.path
+                    guard p == inboxPath || p.hasPrefix(inboxPath + "/") else { continue }
+                    guard seen.insert(std).inserted else { continue }
+                    files.append(std)
                 }
-            } else {
-                let p = std.path
-                guard p == inboxPath || p.hasPrefix(inboxPath + "/") else { continue }
-                guard seen.insert(std).inserted else { continue }
-                files.append(std)
             }
-        }
+            return (files, rootOverride)
+        }.value
 
         guard !files.isEmpty else {
             flashTransientStatus(
-                String(localized: "Those aren’t in the inbox. Drop them in the watched folder first.", comment: "Organizer transient when dropped paths are outside the active inbox root.")
+                String(localized: "Those aren’t in the watched folder. Drop them there first.", comment: "Organizer transient when dropped paths are outside the active watched folder root.")
             )
             return
         }

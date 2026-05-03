@@ -1,11 +1,5 @@
 import Foundation
 
-/// Routes a file URL to either the global sidebar pipeline or a preset snapshot pipeline.
-enum WatchPipeline: Equatable {
-    case global
-    case preset(UUID)
-}
-
 enum WatchFolderPathResolver {
 
     static func normalizedPath(_ path: String) -> String {
@@ -43,11 +37,23 @@ enum WatchFolderPathResolver {
     }
 }
 
-/// Builds routing rules from `BinkyPreferences`: global watch + presets with unique paths.
-/// If the same path is both global and unique-preset, **preset wins** (checked first).
+enum WatchRouting: Equatable, Sendable {
+    /// Use global downloads/watch root; rules from global custom rules if enabled.
+    case global
+    /// File belongs to one or more automations sharing the same inbox root.
+    case automation(inboxRoot: URL, automationIDs: [UUID])
+}
+
+/// Builds watch paths from enabled automations + optional global watch folder.
 struct WatchPipelineRegistry: Sendable {
     let globalPath: String?
-    let presetPaths: [(UUID, String)]
+    let automationPaths: [(UUID, String)]
+
+    /// For tests and tooling; prefer ``init(prefs:)`` in app code.
+    init(globalPath: String?, automationPaths: [(UUID, String)]) {
+        self.globalPath = globalPath
+        self.automationPaths = automationPaths.sorted { $0.1.count > $1.1.count }
+    }
 
     init(prefs: BinkyPreferences) {
         let gpResolved: String? = {
@@ -63,24 +69,27 @@ struct WatchPipelineRegistry: Sendable {
             return WatchFolderPathResolver.normalizedPath(downloads.path)
         }()
 
-        var presets: [(UUID, String)] = []
-        for preset in prefs.savedPresets where preset.watchFolderEnabled && preset.watchFolderModeRaw == "unique" {
+        var auto: [(UUID, String)] = []
+        for a in prefs.savedPresets where a.isEnabled {
             guard let raw = WatchFolderPathResolver.resolvedWatchDirectoryPath(
-                bookmark: preset.watchFolderBookmark,
-                storedPath: preset.watchFolderPath
+                bookmark: a.watchFolderBookmark,
+                storedPath: a.watchFolderPath
             ) else { continue }
-            presets.append((preset.id, raw))
+            auto.append((a.id, raw))
         }
-        // Longest root first; same-length ties keep array order (earlier preset wins).
-        presets.sort { $0.1.count > $1.1.count }
-        self.globalPath = gpResolved
-        self.presetPaths = presets
+
+        self.init(globalPath: gpResolved, automationPaths: auto)
     }
 
-    /// Longest matching preset root wins (list is sorted); else global if it matches.
-    func pipeline(for file: URL) -> WatchPipeline {
-        for (id, root) in presetPaths where WatchFolderPathResolver.file(file, isUnderRoot: root) {
-            return .preset(id)
+    /// Longest matching automation root wins; all automations with that exact root apply (combined rules in preset order).
+    func routing(for file: URL) -> WatchRouting {
+        for (_, root) in automationPaths {
+            guard WatchFolderPathResolver.file(file, isUnderRoot: root) else { continue }
+            let matchingIDs = automationPaths
+                .filter { $0.1 == root }
+                .map(\.0)
+            let rootURL = URL(fileURLWithPath: root).standardizedFileURL
+            return .automation(inboxRoot: rootURL, automationIDs: matchingIDs)
         }
         if let g = globalPath, WatchFolderPathResolver.file(file, isUnderRoot: g) {
             return .global
@@ -90,13 +99,13 @@ struct WatchPipelineRegistry: Sendable {
 
     /// Distinct directory paths for FSEvents (deduped).
     var watchedRootPaths: [String] {
-        Self.allWatchedPaths(globalPath: globalPath, presetPaths: presetPaths)
+        Self.allWatchedPaths(globalPath: globalPath, automationPaths: automationPaths)
     }
 
-    static func allWatchedPaths(globalPath: String?, presetPaths: [(UUID, String)]) -> [String] {
+    static func allWatchedPaths(globalPath: String?, automationPaths: [(UUID, String)]) -> [String] {
         var paths: [String] = []
         var norm = Set<String>()
-        for (_, root) in presetPaths {
+        for (_, root) in automationPaths {
             let n = WatchFolderPathResolver.normalizedPath(root)
             guard !n.isEmpty else { continue }
             if norm.insert(n).inserted { paths.append(root) }
@@ -107,28 +116,23 @@ struct WatchPipelineRegistry: Sendable {
         }
         return paths
     }
+
+    /// Legacy helper: paths from unique presets only (for tests / migration).
+    var presetPaths: [(UUID, String)] { automationPaths }
 }
 
 extension BinkyPreferences {
 
-    /// Inbox layout root and optional preset for sort/tag/rule customization for files routed through folder watch.
-    func sortContext(for fileURL: URL) -> (inboxRoot: URL, preset: CompressionPreset?) {
+    /// Inbox layout root and automations contributing rules for files routed through folder watch.
+    func sortContext(for fileURL: URL) -> (inboxRoot: URL, presets: [CompressionPreset]) {
         let reg = WatchPipelineRegistry(prefs: self)
-        switch reg.pipeline(for: fileURL) {
+        switch reg.routing(for: fileURL) {
         case .global:
-            return (downloadsSortRootDirectory(), nil)
-        case .preset(let id):
-            guard let preset = savedPresets.first(where: { $0.id == id }) else {
-                return (downloadsSortRootDirectory(), nil)
-            }
-            if preset.watchFolderModeRaw == "unique",
-               let path = WatchFolderPathResolver.resolvedWatchDirectoryPath(
-                    bookmark: preset.watchFolderBookmark,
-                    storedPath: preset.watchFolderPath
-               ) {
-                return (URL(fileURLWithPath: path).standardizedFileURL, preset)
-            }
-            return (downloadsSortRootDirectory(), preset)
+            return (downloadsSortRootDirectory(), [])
+        case .automation(let root, let ids):
+            let idSet = Set(ids)
+            let presets = savedPresets.filter { idSet.contains($0.id) }
+            return (root, presets)
         }
     }
 }

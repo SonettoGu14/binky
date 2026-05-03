@@ -28,6 +28,7 @@ final class BinkyPreferences: ObservableObject {
         Self.migrateSortNowShortcutKeyIfNeeded()
         seedDefaultProfileIfNeeded()
         ensureActiveProfileIsValid()
+        migrateAutomationLegacyWatchFoldersIfNeeded()
     }
 
     /// One-time migrate from compression-era defaults key (`shortcut.compressNow` → `shortcut.sortNow`).
@@ -62,6 +63,40 @@ final class BinkyPreferences: ObservableObject {
         guard !savedPresets.isEmpty else { return }
         if activePresetID.isEmpty || !savedPresets.contains(where: { $0.id.uuidString == activePresetID }) {
             activePresetID = savedPresets.first!.id.uuidString
+        }
+    }
+
+    private func migrateAutomationLegacyWatchFoldersIfNeeded() {
+        let key = "binky.automation.legacyGlobalPathHydrated.v1"
+        let d = UserDefaults.standard
+        guard !d.bool(forKey: key) else { return }
+        var list = savedPresets
+        let gp = watchedFolderPath.replacingOccurrences(of: "~", with: NSHomeDirectory())
+        let gb = watchedFolderBookmark
+        for i in list.indices {
+            var a = list[i]
+            a.hydrateLegacyGlobalWatchIfNeeded(globalPath: gp, globalBookmark: gb)
+            list[i] = a
+        }
+        savedPresets = list
+        d.set(true, forKey: key)
+    }
+
+    /// Finder tags that tell Binky to leave a file alone (e.g. “DoNotMove”). Case-insensitive.
+    @AppStorage("sort.globalSkipTagsJSON") private var globalSkipTagsJSONStorage: Data = Data()
+
+    private var cachedGlobalSkipTags: [String]?
+    var globalSkipTags: [String] {
+        get {
+            if let cachedGlobalSkipTags { return cachedGlobalSkipTags }
+            let v = (try? JSONDecoder().decode([String].self, from: globalSkipTagsJSONStorage)) ?? []
+            cachedGlobalSkipTags = v
+            return v
+        }
+        set {
+            objectWillChange.send()
+            cachedGlobalSkipTags = newValue
+            globalSkipTagsJSONStorage = newValue.isEmpty ? Data() : ((try? JSONEncoder().encode(newValue)) ?? Data())
         }
     }
 
@@ -246,11 +281,11 @@ final class BinkyPreferences: ObservableObject {
 
     @AppStorage("sort.finderTagDefaultsJSON") private var sortFinderTagDefaultsJSONStorage: Data = Data()
 
-    private var cachedSortRoutingRules: [InboxSortRule]?
-    var sortRoutingRules: [InboxSortRule] {
+    private var cachedSortRoutingRules: [SortRule]?
+    var sortRoutingRules: [SortRule] {
         get {
             if let cachedSortRoutingRules { return cachedSortRoutingRules }
-            let v = (try? JSONDecoder().decode([InboxSortRule].self, from: sortRoutingRulesJSONStorage)) ?? []
+            let v = (try? JSONDecoder().decode([SortRule].self, from: sortRoutingRulesJSONStorage)) ?? []
             cachedSortRoutingRules = v
             return v
         }
@@ -303,11 +338,16 @@ final class BinkyPreferences: ObservableObject {
 
     @AppStorage("folderWatch.paused") var folderWatchPaused: Bool = false
 
-    /// Watch immediate subfolders of each inbox root (one level) for sorting and sweep.
+    /// Watch immediate subfolders of each watched folder root (one level) for sorting and sweep.
     @AppStorage("watch.recursiveOneLevel") var watchRecursiveOneLevel: Bool = false
 
-    /// When on, saving routing rules triggers a sort across all watched inbox roots (debounced).
+    /// When on, saving routing rules triggers a sort across all watched folder roots (debounced).
     @AppStorage("sort.autoRunWhenRulesChange") var sortAutoRunWhenRulesChange: Bool = false
+
+    /// When on, the sort engine processes files one at a time with a small delay so the user can
+    /// actually watch each file get categorized. Useful for demos, screencasts, and trust-building
+    /// during the first few sorts.
+    @AppStorage("sort.slowModeEnabled") var sortSlowModeEnabled: Bool = false
 
     func sortExcludeExtensionsNormalized() -> Set<String> {
         sortExcludeExtensionsCSV
@@ -388,7 +428,7 @@ final class BinkyPreferences: ObservableObject {
         var presets = savedPresets
         var touched = false
         for i in presets.indices {
-            if presets[i].watchFolderEnabled && presets[i].watchFolderModeRaw == "unique",
+            if presets[i].isEnabled,
                let r = Self.reanchorDirectory(bookmark: presets[i].watchFolderBookmark) {
                 if r.path != presets[i].watchFolderPath {
                     presets[i].watchFolderPath = r.path
@@ -444,15 +484,14 @@ extension BinkyPreferences {
         return savedPresets.first { $0.id == uuid }
     }
 
-    /// Inbox folder used for interactive **Sort Now**, drop routing, preview, Review counts, etc. Honors the selected profile’s unique watch folder when set.
+    /// Default watched folder used for interactive **Sort Now**, drop routing, preview, Review counts, etc. Uses the active automation’s folder when set.
     func activeSortSweepRootDirectory() -> URL {
         reconcileFolderBookmarksIfNeeded()
         guard let preset = activePreset else { return downloadsSortRootDirectory() }
-        if preset.watchFolderEnabled && preset.watchFolderModeRaw == "unique",
-           let path = WatchFolderPathResolver.resolvedWatchDirectoryPath(
-               bookmark: preset.watchFolderBookmark,
-               storedPath: preset.watchFolderPath
-           ), !path.isEmpty {
+        if let path = WatchFolderPathResolver.resolvedWatchDirectoryPath(
+            bookmark: preset.watchFolderBookmark,
+            storedPath: preset.watchFolderPath
+        ), !path.isEmpty {
             return URL(fileURLWithPath: path).standardizedFileURL
         }
         return downloadsSortRootDirectory()

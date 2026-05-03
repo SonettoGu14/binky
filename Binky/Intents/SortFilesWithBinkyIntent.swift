@@ -2,7 +2,7 @@ import AppIntents
 import AppKit
 import Foundation
 
-/// Shortcuts / Siri integration: hand files to the running app for inbox sorting.
+/// Shortcuts / Siri integration: hand files to the running app for folder sorting.
 struct SortFilesWithBinkyIntent: AppIntent {
     static var title: LocalizedStringResource = LocalizedStringResource(
         "Sort Files",

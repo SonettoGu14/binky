@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Dry-run list of where inbox files would land — nothing is moved.
+/// Dry-run list of where watched files would land — nothing is moved.
 struct SortPreviewSheet: View {
     let rows: [SortPreviewEntry]
     var onDismiss: () -> Void = {}

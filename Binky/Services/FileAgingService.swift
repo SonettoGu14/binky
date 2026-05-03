@@ -10,7 +10,7 @@ struct FileAgingPreviewRow: Identifiable, Hashable, Sendable {
     let actionSummary: String
 }
 
-/// Moves or trashes stagnant inbox files per ``CategoryAgingRule`` (daily timer).
+/// Moves or trashes stagnant watched-folder files per ``CategoryAgingRule`` (daily timer).
 @MainActor
 final class FileAgingService {
     static let shared = FileAgingService()

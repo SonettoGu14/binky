@@ -56,7 +56,37 @@ struct ContentView: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: .binkyStartSort)) { _ in
                 Task {
-                    await vm.runInteractiveDownloadsSweep(prefs: prefs)
+                    let enabled = prefs.savedPresets.filter {
+                        $0.isEnabled && !$0.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    }
+                    if enabled.count > 1 {
+                        await vm.runInteractiveSweepAllAutomations(prefs: prefs)
+                    } else {
+                        await vm.runInteractiveDownloadsSweep(prefs: prefs)
+                    }
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .binkyStartSortForAutomation)) { note in
+                Task {
+                    let fallback: () async -> Void = {
+                        let enabled = prefs.savedPresets.filter {
+                            $0.isEnabled && !$0.watchFolderPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                        }
+                        if enabled.count > 1 {
+                            await vm.runInteractiveSweepAllAutomations(prefs: prefs)
+                        } else {
+                            await vm.runInteractiveDownloadsSweep(prefs: prefs)
+                        }
+                    }
+                    guard let id = note.userInfo?[BinkyNotificationUserInfoKey.sortAutomationPresetID] as? UUID else {
+                        await fallback()
+                        return
+                    }
+                    guard let preset = prefs.savedPresets.first(where: { $0.id == id }) else {
+                        await fallback()
+                        return
+                    }
+                    await vm.runInteractiveSweep(preset: preset, prefs: prefs)
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .binkyShowLastBatchSummary)) { _ in

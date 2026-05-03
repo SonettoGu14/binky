@@ -72,6 +72,15 @@ final class SortProgressTracker: ObservableObject {
     private var coalesceProgressNotifications = false
     private var coalescePostWorkItem: DispatchWorkItem?
 
+    /// Wall-clock moment the current batch became active — used to keep the progress UI visible
+    /// long enough for tiny sorts to register visually.
+    private var beganAt: Date?
+    private var pendingMinimumVisibleEndWorkItem: DispatchWorkItem?
+
+    /// Minimum time the progress chrome stays "active" after `.batchStarted` so Sort Now never
+    /// feels like it skipped straight from click → done.
+    private static let minimumVisibleDuration: TimeInterval = 0.9
+
     var fraction: Double {
         guard isActive, total > 0 else { return 0 }
         let c = Double(completed)
@@ -196,7 +205,11 @@ final class SortProgressTracker: ObservableObject {
     private init() {}
 
     func begin(batchTotal: Int) {
+        pendingMinimumVisibleEndWorkItem?.cancel()
+        pendingMinimumVisibleEndWorkItem = nil
+
         if batchTotal <= 0 {
+            beganAt = nil
             resetToIdle(postNotification: true)
             return
         }
@@ -211,6 +224,7 @@ final class SortProgressTracker: ObservableObject {
         coalescePostWorkItem?.cancel()
         coalescePostWorkItem = nil
         latestAnimationPulse = nil
+        beganAt = Date()
         postSnapshotFlush()
     }
 
@@ -239,6 +253,30 @@ final class SortProgressTracker: ObservableObject {
     }
 
     func end() {
+        guard isActive else { return }
+
+        pendingMinimumVisibleEndWorkItem?.cancel()
+        pendingMinimumVisibleEndWorkItem = nil
+
+        let start = beganAt ?? .distantPast
+        let elapsed = Date().timeIntervalSince(start)
+        let remaining = Self.minimumVisibleDuration - elapsed
+
+        if remaining > 0 {
+            let work = DispatchWorkItem { [weak self] in
+                self?.performEndCleanup()
+            }
+            pendingMinimumVisibleEndWorkItem = work
+            DispatchQueue.main.asyncAfter(deadline: .now() + remaining, execute: work)
+        } else {
+            performEndCleanup()
+        }
+    }
+
+    private func performEndCleanup() {
+        pendingMinimumVisibleEndWorkItem?.cancel()
+        pendingMinimumVisibleEndWorkItem = nil
+        beganAt = nil
         isActive = false
         currentItems.removeAll()
         runState = .running
@@ -280,6 +318,9 @@ final class SortProgressTracker: ObservableObject {
     }
 
     private func resetToIdle(postNotification shouldPost: Bool) {
+        pendingMinimumVisibleEndWorkItem?.cancel()
+        pendingMinimumVisibleEndWorkItem = nil
+        beganAt = nil
         isActive = false
         total = 0
         completed = 0
