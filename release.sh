@@ -47,7 +47,7 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-if git rev-parse "refs/tags/v$VERSION" >/dev/null 2>&1; then
+if [ "$BUMP_ONLY" = false ] && git rev-parse "refs/tags/v$VERSION" >/dev/null 2>&1; then
   echo "✗ Git tag v$VERSION already exists locally. Remove it or choose another version."
   exit 1
 fi
