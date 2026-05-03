@@ -1,8 +1,8 @@
 cask "binky" do
-  version "1.3.1"
+  version "1.3.2"
   # Refresh this checksum when publishing `Binky-{version}.zip` via `./release.sh`
   # (a local ad-hoc build can produce a different hash than the signed release artifact).
-  sha256 "f239a5278fedf93dbdf7ede8f8a7a722e0f9f1a8a5c22244576dba71a611a24b"
+  sha256 "150005a8bc73c268a38161a17a040ee9ba8aff6f9f1a9497715427abe4b0f61b"
 
   url "https://github.com/heyderekj/binky/releases/download/v#{version}/Binky-#{version}.zip",
       verified: "github.com/heyderekj/binky/"
