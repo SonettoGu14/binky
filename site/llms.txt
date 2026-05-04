@@ -1,11 +1,11 @@
 # Binky
 
-> Native macOS organizer: **Quick Sort** for one-shot clears, **Routines** for always-on watches. No cloud, no guessing — your rules, stable-file patience, sorted buckets, Review for unknowns. Runs locally. The pacifier for a fussy inbox.
+> Native macOS organizer: **Quick Sort** for one-shot clears, **Routines** for always-on watches. No cloud, no guessing — your rules, stable-file patience, sorted buckets, Review for unknowns. Runs locally. The pacifier for a fussy folder.
 
 ## What it does
 
 - **Quick Sort** — pick a folder, **Sort Now**; stable-file gate and collision-safe moves
-- **Routines** — multiple named watchers (each with its own source and rules) plus global inbox fallback
+- **Routines** — multiple named watchers (each with its own source and rules) plus global fallback when needed
 - **Destinations** — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc
 - **Source-aware routing** — rules can use where a file came from (browser metadata) and content matches
 - **Describe a rule** — plain-English rule building where the OS supports it; manual editor always available
@@ -16,7 +16,7 @@
 - **Daily digest** — one notification summarizing moves, renames, and archives
 - **Weekly digest reminder** — optional scheduled nudge; shareable digest card (PNG) from history
 - **Review** — trust-first staging for ambiguous files
-- **Watch inbox** — optional; Downloads by default unless you aim elsewhere
+- **Watch folder** — optional; Downloads by default unless you aim elsewhere
 - **Shortcuts** — Sort Files intent for routine chains
 - **CLI (`binky`)** — same Organizer prefs/rules from Terminal (`docs/local-cli.md`); flock + `--json`; build via `swift build` in `BinkyCore`
 - **History** — reveals and undo moves when the OS cooperates
@@ -28,8 +28,10 @@
 
 ## Rough comparison (not legal advice)
 
-- **vs Hazel** — Hazel is the Mac routine rules engine everywhere. Binky is inbox-first: watch, gate, sorted folders, Review, Quick Sort when you just need calm now.
-- **vs Spring Cleaner** — Spring Cleaner clears cruft on a schedule. Binky routes live arrivals into piles you configured.
+- **vs Hazel** — Hazel is the Mac routine rules engine everywhere. Binky is folder-first: watch, gate, sorted buckets, Review, Quick Sort when you just need calm now.
+- **vs Dropzone 4** — Dropzone is drag-to-route shelf actions. Binky watches folders without you ferrying each file.
+- **vs Unclutter** — Unclutter is a desktop drawer with a files shelf. Binky routes arrivals into buckets automatically.
+- **vs CleanMyMac X** — CleanMyMac scans and cleans the system. Binky sorts live drops into destinations you configured.
 - **vs manual sorting** — Still free; your time isn't.
 
 ## Technical

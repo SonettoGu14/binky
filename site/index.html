@@ -1191,51 +1191,11 @@
       border: 1px solid var(--divider);
       border-radius: 16px;
       overflow: hidden;
-      padding-top: 12px;
+      padding-top: 0;
     }
-    .cmp-mobile-tabs {
-      display: flex;
-      padding: 0 14px 20px;
-      justify-content: center;
-    }
-    .cmp-segmented {
-      display: inline-flex;
-      padding: 3px;
-      background: var(--surface);
-      border-radius: 9px;
-      gap: 2px;
-      width: 100%;
-      max-width: 320px;
-    }
-    .cmp-tab {
-      flex: 1 1 0;
-      padding: 7px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      background: transparent;
-      border: 0;
-      border-radius: 6px;
-      cursor: pointer;
-      letter-spacing: -0.01em;
-      transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
-    }
-    .cmp-tab:hover { color: var(--text); }
-    .cmp-tab.is-active {
-      background: var(--segmented-tab-active, var(--bg));
-      color: var(--text);
-      box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.08),
-        0 0 0 0.5px rgba(0, 0, 0, 0.04);
-      box-shadow:
-        0 1px 2px oklch(0 0 0 / 0.08),
-        0 0 0 0.5px oklch(0 0 0 / 0.04);
-    }
-    @media (prefers-color-scheme: dark) {
-      .cmp-tab.is-active {
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        box-shadow: 0 1px 2px oklch(0 0 0 / 0.3);
-      }
+
+    .comparison-card > .comparison-scroll:first-child {
+      padding-top: 14px;
     }
     .comparison-scroll {
       width: 100%;
@@ -1276,7 +1236,7 @@
     .comparison-table thead th:last-child,
     .comparison-table tbody td:last-child { padding-right: 24px; }
     .comparison-table thead .th-binky,
-    .comparison-table thead .th-cycle { width: 170px; }
+    .comparison-table thead .th-cycle { width: 170px; min-width: 148px; }
     .comparison-table thead .th-binky { padding-bottom: 10px; vertical-align: top; }
     .th-binky-name {
       display: inline-block;
@@ -1424,7 +1384,7 @@
     @media (max-width: 700px) {
       .comparison-card { border-radius: 12px; padding-top: 8px; }
       .comparison-table thead .th-binky { width: 56px; }
-      .comparison-table thead .th-cycle { width: 130px; }
+      .comparison-table thead .th-cycle { width: min(170px, 42vw); min-width: min(148px, 42vw); }
       .comparison-table thead th:first-child,
       .cmp-label-cell { padding-left: 12px !important; }
       .comparison-table thead th:last-child,
@@ -1546,13 +1506,6 @@
     @media (max-width: 700px) {
       .who-for-row { grid-template-columns: 1fr; }
     }
-
-    /* Cycling organizer comparison table */
-    .comparison-table--org td[data-col] { display: none; }
-    .comparison-table--org[data-active-tool="hazel"] td[data-col="hazel"],
-    .comparison-table--org[data-active-tool="neatify"] td[data-col="neatify"],
-    .comparison-table--org[data-active-tool="finder"] td[data-col="finder"],
-    .comparison-table--org[data-active-tool="refolder"] td[data-col="refolder"] { display: table-cell; }
 
     /* Mid-page CTA */
     .cta-mid {
@@ -1972,28 +1925,22 @@
   <section class="comparison" id="comparison">
     <div class="cmp-row">
       <div class="cmp-text-card">
-        <h2 class="cmp-title">Match the tool to the tantrum.</h2>
-        <p class="cmp-desc">Hazel is a full rules engine. Neatify runs from the menu bar. Binky runs Routines across fussy inboxes — sorted buckets first, previews before moves, Receipt sniffing — and parks doubtful files behind Review alongside source-aware routing, plain-language rules, plus extractor / DMG actions whenever buckets aren&apos;t enough.</p>
+        <h2 class="cmp-title">The quiet one is Binky.</h2>
+        <p class="cmp-desc">Hazel writes rules. Refolder asks AI. Dropzone wants a drag. Binky just watches, sorts, and parks the mess — no subscription, no setup tax.</p>
         <p class="cmp-footnote">Rough tradeoffs — features move. <a href="/compare/">Full comparisons →</a></p>
       </div>
       <div class="comparison-card">
-        <div class="cmp-mobile-tabs">
-          <div class="cmp-segmented" role="tablist" aria-label="Compare with">
-            <button type="button" class="cmp-tab is-active" data-org-tab="hazel">Hazel</button>
-            <button type="button" class="cmp-tab" data-org-tab="neatify">Neatify</button>
-            <button type="button" class="cmp-tab" data-org-tab="refolder">Refolder</button>
-            <button type="button" class="cmp-tab" data-org-tab="finder">Finder</button>
-          </div>
-        </div>
         <div class="comparison-scroll">
-          <table class="comparison-table comparison-table--org" data-active-tool="hazel">
+          <table class="comparison-table comparison-table--cycle">
             <thead>
               <tr>
                 <th scope="col"></th>
                 <th scope="col" class="th-binky"><div class="th-binky-name">Binky</div></th>
                 <th scope="col" class="th-cycle">
                   <div class="th-cycle-row">
+                    <button type="button" class="th-cycle-btn" data-dir="-1" aria-label="Previous app"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 12l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z" clip-rule="evenodd"/></svg></button>
                     <span class="th-tool" id="cmp-org-name">Hazel</span>
+                    <button type="button" class="th-cycle-btn" data-dir="1" aria-label="Next app"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 4.53a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd"/></svg></button>
                   </div>
                 </th>
               </tr>
@@ -2005,10 +1952,7 @@
                   Price
                 </div></td>
                 <td class="cmp-binky">Free</td>
-                <td data-col="hazel">Paid ($42)</td>
-                <td data-col="neatify">Paid ($31)</td>
-                <td data-col="finder">Free</td>
-                <td data-col="refolder">Paid (Setapp)</td>
+                <td data-row="price"></td>
               </tr>
               <tr>
                 <td class="cmp-label-cell"><div class="cmp-label">
@@ -2016,10 +1960,7 @@
                   Watch folder
                 </div></td>
                 <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                <td data-col="hazel"><span class="cmp-dim">Rules-based</span></td>
-                <td data-col="neatify"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                <td data-col="finder"><span class="cmp-cross">—</span></td>
-                <td data-col="refolder"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
+                <td data-row="watch"></td>
               </tr>
               <tr>
                 <td class="cmp-label-cell"><div class="cmp-label">
@@ -2027,10 +1968,7 @@
                   Review folder
                 </div></td>
                 <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                <td data-col="hazel"><span class="cmp-cross">—</span></td>
-                <td data-col="neatify"><span class="cmp-cross">—</span></td>
-                <td data-col="finder"><span class="cmp-dim">You decide</span></td>
-                <td data-col="refolder"><span class="cmp-cross">—</span></td>
+                <td data-row="review"></td>
               </tr>
               <tr>
                 <td class="cmp-label-cell"><div class="cmp-label">
@@ -2038,10 +1976,7 @@
                   Waits for downloads to finish
                 </div></td>
                 <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                <td data-col="hazel"><span class="cmp-dim">Depends on rule</span></td>
-                <td data-col="neatify"><span class="cmp-dim">Varies</span></td>
-                <td data-col="finder"><span class="cmp-dim">You wait</span></td>
-                <td data-col="refolder"><span class="cmp-cross">—</span></td>
+                <td data-row="gate"></td>
               </tr>
               <tr>
                 <td class="cmp-label-cell"><div class="cmp-label">
@@ -2049,10 +1984,7 @@
                   Optional Finder tags
                 </div></td>
                 <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                <td data-col="hazel"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                <td data-col="neatify"><span class="cmp-cross">—</span></td>
-                <td data-col="finder"><span class="cmp-dim">DIY</span></td>
-                <td data-col="refolder"><span class="cmp-cross">—</span></td>
+                <td data-row="tags"></td>
               </tr>
               <tr>
                 <td class="cmp-label-cell"><div class="cmp-label">
@@ -2060,10 +1992,7 @@
                   Undo moves
                 </div></td>
                 <td class="cmp-binky"><span class="cmp-dim">Where macOS agrees</span></td>
-                <td data-col="hazel"><span class="cmp-dim">Workflow-dependent</span></td>
-                <td data-col="neatify"><span class="cmp-dim">Where macOS agrees</span></td>
-                <td data-col="finder"><span class="cmp-dim">⌘Z in Finder</span></td>
-                <td data-col="refolder"><span class="cmp-dim">Workflow-dependent</span></td>
+                <td data-row="undo"></td>
               </tr>
               <tr>
                 <td class="cmp-label-cell"><div class="cmp-label">
@@ -2071,10 +2000,7 @@
                   Custom rules
                 </div></td>
                 <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                <td data-col="hazel"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg> <span class="cmp-dim">Full engine</span></td>
-                <td data-col="neatify"><span class="cmp-cross">—</span></td>
-                <td data-col="finder"><span class="cmp-cross">—</span></td>
-                <td data-col="refolder"><span class="cmp-dim">AI-assisted</span></td>
+                <td data-row="rules"></td>
               </tr>
               <tr>
                 <td class="cmp-label-cell"><div class="cmp-label">
@@ -2082,10 +2008,7 @@
                   Sort preview
                 </div></td>
                 <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg></td>
-                <td data-col="hazel"><span class="cmp-cross">—</span></td>
-                <td data-col="neatify"><span class="cmp-cross">—</span></td>
-                <td data-col="finder"><span class="cmp-cross">—</span></td>
-                <td data-col="refolder"><span class="cmp-cross">—</span></td>
+                <td data-row="preview"></td>
               </tr>
               <tr>
                 <td class="cmp-label-cell"><div class="cmp-label">
@@ -2093,10 +2016,7 @@
                   Open source
                 </div></td>
                 <td class="cmp-binky"><svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg> <span class="cmp-dim">MIT</span></td>
-                <td data-col="hazel"><span class="cmp-cross">—</span></td>
-                <td data-col="neatify"><span class="cmp-cross">—</span></td>
-                <td data-col="finder"><span class="cmp-dim">N/A</span></td>
-                <td data-col="refolder"><span class="cmp-cross">—</span></td>
+                <td data-row="opensource"></td>
               </tr>
               <tr>
                 <td class="cmp-label-cell"><div class="cmp-label">
@@ -2104,10 +2024,7 @@
                   App size
                 </div></td>
                 <td class="cmp-binky"><span class="cmp-dim">12 MB</span></td>
-                <td data-col="hazel"><span class="cmp-dim">~29 MB</span></td>
-                <td data-col="neatify"><span class="cmp-dim">~3 MB</span></td>
-                <td data-col="refolder"><span class="cmp-dim">~22 MB</span></td>
-                <td data-col="finder"><span class="cmp-cross">—</span></td>
+                <td data-row="appsize"></td>
               </tr>
             </tbody>
           </table>
@@ -2428,26 +2345,150 @@
   </script>
   <script>
     (function () {
-      var tools = ['hazel', 'neatify', 'refolder', 'finder'];
-      var names = { hazel: 'Hazel', neatify: 'Neatify', finder: 'Finder', refolder: 'Refolder' };
-      var table = document.querySelector('.comparison-table--org');
+      var CHECK = '<svg class="cmp-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg>';
+      var CROSS = '<span class="cmp-cross">—</span>';
+      function dim(t) {
+        return '<span class="cmp-dim">' + t + '</span>';
+      }
+      var tools = [
+        {
+          name: 'Hazel',
+          rows: {
+            price: 'Paid ($42)',
+            watch: dim('Rules-based'),
+            review: CROSS,
+            gate: dim('Depends on rule'),
+            tags: CHECK,
+            undo: dim('Workflow-dependent'),
+            rules: CHECK + ' ' + dim('Full engine'),
+            preview: CROSS,
+            opensource: CROSS,
+            appsize: dim('~29 MB')
+          }
+        },
+        {
+          name: 'Neatify',
+          rows: {
+            price: 'Paid ($31)',
+            watch: CHECK,
+            review: CROSS,
+            gate: dim('Varies'),
+            tags: CROSS,
+            undo: dim('Where macOS agrees'),
+            rules: CROSS,
+            preview: CROSS,
+            opensource: CROSS,
+            appsize: dim('~3 MB')
+          }
+        },
+        {
+          name: 'Refolder',
+          rows: {
+            price: 'Paid (Setapp)',
+            watch: CHECK,
+            review: CROSS,
+            gate: CROSS,
+            tags: CROSS,
+            undo: dim('Workflow-dependent'),
+            rules: dim('AI-assisted'),
+            preview: CROSS,
+            opensource: CROSS,
+            appsize: dim('~22 MB')
+          }
+        },
+        {
+          name: 'Finder',
+          rows: {
+            price: 'Free',
+            watch: CROSS,
+            review: dim('You decide'),
+            gate: dim('You wait'),
+            tags: dim('DIY'),
+            undo: dim('⌘Z in Finder'),
+            rules: CROSS,
+            preview: CROSS,
+            opensource: dim('N/A'),
+            appsize: CROSS
+          }
+        },
+        {
+          name: 'Dropzone 4',
+          rows: {
+            price: dim('Paid (~$35)'),
+            watch: dim('Manual drag'),
+            review: CROSS,
+            gate: CROSS,
+            tags: CROSS,
+            undo: CROSS,
+            rules: dim('Actions'),
+            preview: CROSS,
+            opensource: CROSS,
+            appsize: dim('~18 MB')
+          }
+        },
+        {
+          name: 'Unclutter',
+          rows: {
+            price: dim('Paid (~$20)'),
+            watch: CROSS,
+            review: dim('Shelf only'),
+            gate: CROSS,
+            tags: CROSS,
+            undo: CROSS,
+            rules: CROSS,
+            preview: CROSS,
+            opensource: CROSS,
+            appsize: dim('~6 MB')
+          }
+        },
+        {
+          name: 'CleanMyMac X',
+          rows: {
+            price: dim('Paid (~$40/yr)'),
+            watch: dim('Scan-based'),
+            review: CROSS,
+            gate: CROSS,
+            tags: CROSS,
+            undo: dim('Trash restore'),
+            rules: CROSS,
+            preview: CROSS,
+            opensource: CROSS,
+            appsize: dim('~50 MB')
+          }
+        }
+      ];
+      var idx = 0;
+      var table = document.querySelector('#comparison .comparison-table--cycle');
       var nameEl = document.getElementById('cmp-org-name');
-      var tabs = document.querySelectorAll('[data-org-tab]');
-      if (!table || !nameEl || !tabs.length) return;
+      var thCycle = document.querySelector('#comparison .th-cycle');
+      if (!table || !nameEl || !tools.length) return;
 
-      function activate(tool) {
-        table.setAttribute('data-active-tool', tool);
-        nameEl.textContent = names[tool];
-        tabs.forEach(function (btn) {
-          btn.classList.toggle('is-active', btn.getAttribute('data-org-tab') === tool);
+      function paint() {
+        var tool = tools[idx];
+        nameEl.textContent = tool.name;
+        Object.keys(tool.rows).forEach(function (key) {
+          table.querySelectorAll('td[data-row="' + key + '"]').forEach(function (td) {
+            td.innerHTML = tool.rows[key];
+          });
         });
       }
 
-      tabs.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          activate(btn.getAttribute('data-org-tab'));
+      paint();
+
+      if (thCycle) {
+        thCycle.querySelectorAll('.th-cycle-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var dir = parseInt(btn.getAttribute('data-dir'), 10) || 1;
+            var len = tools.length;
+            idx = ((idx + dir) % len + len) % len;
+            nameEl.classList.add('fading');
+            setTimeout(function () {
+              paint();
+              nameEl.classList.remove('fading');
+            }, 120);
+          });
         });
-      });
+      }
     })();
   </script>
 </body>

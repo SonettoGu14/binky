@@ -36,6 +36,21 @@
     <priority>0.75</priority>
   </url>
   <url>
+    <loc>https://binkyfiles.com/compare/dropzone/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://binkyfiles.com/compare/unclutter/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://binkyfiles.com/compare/cleanmymac/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
     <loc>https://binkyfiles.com/llms.txt</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
