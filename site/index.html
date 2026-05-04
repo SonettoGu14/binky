@@ -1576,8 +1576,14 @@
 
     .cta-mid-sub {
       font-size: 14px;
+      line-height: 1.55;
       color: var(--text-secondary);
       margin: -10px 0 10px;
+      /* Narrow measure so the rag isn’t one long line + a stub; not `balance` (equal-ish lines). */
+      max-width: min(34ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      text-wrap: pretty;
     }
 
   </style>
@@ -2130,24 +2136,9 @@
         <p class="faq-a">Nope. Out of the box, routines watch a folder — Downloads still polite default — and sort calm buckets. Reach for Describe a rule once you crave specifics.</p>
       </div>
 
-      <div class="faq-item" id="faq-licensing">
-        <h3 class="faq-q">How does Binky 2.0 licensing work?</h3>
-        <p class="faq-a"><strong>It’s not a subscription.</strong> Pay once for Binky 2.0 on official builds, keep the app, get <strong>one year of updates</strong> included. After that you can <strong>renew yearly</strong> (planned around half the purchase price) if you want another year of updates — or stay on the last version you installed. <a href="https://github.com/heyderekj/binky" target="_blank" rel="noopener">Source stays MIT</a>; the license is for hassle-free signed builds and the update channel.</p>
-      </div>
-
       <div class="faq-item">
-        <h3 class="faq-q">Do I have to renew?</h3>
-        <p class="faq-a">No. Renewal only extends how long you receive updates. The app you already have keeps working.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3 class="faq-q">I’m on Binky 1.x — do I pay?</h3>
-        <p class="faq-a">Not for what you’re using now. 1.x stays free and open source. Payment starts when you choose to move to <strong>2.0</strong> for official builds and new paid-tier features.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3 class="faq-q">Is there a Binky + Dinky bundle?</h3>
-        <p class="faq-a">Planned: a family bundle with <a href="https://dinkyfiles.com" target="_blank" rel="noopener">Dinky</a> — one-time purchase, one year of updates for both, with a lower yearly renewal than buying separately. Calm inbox, smaller files.</p>
+        <h3 class="faq-q">What’s the difference between Quick Sort and Routines?</h3>
+        <p class="faq-a">Quick Sort is a one-shot sweep — pick a folder, hit Sort, done. Routines are named, persistent watchers: each one has its own source folder, rule stack, and tag defaults that run automatically. Start with Quick Sort; graduate to Routines when the same folder keeps yelling.</p>
       </div>
 
       <div class="faq-item">
@@ -2158,11 +2149,6 @@
       <div class="faq-item">
         <h3 class="faq-q">Mac only? Which macOS?</h3>
         <p class="faq-a">Yes. SwiftUI, native frameworks, no cross-platform runtime. Requires macOS 14 Sonoma or later. On macOS 26 Tahoe, the UI uses Liquid Glass where available.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3 class="faq-q">Morning digest?</h3>
-        <p class="faq-a">Optional UserNotifications rollup when you crave tallies instead of babysitting batches. Default stays quiet.</p>
       </div>
 
       <div class="faq-item">
