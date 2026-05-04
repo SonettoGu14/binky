@@ -254,6 +254,13 @@
   vertical-align: top;
 }
 
+.comparison-table thead .th-cycle {
+  width: 170px;
+  min-width: 148px;
+  padding-bottom: 10px;
+  vertical-align: top;
+}
+
 /* Cycle-through competitor column (prev/next), no segmented tabs */
 .comparison-card > .comparison-scroll:first-child {
   padding-top: 14px;
