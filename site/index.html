@@ -111,6 +111,11 @@
       --code-bg: oklch(0.2273 0.0038 286.09);
       --faq-row-even: oklch(0 0 0 / 0.03);
       --row-hover: oklch(0.6129 0.2098 7.08 / 0.05);
+      /* Install modal segmented tabs — raised pill on gray track */
+      --segmented-tab-active: #fff;
+      --segmented-tab-active: oklch(1 0 0);
+      --segmented-tab-shadow: rgba(0, 0, 0, 0.06);
+      --segmented-tab-shadow: oklch(0 0 0 / 0.06);
       --cmp-cross: oklch(0.8622 0.0068 286.26);
       --cmp-dim: oklch(0.752 0.0057 286.26);
       --text-on-brand: oklch(1 0 0);
@@ -167,6 +172,8 @@
         /* Segmented control “pill” on dark gray track — distinct from page bg */
         --segmented-tab-active: #5a5a5c;
         --segmented-tab-active: oklch(0.4683 0.0032 286.28);
+        --segmented-tab-shadow: rgba(0, 0, 0, 0.35);
+        --segmented-tab-shadow: oklch(0 0 0 / 0.35);
       }
     }
 
@@ -746,12 +753,63 @@
       color: var(--text);
     }
 
+    /* Segmented tab control (install modal) */
+    .cmp-segmented {
+      display: flex;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      padding: 3px;
+      gap: 2px;
+      border-radius: 10px;
+      background: var(--surface);
+      box-sizing: border-box;
+    }
+    .cmp-tab {
+      flex: 1 1 0;
+      min-width: 0;
+      margin: 0;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+    .cmp-tab:hover:not(.is-active) {
+      color: var(--text);
+    }
+    .cmp-tab.is-active {
+      background: var(--segmented-tab-active);
+      color: var(--text);
+      box-shadow: 0 1px 2px var(--segmented-tab-shadow);
+    }
+    .cmp-tab:focus {
+      outline: none;
+    }
+    .cmp-tab:focus-visible {
+      outline: 2px solid var(--brand);
+      outline-offset: 2px;
+    }
+
     .install-modal-tabstrip {
       margin: 0 0 18px;
     }
     .install-modal-tabstrip .cmp-segmented {
       max-width: none;
       width: 100%;
+      margin: 0;
     }
     .install-homebrew-note {
       font-size: 13px;
