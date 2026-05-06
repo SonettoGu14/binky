@@ -974,6 +974,53 @@
     }
     .copy-btn.copied { color: var(--success); }
 
+    /* Your data (distribution + outbound calls) */
+    .data-blurb {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 64px;
+      padding: 28px 32px;
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      background: var(--faq-row-even);
+      box-sizing: border-box;
+    }
+    .data-blurb-title {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0 0 16px;
+      color: var(--text);
+      text-align: center;
+    }
+    .data-blurb-lead,
+    .data-blurb-body,
+    .data-blurb-sub,
+    .data-blurb-close,
+    .data-blurb-list li {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      margin: 0 0 12px;
+    }
+    .data-blurb-close {
+      margin-bottom: 0;
+      margin-top: 14px;
+    }
+    .data-blurb-list {
+      margin: 0 0 0 1.15rem;
+      padding: 0;
+    }
+    .data-blurb-list li + li {
+      margin-top: 8px;
+    }
+    .data-blurb-sub {
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
     /* FAQ */
     .faq {
       width: 100%;
@@ -1020,7 +1067,8 @@
     /* Same link treatment as footer — secondary + underline; hover to primary text */
     footer a,
     .faq-a a,
-    .cmp-text-card a {
+    .cmp-text-card a,
+    .data-blurb a {
       color: var(--text-secondary);
       text-decoration: underline;
       text-decoration-thickness: 1px;
@@ -1028,7 +1076,8 @@
     }
     footer a:hover,
     .faq-a a:hover,
-    .cmp-text-card a:hover {
+    .cmp-text-card a:hover,
+    .data-blurb a:hover {
       color: var(--text);
     }
     .faq-inline-link {
@@ -1074,6 +1123,9 @@
     }
 
     @media (max-width: 700px) {
+      .data-blurb {
+        padding: 22px 18px;
+      }
       .faq-grid { grid-template-columns: 1fr; }
       .faq-item:nth-child(-n+2) { border-top: 1px solid var(--divider); padding-top: 24px; }
       .faq-item:first-child { border-top: none; padding-top: 0; }
@@ -2099,6 +2151,18 @@
     <ul class="reviews-grid" id="reviews-grid"></ul>
   </section>
 
+  <section class="data-blurb" id="data" aria-labelledby="data-heading">
+    <h2 class="data-blurb-title" id="data-heading">Your data, in plain English</h2>
+    <p class="data-blurb-lead">Binky isn&apos;t from the App Store, and the build isn&apos;t notarized today. That&apos;s a distribution choice, not a data choice. The source is on <a href="https://github.com/heyderekj/binky" target="_blank" rel="noopener">GitHub</a> under MIT so you can read what it does.</p>
+    <p class="data-blurb-body">Sorting stays on your Mac. No Binky cloud, no upload step, no account.</p>
+    <p class="data-blurb-sub">What leaves the machine</p>
+    <ul class="data-blurb-list">
+      <li>Once a day, Binky asks GitHub if a newer release exists. That&apos;s the only automatic outbound request (see <a href="https://github.com/heyderekj/binky/blob/main/Binky/Services/UpdateChecker.swift" target="_blank" rel="noopener">UpdateChecker.swift</a>).</li>
+      <li>Crash sharing is off by default. When you turn it on, Apple&apos;s MetricKit delivers diagnostics on your Mac. Nothing is sent until you choose Email or a prefilled GitHub issue.</li>
+    </ul>
+    <p class="data-blurb-close">App Store apps are convenient. Notarized apps passed an Apple scan. Neither replaces reading what the app actually does — that&apos;s what the source link above is for.</p>
+  </section>
+
   <section class="faq" id="faq">
     <div class="faq-grid">
       <div class="faq-item">
@@ -2118,7 +2182,12 @@
 
       <div class="faq-item">
         <h3 class="faq-q">Does Binky upload my files?</h3>
-        <p class="faq-a">No. Sorting stays on your Mac. No accounts baked in.</p>
+        <p class="faq-a">No. Sorting stays on your Mac — no Binky cloud, no account. Once a day the app checks GitHub for a newer release (that&apos;s the only automatic outbound request). Details: <a href="#data">Your data, in plain English</a>.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3 class="faq-q">Is Binky notarized? Why isn&apos;t it on the App Store?</h3>
+        <p class="faq-a">It isn&apos;t Apple-notarized or Mac App Store today. That&apos;s distribution — the binary ships straight from GitHub as free MIT open source. For what the app actually talks to over the network, read <a href="#data">Your data, in plain English</a>. First-launch Gatekeeper pain is separate: <button type="button" class="faq-inline-link" onclick="document.getElementById('gatekeeper-modal').classList.add('open')">How to fix it →</button></p>
       </div>
 
       <div class="faq-item">

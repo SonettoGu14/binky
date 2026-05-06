@@ -39,6 +39,12 @@
 - Minimum **macOS 14 Sonoma**; Liquid Glass (`.glassEffect`) on **macOS 26 Tahoe** with material fallback on earlier releases
 - SwiftUI + AppKit; dependency rules favor Apple frameworks ([project note](https://github.com/heyderekj/binky/blob/main/README.md))
 
+## Network behavior
+
+- **Update check:** once per day at most, the app requests GitHub’s public API for the latest release (`Binky/Services/UpdateChecker.swift`). No file paths or rules are sent.
+- **Crash diagnostics:** optional in-app toggle; Apple’s MetricKit delivers payloads on-device. Nothing is transmitted until the user chooses email or a prefilled GitHub issue (`Binky/Services/DiagnosticsReporter.swift`).
+- **No in-app telemetry:** no bundled analytics, crash-reporting SaaS, or ad SDKs. Marketing site **binkyfiles.com** uses Fathom for page analytics only; the app does not.
+
 ## Links
 
 - Website: https://binkyfiles.com
