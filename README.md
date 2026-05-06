@@ -6,7 +6,10 @@ Binky waits for files to finish landing, then routes them into clear sorted fold
 
 Unknown or sketchy extensions do not disappear silently: they land in **Review** first. Optional Finder tags, move summaries, and session history make it easy to verify what happened and undo where possible.
 
-**Requires macOS 14 Sonoma or later** (Liquid Glass UI on macOS 26 Tahoe).
+## System requirements
+
+- **Apple Silicon** (M-series Mac). Current **1.x** DMG and Homebrew cask builds are not for Intel-based Macs (Finder may show the app icon with a slash through it on the wrong architecture).
+- **macOS 14** (Sonoma) or later (Liquid Glass UI on macOS 26 Tahoe).
 
 <table>
   <tr>
@@ -31,6 +34,8 @@ brew install --cask binky
 ```
 
 You can also download `Binky-{version}.dmg` or `Binky-{version}.zip` from [GitHub Releases](https://github.com/heyderekj/binky/releases).
+
+**Sister app — [Dinky](https://dinkyfiles.com)** (images, video, audio, PDF compression) currently requires **Apple Silicon** and **macOS 15 Sequoia** or later for distributed builds; see dinkyfiles.com for details.
 
 ## About the developer
 
