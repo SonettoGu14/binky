@@ -1,6 +1,6 @@
 # Binky
 
-A native macOS app that calms whatever folder is fussy — Downloads, Desktop, a Dropbox inbox, a screenshots dump, you name it. **Quick Sort** is one-tap cleanup; **Routines** are named watchers with their own sources, rules, and optional Finder tags.
+A native macOS app that calms whatever folder is fussy — Downloads, Desktop, a Dropbox folder, a screenshots dump, you name it. **Quick Sort** is one-tap cleanup; **Routines** are named watchers with their own sources, rules, and optional Finder tags.
 
 Binky waits for files to finish landing, then routes them into clear sorted folders — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, and Misc — or runs the action you chose (extract an archive, install from a DMG, fan out by Finder tag, and more).
 
@@ -13,7 +13,7 @@ Unknown or sketchy extensions do not disappear silently: they land in **Review**
 
 <table>
   <tr>
-    <td><img src="site/screenshots/binky-sorting-2.png" alt="Binky organizer inbox with Downloads sorted into folders" width="100%" /></td>
+    <td><img src="site/screenshots/binky-sorting-2.png" alt="Binky organizer with Downloads sorted into folders" width="100%" /></td>
     <td><img src="site/screenshots/binky-routines-new.webp" alt="Binky in Routines mode — named watchers, sources, rules, and organizer" width="100%" /></td>
   </tr>
   <tr>
@@ -43,9 +43,9 @@ Hey! I'm [Derek Castelli](https://www.heyderekj.com), a full-time freelance web 
 
 ## Features
 
-- **Quick Sort** — one-tap sweep for any inbox (defaults to `~/Downloads`), with stable-file checks and collision-safe moves
+- **Quick Sort** — one-tap sweep for any folder (defaults to `~/Downloads`), with stable-file checks and collision-safe moves
 - **CLI (`binky`)** — ship the Organizer engine from Terminal; build `BinkyCore` with SwiftPM ([`docs/local-cli.md`](docs/local-cli.md))
-- **Routines** — multiple named watchers (each with its own source folder and rules) plus a global inbox fallback
+- **Routines** — multiple named watchers (each with its own source folder and rules) plus a global folder fallback
 - **Watch** - monitor folders continuously and route new files as they settle
 - **Rules** - extensions, names, origins, OCR/receipt hints, Finder tag predicates, actions (move, zip, extract, DMG install, tag fan-out, trash, rename)
 - **Review folder** — unknown or ambiguous extensions get held for inspection first
@@ -68,7 +68,7 @@ Hey! I'm [Derek Castelli](https://www.heyderekj.com), a full-time freelance web 
 
 Downloads is where good naming conventions go to die. Binky exists to make that mess quiet again without adding another noisy "productivity system."
 
-Fussy inbox. Meet Binky.
+Fussy folder. Meet Binky.
 
 ## How it works
 
