@@ -14,7 +14,7 @@ Unknown or sketchy extensions do not disappear silently: they land in **Review**
 <table>
   <tr>
     <td><img src="site/screenshots/binky-sorting-2.png" alt="Binky organizer inbox with Downloads sorted into folders" width="100%" /></td>
-    <td><img src="site/screenshots/binky-routines-3.webp" alt="Binky in Routines mode — named watchers, sources, rules, and organizer" width="100%" /></td>
+    <td><img src="site/screenshots/binky-routines-new.webp" alt="Binky in Routines mode — named watchers, sources, rules, and organizer" width="100%" /></td>
   </tr>
   <tr>
     <td><img src="site/screenshots/binky-sorting-summary-2.webp" alt="Binky sorting summary showing batch outcomes" width="100%" /></td>
