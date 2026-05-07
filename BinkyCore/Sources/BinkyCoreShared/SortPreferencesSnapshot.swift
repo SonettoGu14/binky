@@ -21,6 +21,10 @@ public struct SortPreferencesSnapshot: Sendable {
     /// Lowercased Finder tags — files tagged with any of these are never sorted.
     public let globalSkipTagSet: Set<String>
     public let slowMode: Bool
+    /// When true, immediate loose directories under each watch root move into the configured loose-folder destination (opaque; inner files are not harvested separately).
+    public let sortMoveLooseFoldersEnabled: Bool
+    /// Relative path under the sort root for loose folders; empty string means use ``FileSortCategory/folders`` default folder name.
+    public let sortLooseFoldersDestinationRelative: String
 
     public init(
         excludeExtensions: Set<String>,
@@ -39,7 +43,9 @@ public struct SortPreferencesSnapshot: Sendable {
         watchRecursiveOneLevel: Bool,
         savedPresetOrder: [UUID],
         globalSkipTagSet: Set<String>,
-        slowMode: Bool
+        slowMode: Bool,
+        sortMoveLooseFoldersEnabled: Bool,
+        sortLooseFoldersDestinationRelative: String
     ) {
         self.excludeExtensions = excludeExtensions
         self.excludeNameFragments = excludeNameFragments
@@ -58,6 +64,8 @@ public struct SortPreferencesSnapshot: Sendable {
         self.savedPresetOrder = savedPresetOrder
         self.globalSkipTagSet = globalSkipTagSet
         self.slowMode = slowMode
+        self.sortMoveLooseFoldersEnabled = sortMoveLooseFoldersEnabled
+        self.sortLooseFoldersDestinationRelative = sortLooseFoldersDestinationRelative
     }
 }
 
@@ -68,4 +76,15 @@ public enum SortDuplicateHandlingMode: String, Codable, CaseIterable, Identifiab
     case moveToTrash
 
     public var id: String { rawValue }
+}
+
+extension SortPreferencesSnapshot {
+    /// Sanitized relative path under the sort root for loose-folder moves; falls back to ``FileSortCategory/folders``.
+    public func resolvedLooseFoldersRelativePath() -> String {
+        let trimmed = sortLooseFoldersDestinationRelative.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return FileSortCategory.folders.downloadsSubfolder }
+        let parts = trimmed.split(separator: "/").map(String.init).filter { !$0.isEmpty && $0 != "." && $0 != ".." }
+        guard !parts.isEmpty else { return FileSortCategory.folders.downloadsSubfolder }
+        return parts.joined(separator: "/")
+    }
 }

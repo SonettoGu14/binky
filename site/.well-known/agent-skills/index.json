@@ -4,7 +4,7 @@
     {
       "name": "binky-overview",
       "type": "skill-md",
-      "description": "Context for the Binky macOS Downloads inbox organizer app.",
+      "description": "Context for the Binky macOS folder organizer app (Downloads-first, open source).",
       "url": "https://binkyfiles.com/.well-known/agent-skills/binky-overview/SKILL.md",
       "digest": "sha256:da453834b66d4b23f875494b2ec4e83d325543ef18cac0dded5f92c53b4db2b0"
     }

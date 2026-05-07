@@ -99,20 +99,21 @@ final class OrganizerViewModel: ObservableObject {
         }
         let root = prefs.activeSortSweepRootDirectory()
         let recursive = prefs.watchRecursiveOneLevel
-        let files = await Task.detached(priority: .utility) {
-            DownloadsSortOrchestrator.collectSweepFiles(
+        let w = await Task.detached(priority: .utility) {
+            DownloadsSortOrchestrator.collectSweepWorkItems(
                 in: root,
-                recursiveOneLevel: recursive
+                recursiveOneLevel: recursive,
+                moveLooseFolders: prefs.sortMoveLooseFoldersEnabled
             )
         }.value
-        guard !files.isEmpty else {
+        guard w.hasAnyWork else {
             flashTransientStatus(
                 String(localized: "Binky'd. Already handled.", comment: "Organizer transient banner when Sweep finds no files in the watched folder.")
             )
             return
         }
         let outcome = await DownloadsSortOrchestrator.shared.sort(
-            files: files,
+            work: w,
             prefs: prefs,
             progress: SortProgressTracker.orchestratorClosure()
         )
@@ -131,25 +132,29 @@ final class OrganizerViewModel: ObservableObject {
         }
         let root = rootURL.standardizedFileURL
         let recursive = prefs.watchRecursiveOneLevel
-        let (files, rootOverride) = await Task.detached(priority: .utility) {
-            let collected = DownloadsSortOrchestrator.collectSweepFiles(
+        let (work, rootOverride) = await Task.detached(priority: .utility) {
+            let collected = DownloadsSortOrchestrator.collectSweepWorkItems(
                 in: root,
-                recursiveOneLevel: recursive
+                recursiveOneLevel: recursive,
+                moveLooseFolders: prefs.sortMoveLooseFoldersEnabled
             )
             var override: [URL: URL] = [:]
-            for url in collected {
+            for url in collected.fileURLs {
+                override[url] = root
+            }
+            for url in collected.looseFolderURLs {
                 override[url] = root
             }
             return (collected, override)
         }.value
-        guard !files.isEmpty else {
+        guard work.hasAnyWork else {
             flashTransientStatus(
                 String(localized: "Binky'd. Already handled.", comment: "Organizer transient banner when Sweep finds no files in the watched folder.")
             )
             return
         }
         let outcome = await DownloadsSortOrchestrator.shared.sort(
-            files: files,
+            work: work,
             prefs: prefs,
             rootOverride: rootOverride,
             progress: SortProgressTracker.orchestratorClosure()
@@ -170,25 +175,29 @@ final class OrganizerViewModel: ObservableObject {
         }
         let root = URL(fileURLWithPath: preset.watchFolderPath).standardizedFileURL
         let recursive = prefs.watchRecursiveOneLevel
-        let (files, rootOverride) = await Task.detached(priority: .utility) {
-            let collected = DownloadsSortOrchestrator.collectSweepFiles(
+        let (work, rootOverride) = await Task.detached(priority: .utility) {
+            let collected = DownloadsSortOrchestrator.collectSweepWorkItems(
                 in: root,
-                recursiveOneLevel: recursive
+                recursiveOneLevel: recursive,
+                moveLooseFolders: prefs.sortMoveLooseFoldersEnabled
             )
             var override: [URL: URL] = [:]
-            for url in collected {
+            for url in collected.fileURLs {
+                override[url] = root
+            }
+            for url in collected.looseFolderURLs {
                 override[url] = root
             }
             return (collected, override)
         }.value
-        guard !files.isEmpty else {
+        guard work.hasAnyWork else {
             flashTransientStatus(
                 String(localized: "Binky'd. Already handled.", comment: "Organizer transient banner when Sweep finds no files in the watched folder.")
             )
             return
         }
         let outcome = await DownloadsSortOrchestrator.shared.sort(
-            files: files,
+            work: work,
             prefs: prefs,
             rootOverride: rootOverride,
             progress: SortProgressTracker.orchestratorClosure()
@@ -219,25 +228,34 @@ final class OrganizerViewModel: ObservableObject {
 
         let roots = enabled.map { URL(fileURLWithPath: $0.watchFolderPath).standardizedFileURL }
         let recursive = prefs.watchRecursiveOneLevel
-        let (allFiles, rootOverride) = await Task.detached(priority: .utility) {
-            var collected: [URL] = []
+        let moveLoose = prefs.sortMoveLooseFoldersEnabled
+        let (work, rootOverride) = await Task.detached(priority: .utility) {
+            var filePaths: [URL] = []
+            var folderPaths: [URL] = []
             var override: [URL: URL] = [:]
-            var seenPaths: Set<String> = []
+            var seenFiles: Set<String> = []
+            var seenFolders: Set<String> = []
             for root in roots {
-                let files = DownloadsSortOrchestrator.collectSweepFiles(
+                let w = DownloadsSortOrchestrator.collectSweepWorkItems(
                     in: root,
-                    recursiveOneLevel: recursive
+                    recursiveOneLevel: recursive,
+                    moveLooseFolders: moveLoose
                 )
-                for url in files {
-                    guard seenPaths.insert(url.standardizedFileURL.path).inserted else { continue }
-                    collected.append(url)
+                for url in w.fileURLs {
+                    guard seenFiles.insert(url.standardizedFileURL.path).inserted else { continue }
+                    filePaths.append(url)
+                    override[url] = root
+                }
+                for url in w.looseFolderURLs {
+                    guard seenFolders.insert(url.standardizedFileURL.path).inserted else { continue }
+                    folderPaths.append(url)
                     override[url] = root
                 }
             }
-            return (collected, override)
+            return (SortSweepWorkItems(fileURLs: filePaths, looseFolderURLs: folderPaths), override)
         }.value
 
-        guard !allFiles.isEmpty else {
+        guard work.hasAnyWork else {
             flashTransientStatus(
                 String(localized: "All quiet. Every folder is Binky'd.", comment: "Organizer transient banner when Sweep All finds no files across all routines.")
             )
@@ -245,7 +263,7 @@ final class OrganizerViewModel: ObservableObject {
         }
 
         let outcome = await DownloadsSortOrchestrator.shared.sort(
-            files: allFiles,
+            work: work,
             prefs: prefs,
             rootOverride: rootOverride,
             progress: SortProgressTracker.orchestratorClosure()
@@ -327,13 +345,11 @@ final class OrganizerViewModel: ObservableObject {
 
     /// Dry-run rows for active sweep root (sidebar Preview).
     func inboxPreviewEntries(prefs: BinkyPreferences) async -> [SortPreviewEntry] {
-        let files = DownloadsSortOrchestrator.collectSweepFiles(
+        let work = DownloadsSortOrchestrator.collectSweepWorkItems(
             in: prefs.activeSortSweepRootDirectory(),
-            recursiveOneLevel: prefs.watchRecursiveOneLevel
+            recursiveOneLevel: prefs.watchRecursiveOneLevel,
+            moveLooseFolders: prefs.sortMoveLooseFoldersEnabled
         )
-        return await DownloadsSortOrchestrator.shared.previewSort(
-            files: files,
-            prefs: prefs
-        )
+        return await DownloadsSortOrchestrator.shared.previewSort(work: work, prefs: prefs)
     }
 }

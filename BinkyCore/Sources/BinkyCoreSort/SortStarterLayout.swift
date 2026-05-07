@@ -1,24 +1,86 @@
 import BinkyCoreShared
 import Foundation
 
+/// Files and optional loose directories to process in one sweep (matches app + CLI organizer passes).
+public struct SortSweepWorkItems: Sendable {
+    public var fileURLs: [URL]
+    public var looseFolderURLs: [URL]
+
+    public init(fileURLs: [URL], looseFolderURLs: [URL] = []) {
+        self.fileURLs = fileURLs
+        self.looseFolderURLs = looseFolderURLs
+    }
+
+    public init() {
+        self.fileURLs = []
+        self.looseFolderURLs = []
+    }
+
+    public var hasAnyWork: Bool { !fileURLs.isEmpty || !looseFolderURLs.isEmpty }
+}
+
 /// Enumerate regular files suitable for organizer passes (CLI + tooling).
 /// Matches the app sweep: immediate files in ``root``, plus one level deeper when `recursiveOneLevel` is true.
 public enum SortSweepFilesCollection {
 
     /// Files directly under `root`, plus regular files one level inside immediate subfolders when `recursiveOneLevel` is true.
     public static func files(in root: URL, recursiveOneLevel: Bool, fileManager fm: FileManager = .default) -> [URL] {
-        guard let urls = try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]) else {
-            return []
+        workItems(in: root, recursiveOneLevel: recursiveOneLevel, moveLooseFolders: false, fileManager: fm).fileURLs
+    }
+
+    /// Full sweep: loose files, optional loose folders to relocate as units, and `.app` bundles as file-phase items.
+    public static func workItems(
+        in root: URL,
+        recursiveOneLevel: Bool,
+        moveLooseFolders: Bool,
+        fileManager fm: FileManager = .default
+    ) -> SortSweepWorkItems {
+        let rootStd = root.standardizedFileURL
+        let builtIns = FileSortCategory.builtinDestinationDirectoryNamesLowercased
+        guard let urls = try? fm.contentsOfDirectory(at: rootStd, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]) else {
+            return SortSweepWorkItems()
         }
+
+        var looseFolders: [URL] = []
+        var opaqueFolderPaths: Set<String> = []
+
+        if moveLooseFolders {
+            for url in urls {
+                let std = url.standardizedFileURL
+                let vals = try? std.resourceValues(forKeys: [.isDirectoryKey])
+                guard vals?.isDirectory == true else { continue }
+                let name = std.lastPathComponent
+                if name.hasPrefix(".") { continue }
+                let lower = name.lowercased()
+                if builtIns.contains(lower) { continue }
+                if std.pathExtension.lowercased() == "app" { continue }
+                looseFolders.append(std)
+                opaqueFolderPaths.insert(std.path)
+            }
+        }
+
         var files: [URL] = []
         for url in urls {
-            let vals = try? url.resourceValues(forKeys: [.isDirectoryKey])
-            if vals?.isDirectory != true {
-                files.append(url.standardizedFileURL)
+            let std = url.standardizedFileURL
+            let vals = try? std.resourceValues(forKeys: [.isDirectoryKey])
+            let isDir = vals?.isDirectory == true
+
+            if !isDir {
+                files.append(std)
                 continue
             }
+
+            if std.pathExtension.lowercased() == "app" {
+                files.append(std)
+                continue
+            }
+
+            if opaqueFolderPaths.contains(std.path) {
+                continue
+            }
+
             guard recursiveOneLevel else { continue }
-            guard let inner = try? fm.contentsOfDirectory(at: url, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]) else {
+            guard let inner = try? fm.contentsOfDirectory(at: std, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]) else {
                 continue
             }
             for u in inner {
@@ -27,7 +89,8 @@ public enum SortSweepFilesCollection {
                 }
             }
         }
-        return files
+
+        return SortSweepWorkItems(fileURLs: files, looseFolderURLs: looseFolders)
     }
 }
 

@@ -23,8 +23,8 @@ extension Notification.Name {
     static let binkyStartSort = Notification.Name("binkyStartSort")
     /// Sweep one routine by id (`userInfo`: ``BinkyNotificationUserInfoKey/sortRoutinePresetID`` → `UUID`).
     static let binkyStartSortForRoutine = Notification.Name("binkyStartSortForRoutine")
-    /// Open the SwiftUI `Settings` scene from any AppKit context (menu bar, status item, etc.).
-    static let binkyOpenSettings = Notification.Name("binkyOpenSettings")
+    /// macOS: raise the preferences ``Window`` (`openWindow(id:)` in ``BinkyShortcutCommands``).
+    static let binkyOpenMacPreferences = Notification.Name("binkyOpenMacPreferences")
     /// Bring the main organizer window forward (or create one) from any AppKit context.
     static let binkyShowMainWindow = Notification.Name("binkyShowMainWindow")
     /// Another sort couldn’t start because one is already in flight.

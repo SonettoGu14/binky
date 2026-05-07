@@ -350,7 +350,7 @@ struct OrganizerMainView: View {
                 systemImage: "repeat.circle"
             )
             organizerSettingsSidebarLink(
-                tab: .general,
+                tab: .generalBehavior,
                 title: String(localized: "All settings", comment: "Organizer sidebar shortcut to general settings tab."),
                 systemImage: "gearshape"
             )
@@ -608,9 +608,11 @@ struct OrganizerMainView: View {
         .buttonStyle(.plain)
     }
 
-    /// Opens the Settings scene (``SettingsLink``) and matches the row styling of legacy sidebar links.
+    /// Opens the preferences window and matches the row styling of legacy sidebar links.
     private func organizerSettingsSidebarLink(tab: PreferencesTab, title: String, systemImage: String) -> some View {
-        SettingsLink {
+        Button {
+            PreferencesTab.openPreferencesWindow(selecting: tab)
+        } label: {
             HStack(spacing: 6) {
                 Image(systemName: systemImage)
                     .font(.system(size: 12, weight: .medium))
@@ -624,9 +626,6 @@ struct OrganizerMainView: View {
             .padding(.vertical, 1)
             .contentShape(Rectangle())
         }
-        .simultaneousGesture(TapGesture().onEnded {
-            PreferencesTab.stagePendingTab(tab)
-        })
         .buttonStyle(.plain)
         .foregroundStyle(binkyTintColor)
     }
@@ -1016,16 +1015,16 @@ struct OrganizerMainView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 HStack(spacing: 10) {
-                    SettingsLink {
+                    Button {
+                        showCalmDesktopPopover = false
+                        PreferencesTab.stageRoutinesWithCalmDesktopTemplate()
+                        PreferencesTab.openPreferencesWindow()
+                    } label: {
                         Text(String(localized: "Calm my Desktop…", comment: "Opens Settings to add Desktop routine."))
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(binkyTintColor)
                     .controlSize(.regular)
-                    .simultaneousGesture(TapGesture().onEnded {
-                        showCalmDesktopPopover = false
-                        PreferencesTab.stageRoutinesWithCalmDesktopTemplate()
-                    })
                     Button(String(localized: "Dismiss", comment: "Dismiss Desktop onboarding popover.")) {
                         withAnimation { calmDesktopOnboardingDismissed = true }
                         showCalmDesktopPopover = false
@@ -1104,15 +1103,15 @@ struct OrganizerMainView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer(minLength: 0)
-            SettingsLink {
+            Button {
+                PreferencesTab.stageRoutinesWithCalmDesktopTemplate()
+                PreferencesTab.openPreferencesWindow()
+            } label: {
                 Text(String(localized: "Calm my Desktop…", comment: "Opens Settings to add Desktop routine."))
             }
             .buttonStyle(.borderedProminent)
             .tint(binkyTintColor)
             .controlSize(.small)
-            .simultaneousGesture(TapGesture().onEnded {
-                PreferencesTab.stageRoutinesWithCalmDesktopTemplate()
-            })
 
             Button(String(localized: "Dismiss", comment: "Dismiss Desktop onboarding banner.")) {
                 withAnimation(.easeInOut(duration: 0.2)) {

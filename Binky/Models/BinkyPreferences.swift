@@ -346,6 +346,12 @@ final class BinkyPreferences: ObservableObject {
     /// Watch immediate subfolders of each watched folder root (one level) for sorting and sweep.
     @AppStorage("watch.recursiveOneLevel") var watchRecursiveOneLevel: Bool = false
 
+    /// Move non–destination loose directories at the watch root into the Folders destination as a single unit.
+    @AppStorage("sort.moveLooseFolders.enabled") var sortMoveLooseFoldersEnabled: Bool = false
+
+    /// Relative path under the sort root for loose-folder moves; empty = default ``FileSortCategory.folders`` folder name.
+    @AppStorage("sort.moveLooseFolders.relativePath") var sortLooseFoldersDestinationRelative: String = ""
+
     /// When on, saving routing rules triggers a sort across all watched folder roots (debounced).
     @AppStorage("sort.autoRunWhenRulesChange") var sortAutoRunWhenRulesChange: Bool = false
 
@@ -499,7 +505,9 @@ extension BinkyPreferences {
                     .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
                     .filter { !$0.isEmpty }
             ),
-            slowMode: sortSlowModeEnabled
+            slowMode: sortSlowModeEnabled,
+            sortMoveLooseFoldersEnabled: sortMoveLooseFoldersEnabled,
+            sortLooseFoldersDestinationRelative: sortLooseFoldersDestinationRelative
         )
     }
 

@@ -12,7 +12,7 @@ A native macOS sorter that follows your rules — no cloud, no guessing. **Quick
 
 ## Highlights
 
-- **Quick Sort** — one-tap sweep for any inbox (defaults to `~/Downloads`); waits for downloads to finish, collision-safe moves
+- **Quick Sort** — one-tap sweep for any folder (defaults to `~/Downloads`); waits for downloads to finish, collision-safe moves
 - **Routines** — named watchers with their own sources, rules, and optional Finder tags; plain-English rule building on macOS 26+
 - **Source-aware routing** — match by download origin and content, not just filename
 - **Receipt & invoice detection** — routes financial PDFs when content looks like a receipt

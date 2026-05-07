@@ -10,7 +10,7 @@ struct ReviewFolderTriageSheet: View {
     @State private var ruleEditor: RuleEditorSheetState?
 
     private static let moveTargets: [FileSortCategory] = [
-        .images, .pdf, .video, .audio, .documents, .archives, .apps, .screenshots, .misc, .receipts,
+        .images, .pdf, .video, .audio, .documents, .archives, .apps, .screenshots, .misc, .folders, .receipts,
     ]
 
     var body: some View {
@@ -58,8 +58,7 @@ struct ReviewFolderTriageSheet: View {
                                     let order = prefs.sortRoutingRules.count + 1
                                     ruleEditor = RuleEditorSheetState(
                                         draft: SortRule.draftFromReviewFile(url: item.url, order: order),
-                                        isNew: true,
-                                        showDescribeSection: false
+                                        isNew: true
                                     )
                                 }
                                 .controlSize(.small)
@@ -152,6 +151,7 @@ struct ReviewFolderTriageSheet: View {
         case .review: return String(localized: "Review", comment: "Sort category.")
         case .duplicates: return String(localized: "Duplicates", comment: "Sort category.")
         case .receipts: return String(localized: "Receipts", comment: "Sort category.")
+        case .folders: return String(localized: "Folders", comment: "Sort category.")
         }
     }
 

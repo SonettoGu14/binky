@@ -72,6 +72,62 @@ func fileLooksStableWithoutPolling(url: URL) -> Bool {
     return Date().timeIntervalSince(anchor) >= 3
 }
 
+func directoryLooksStableWithoutPolling(url: URL) -> Bool {
+    guard !looksTransientIncomplete(url) else { return false }
+    let fm = FileManager.default
+    var isDir: ObjCBool = false
+    guard fm.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue else { return false }
+    guard let vals = try? url.resourceValues(forKeys: [.contentModificationDateKey, .addedToDirectoryDateKey]),
+          let modified = vals.contentModificationDate else {
+        return false
+    }
+    let anchor = vals.addedToDirectoryDate.map { max($0, modified) } ?? modified
+    return Date().timeIntervalSince(anchor) >= 3
+}
+
+func waitUntilStableDirectory(
+    at url: URL,
+    maxSeconds: Double = 120,
+    continueCheck: (() async -> Bool)? = nil
+) async -> Bool {
+    let fm = FileManager.default
+    var lastMod: Date?
+    var unchangedHits = 0
+    let end = Date().addingTimeInterval(maxSeconds)
+
+    while Date() < end {
+        if let continueCheck, await continueCheck() == false {
+            return false
+        }
+        guard fm.fileExists(atPath: url.path) else { return false }
+        do {
+            let v = try url.resourceValues(forKeys: [.contentModificationDateKey])
+            let m = v.contentModificationDate
+            if m == lastMod {
+                unchangedHits += 1
+                if unchangedHits >= 2 {
+                    try await Task.sleep(nanoseconds: 600_000_000)
+                    return true
+                }
+            } else {
+                unchangedHits = 0
+            }
+            lastMod = m
+            try await Task.sleep(nanoseconds: 380_000_000)
+        } catch {
+            return false
+        }
+    }
+    return false
+}
+
+public func isAppBundleURL(_ url: URL) -> Bool {
+    let fm = FileManager.default
+    var isDir: ObjCBool = false
+    guard fm.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue else { return false }
+    return url.pathExtension.lowercased() == "app"
+}
+
 // MARK: - Classification
 
 func screenshotHeuristic(_ url: URL) -> Bool {
@@ -86,6 +142,8 @@ enum FileClassification {
         let ext = url.pathExtension.lowercased()
 
         if looksTransientIncomplete(url) { return .review }
+
+        if isAppBundleURL(url) { return .apps }
 
         let archives: Set<String> = ["zip", "rar", "7z", "tar", "gz", "tgz", "bz2", "xz"]
         let images: Set<String> = ["jpg", "jpeg", "png", "gif", "webp", "heic", "heif", "tif", "tiff", "bmp", "avif"]
@@ -443,9 +501,11 @@ private actor SortRenameCounterActor {
 }
 
 /// Serializes uniquify + move into the same destination folder across concurrent sort tasks.
-private final class PerDestinationUniquifyGate: @unchecked Sendable {
+public final class PerDestinationUniquifyGate: @unchecked Sendable {
     private let master = NSLock()
     private var locks: [String: NSLock] = [:]
+
+    public init() {}
 
     func sync<R>(directory: URL, _ body: () throws -> R) rethrows -> R {
         let key = directory.standardizedFileURL.path
@@ -518,6 +578,189 @@ public enum SortWork {
         }
     }
 
+    /// Relocates loose directories under each watch root when enabled (sequential).
+    nonisolated public static func runLooseFolderMoves(
+        folderURLs: [URL],
+        snapshot: SortPreferencesSnapshot,
+        rootOverride: [URL: URL],
+        destGate: PerDestinationUniquifyGate,
+        gate: SortRunGate,
+        progress: (@Sendable (SortProgressEvent) -> Void)?,
+        hooks: SortWorkHooks
+    ) async -> (rows: [SortBatchEntry], tagWriteFailures: Int) {
+        guard snapshot.sortMoveLooseFoldersEnabled, !folderURLs.isEmpty else { return ([], 0) }
+        let throttleDenom = max(1, folderURLs.count)
+        var rows: [SortBatchEntry] = []
+        var tagWriteFailures = 0
+        let fm = FileManager.default
+        let rel = snapshot.resolvedLooseFoldersRelativePath()
+
+        for standardized in folderURLs {
+            let standardized = standardized.standardizedFileURL
+            guard await gate.continueWhenSortPermitsProgress() else { break }
+            let pathKey = standardized.path
+            let displayName = standardized.lastPathComponent
+
+            progress?(.fileStarted(path: pathKey, displayName: displayName, animationBucket: FileSortCategory.folders.sortAnimationBucket))
+            defer { progress?(.fileFinished(path: pathKey)) }
+
+            if looksTransientIncomplete(standardized) {
+                let oh = WhereFromsReader.primaryOriginHost(forFileAt: standardized)
+                rows.append(SortBatchEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    destinationPath: nil,
+                    category: .review,
+                    disposition: .skippedTransient,
+                    reason: String(localized: "Temporary artifact — skipping folder until finalized.", comment: "Sort loose folder log."),
+                    matchedRuleName: nil,
+                    originHost: oh
+                ))
+                await applyEnergyThrottleBetweenFiles(batchSize: throttleDenom, hooks: hooks)
+                continue
+            }
+
+            let stableOK: Bool
+            if directoryLooksStableWithoutPolling(url: standardized) {
+                stableOK = true
+            } else {
+                stableOK = await waitUntilStableDirectory(at: standardized, continueCheck: {
+                    await gate.continueWhenSortPermitsProgress()
+                })
+            }
+            guard stableOK else {
+                if gate.stopRequested() { break }
+                let oh = WhereFromsReader.primaryOriginHost(forFileAt: standardized)
+                rows.append(SortBatchEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    destinationPath: nil,
+                    category: .review,
+                    disposition: .skippedStableCheckTimeout,
+                    reason: String(localized: "Folder never stabilized before timeout.", comment: "Sort loose folder log."),
+                    matchedRuleName: nil,
+                    originHost: oh
+                ))
+                await applyEnergyThrottleBetweenFiles(batchSize: throttleDenom, hooks: hooks)
+                continue
+            }
+
+            if isURLExcludedForSort(url: standardized, snapshot: snapshot) {
+                let oh = WhereFromsReader.primaryOriginHost(forFileAt: standardized)
+                rows.append(SortBatchEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    destinationPath: nil,
+                    category: .misc,
+                    disposition: .skippedExcluded,
+                    reason: String(localized: "Skipped — matches your ignore list.", comment: "Sort log."),
+                    matchedRuleName: nil,
+                    originHost: oh
+                ))
+                await applyEnergyThrottleBetweenFiles(batchSize: throttleDenom, hooks: hooks)
+                continue
+            }
+
+            if fileURLMatchesGlobalSkipTags(standardized, snapshot: snapshot) {
+                let oh = WhereFromsReader.primaryOriginHost(forFileAt: standardized)
+                rows.append(SortBatchEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    destinationPath: nil,
+                    category: .misc,
+                    disposition: .skippedExcluded,
+                    reason: String(localized: "Skipped — folder has a protected Finder tag.", comment: "Sort loose folder log."),
+                    matchedRuleName: nil,
+                    originHost: oh
+                ))
+                await applyEnergyThrottleBetweenFiles(batchSize: throttleDenom, hooks: hooks)
+                continue
+            }
+
+            let (defaultRoot, presets) = sortInboxContext(for: standardized, snapshot: snapshot)
+            let inboxRoot = rootOverride[standardized] ?? defaultRoot
+            let destRoot = inboxRoot.appendingPathComponent(rel, isDirectory: true)
+
+            let parent = standardized.deletingLastPathComponent().standardizedFileURL
+            if parent == destRoot.standardizedFileURL {
+                rows.append(SortBatchEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    destinationPath: standardized.path,
+                    category: .folders,
+                    disposition: .kept,
+                    reason: String(localized: "Already in Folders destination.", comment: "Sort loose folder log."),
+                    matchedRuleName: nil,
+                    originHost: nil
+                ))
+                await applyEnergyThrottleBetweenFiles(batchSize: throttleDenom, hooks: hooks)
+                continue
+            }
+
+            do {
+                let target = try destGate.sync(directory: destRoot) {
+                    try fm.createDirectory(at: destRoot, withIntermediateDirectories: true)
+                    return SortCollision.uniquify(
+                        destinationDirectory: destRoot,
+                        preferredFilename: standardized.lastPathComponent
+                    )
+                }
+                if target.standardizedFileURL == standardized {
+                    rows.append(SortBatchEntry(
+                        id: UUID(),
+                        sourcePath: standardized.path,
+                        destinationPath: standardized.path,
+                        category: .folders,
+                        disposition: .kept,
+                        reason: String(localized: "Already at target path.", comment: "Sort loose folder log."),
+                        matchedRuleName: nil,
+                        originHost: nil
+                    ))
+                    await applyEnergyThrottleBetweenFiles(batchSize: throttleDenom, hooks: hooks)
+                    continue
+                }
+                try fm.moveItem(at: standardized, to: target)
+
+                if snapshot.assignFinderTagsOnSortEnabled {
+                    let tags = FinderTagComposer.compose(
+                        naturalCategory: .folders,
+                        globalDefaults: snapshot.finderTagDefaultsByCategory,
+                        preset: presets.first,
+                        matchedRule: nil,
+                        appendNewSemanticTag: snapshot.sortAppendNewSemanticTagEnabled
+                    )
+                    let okTag = FinderTagApplicator.merge(tags, onto: target)
+                    if !okTag { tagWriteFailures += 1 }
+                }
+
+                rows.append(SortBatchEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    destinationPath: target.path,
+                    category: .folders,
+                    disposition: .moved,
+                    reason: String(localized: "Moved loose folder into Folders destination.", comment: "Sort loose folder log."),
+                    matchedRuleName: nil,
+                    originHost: nil
+                ))
+            } catch {
+                rows.append(SortBatchEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    destinationPath: nil,
+                    category: .folders,
+                    disposition: .skippedError,
+                    reason: error.localizedDescription,
+                    matchedRuleName: nil,
+                    originHost: nil
+                ))
+            }
+            await applyEnergyThrottleBetweenFiles(batchSize: throttleDenom, hooks: hooks)
+        }
+
+        return (rows, tagWriteFailures)
+    }
+
     /// Runs the per-file pipeline off the main actor. Progress closure is ``Sendable`` and safe to call from here.
     /// `rootOverride` lets the caller pin specific files to an ad-hoc inbox root (e.g. a right-clicked folder).
     nonisolated public static func runSortWorkLoop(
@@ -526,11 +769,12 @@ public enum SortWork {
         rootOverride: [URL: URL],
         gate: SortRunGate,
         progress: (@Sendable (SortProgressEvent) -> Void)?,
-        hooks: SortWorkHooks
+        hooks: SortWorkHooks,
+        destGate: PerDestinationUniquifyGate? = nil
     ) async -> (rows: [SortBatchEntry], tagWriteFailures: Int) {
         guard !workURLs.isEmpty else { return (rows: [], tagWriteFailures: 0) }
         let batchSize = workURLs.count
-        let destGate = PerDestinationUniquifyGate()
+        let destGateResolved = destGate ?? PerDestinationUniquifyGate()
         let renameCounter = SortRenameCounterActor()
         // Slow mode forces sequential processing so each file's progress UI is readable.
         let maxConcurrent = snapshot.slowMode
@@ -575,7 +819,15 @@ public enum SortWork {
                 return SortIndexedFileResult(rows: [], tagWriteFailures: 0)
             }
             let stableOK: Bool
-            if fileLooksStableWithoutPolling(url: standardized) {
+            if isAppBundleURL(standardized) {
+                if directoryLooksStableWithoutPolling(url: standardized) {
+                    stableOK = true
+                } else {
+                    stableOK = await waitUntilStableDirectory(at: standardized, continueCheck: {
+                        await gate.continueWhenSortPermitsProgress()
+                    })
+                }
+            } else if fileLooksStableWithoutPolling(url: standardized) {
                 stableOK = true
             } else {
                 stableOK = await waitUntilStable(at: standardized, continueCheck: {
@@ -693,7 +945,7 @@ public enum SortWork {
                         } else {
                             let dupDir = StarterDestinations.directory(for: .duplicates, root: inboxRoot)
                             do {
-                                let dest: URL = try destGate.sync(directory: dupDir) {
+                                let dest: URL = try destGateResolved.sync(directory: dupDir) {
                                     try fm.createDirectory(at: dupDir, withIntermediateDirectories: true)
                                     let destInner = SortCollision.uniquify(
                                         destinationDirectory: dupDir,
@@ -809,7 +1061,7 @@ public enum SortWork {
                     rule.name
                 )
                 do {
-                    _ = try destGate.sync(directory: destinationDir) {
+                    _ = try destGateResolved.sync(directory: destinationDir) {
                         try fm.createDirectory(at: destinationDir, withIntermediateDirectories: true)
                     }
                     try ArchiveExtractionService.extract(source: standardized, destinationDirectory: destinationDir)
@@ -980,7 +1232,7 @@ public enum SortWork {
                     rule.name
                 )
                 do {
-                    let zipURL: URL = try destGate.sync(directory: destinationDir) {
+                    let zipURL: URL = try destGateResolved.sync(directory: destinationDir) {
                         try fm.createDirectory(at: destinationDir, withIntermediateDirectories: true)
                         return SortCollision.uniquify(destinationDirectory: destinationDir, preferredFilename: zipPreferred)
                     }
@@ -1042,7 +1294,7 @@ public enum SortWork {
 
             let target: URL
             do {
-                target = try destGate.sync(directory: destinationDir) {
+                target = try destGateResolved.sync(directory: destinationDir) {
                     try fm.createDirectory(at: destinationDir, withIntermediateDirectories: true)
                     return SortCollision.uniquify(destinationDirectory: destinationDir, preferredFilename: preferredFilename)
                 }

@@ -18,6 +18,11 @@ private final class BinkyRootModel: ObservableObject {
     }
 }
 
+/// `Window` scene id for macOS preferences (unified title bar chrome matches the main window; unlike `Settings`).
+private enum BinkyMacPreferencesWindow {
+    static let sceneID = "binky-preferences"
+}
+
 @main
 struct BinkyApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -89,14 +94,27 @@ struct BinkyApp: App {
             CommandGroup(replacing: .help) {
                 HelpMenuCommands(updater: updater)
             }
+
+            // Preferences use a `Window` scene (not `Settings`) so the unified title bar matches
+            // the organizer window — navigation title and Back/Forward stay on one line with the traffic lights.
+            CommandGroup(replacing: .appSettings) {
+                Button(String(localized: "Settings…", comment: "App menu: open settings.")) {
+                    NotificationCenter.default.post(name: .binkyOpenMacPreferences, object: nil)
+                }
+                .keyboardShortcut(",", modifiers: .command)
+            }
         }
 
-        Settings {
+        Window(String(localized: "Settings", comment: "Preferences window title."), id: BinkyMacPreferencesWindow.sceneID) {
             PreferencesView()
                 .environmentObject(root.prefs)
                 .environmentObject(updater)
                 .tint(binkyTintColor)
         }
+        .windowToolbarStyle(.unified(showsTitle: true))
+        .windowResizability(.contentMinSize)
+        .defaultSize(width: 760, height: 560)
+        .commandsRemoved()
 
         // Opened via the Help menu. Single-instance; reuses the same
         // window if it's already on screen.
@@ -160,6 +178,10 @@ private struct BinkyShortcutCommands: View {
         .onReceive(NotificationCenter.default.publisher(for: .binkyShowMainWindow)) { _ in
             NSApp.activate()
             openWindow(id: "main")
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .binkyOpenMacPreferences)) { _ in
+            NSApp.activate()
+            openWindow(id: BinkyMacPreferencesWindow.sceneID)
         }
     }
 }

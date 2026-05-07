@@ -1,11 +1,11 @@
 # Binky
 
-> Native macOS organizer: **Quick Sort** for one-shot clears, **Routines** for always-on watches. No cloud, no guessing — your rules, stable-file patience, sorted buckets, Review for unknowns. Runs locally. The pacifier for a fussy folder.
+> Native macOS organizer: **Quick Sort** for one-shot clears, **Routines** for always-on watches. No cloud, no guessing — your rules, stable-file patience, sorted destinations, Review for unknowns. Runs locally. The pacifier for a fussy folder.
 
 ## What it does
 
-- **Quick Sort** — pick a folder, **Sort Now**; stable-file gate and collision-safe moves
-- **Routines** — multiple named watchers (each with its own source and rules) plus global fallback when needed
+- **Quick Sort** — pick a folder, **Sort Now**; stable-file gate and collision-safe moves; **⌘1** in the app
+- **Routines** — multiple named watchers (each with its own source and rules) plus global fallback when needed; **⌘2** in the app (same routing as Quick Sort)
 - **Destinations** — Images, PDFs, Media, Documents, Archives, Apps, Screenshots, Misc
 - **Source-aware routing** — rules can use where a file came from (browser metadata) and content matches
 - **Describe a rule** — plain-English rule building where the OS supports it; manual editor always available
@@ -28,9 +28,9 @@
 
 ## Rough comparison (not legal advice)
 
-- **vs Hazel** — Hazel is the Mac routine rules engine everywhere. Binky is folder-first: watch, gate, sorted buckets, Review, Quick Sort when you just need calm now.
+- **vs Hazel** — Hazel is the Mac routine rules engine everywhere. Binky is folder-first: watch, gate, sorted destinations, Review, Quick Sort when you just need calm now.
 - **vs Dropzone 4** — Dropzone is drag-to-route shelf actions. Binky watches folders without you ferrying each file.
-- **vs Unclutter** — Unclutter is a desktop drawer with a files shelf. Binky routes arrivals into buckets automatically.
+- **vs Unclutter** — Unclutter is a desktop drawer with a files shelf. Binky routes arrivals into destinations automatically.
 - **vs CleanMyMac** — CleanMyMac scans and cleans the system. Binky sorts live drops into destinations you configured.
 - **vs manual sorting** — Still free; your time isn't.
 

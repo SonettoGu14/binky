@@ -52,6 +52,7 @@ final class DownloadSortClassificationTests: XCTestCase {
         XCTAssertEqual(FileSortCategory.misc.sortAnimationBucket, .documents)
         XCTAssertEqual(FileSortCategory.duplicates.sortAnimationBucket, .documents)
         XCTAssertEqual(FileSortCategory.receipts.sortAnimationBucket, .documents)
+        XCTAssertEqual(FileSortCategory.folders.sortAnimationBucket, .documents)
     }
 
     func testTransientSuffixRoutesToReview() {

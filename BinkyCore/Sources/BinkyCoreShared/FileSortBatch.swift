@@ -1,7 +1,7 @@
 import Foundation
 
 public enum FileSortCategory: String, CaseIterable, Codable, Sendable {
-    case images, pdf, video, audio, documents, archives, apps, screenshots, misc, review, duplicates, receipts
+    case images, pdf, video, audio, documents, archives, apps, screenshots, misc, review, duplicates, receipts, folders
 
     public var downloadsSubfolder: String {
         switch self {
@@ -15,7 +15,13 @@ public enum FileSortCategory: String, CaseIterable, Codable, Sendable {
         case .review: return "Review"
         case .duplicates: return "Duplicates"
         case .receipts: return "Receipts"
+        case .folders: return "Folders"
         }
+    }
+
+    /// Lowercased names of first-class destination directories under a sort root. Used to avoid relocating Binky’s own layout when moving loose folders.
+    public static var builtinDestinationDirectoryNamesLowercased: Set<String> {
+        Set(allCases.map { $0.downloadsSubfolder.lowercased() })
     }
 
     public var semanticTagHint: String {
@@ -27,6 +33,7 @@ public enum FileSortCategory: String, CaseIterable, Codable, Sendable {
         case .pdf, .documents: return "Receipt"
         case .duplicates: return "Duplicate"
         case .receipts: return "Receipt"
+        case .folders: return "New"
         default: return "New"
         }
     }
@@ -35,7 +42,7 @@ public enum FileSortCategory: String, CaseIterable, Codable, Sendable {
         switch self {
         case .images, .screenshots: return .images
         case .video: return .videos
-        case .pdf, .audio, .documents, .archives, .apps, .misc, .review, .duplicates, .receipts: return .documents
+        case .pdf, .audio, .documents, .archives, .apps, .misc, .review, .duplicates, .receipts, .folders: return .documents
         }
     }
 }

@@ -16,7 +16,6 @@
 - **Binky + Dinky bundle:** planned one-time **$15** with one year of updates for both; **$9/year** bundle renewal draft. Internal spec: [`docs/future/BINKY_2.0_PAID_TRANSITION.md`](docs/future/BINKY_2.0_PAID_TRANSITION.md).
 - **MIT source** remains; license pays for signed binaries + update channel + 2.0 feature work.
 - **Site + docs:** FAQ + schema offers updated on [`site/index.html`](site/index.html); compare hub/leaves; [`README.md`](README.md), [`site/homepage.md`](site/homepage.md), [`site/llms.txt`](site/llms.txt). Help: [`Binky/Resources/Help.md`](Binky/Resources/Help.md), [`Binky/Resources/en.lproj/Help.md`](Binky/Resources/en.lproj/Help.md).
-- **In-app:** Settings → **License** (General); update banner **Licensing…** link.
 
 ### Added — v2.0 Routines (formerly Automations)
 

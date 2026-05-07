@@ -8,8 +8,6 @@ struct ContentView: View {
     @EnvironmentObject var prefs: BinkyPreferences
     @EnvironmentObject var updater: UpdateChecker
     @ObservedObject var vm: OrganizerViewModel
-    @Environment(\.openSettings) private var openSettings
-
     @AppStorage("binky.mainWindowMode") private var mainWindowStored = MainWindowMode.quickSort.rawValue
 
     /// One-time heuristic: upgrading users land on **Routines** when they’ve already enabled watches.
@@ -38,7 +36,6 @@ struct ContentView: View {
                 vm: vm,
                 prefs: prefs,
                 updater: updater,
-                openSettings: openSettings,
                 openFilesPanel: { openSortableFilesPanel() }
             ))
             .onReceive(NotificationCenter.default.publisher(for: .binkyShowHistory)) { _ in
@@ -200,7 +197,6 @@ private struct MenuBridgeObservers: ViewModifier {
     @ObservedObject var vm: OrganizerViewModel
     @ObservedObject var prefs: BinkyPreferences
     @ObservedObject var updater: UpdateChecker
-    let openSettings: OpenSettingsAction
     let openFilesPanel: () -> Void
 
     func body(content: Content) -> some View {
@@ -221,10 +217,6 @@ private struct MenuBridgeObservers: ViewModifier {
             }
             .onReceive(NotificationCenter.default.publisher(for: .binkyShowLastBatchSummary)) { _ in
                 vm.showLastSortSummary()
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .binkyOpenSettings)) { _ in
-                NSApp.activate()
-                openSettings()
             }
             .onReceive(NotificationCenter.default.publisher(for: .binkyCheckUpdates)) { _ in
                 Task {

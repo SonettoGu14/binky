@@ -51,7 +51,7 @@ struct WeeklyDigestShareCard: View {
 
                 if !model.topCategories.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(String(localized: "Top buckets", comment: "Weekly digest section."))
+                        Text(String(localized: "Top destinations", comment: "Weekly digest section."))
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(.secondary)
                         HStack(spacing: 14) {
@@ -115,6 +115,7 @@ struct WeeklyDigestShareCard: View {
         case .review: return "eyes"
         case .duplicates: return "square.on.square"
         case .receipts: return "creditcard"
+        case .folders: return "folder"
         }
     }
 }

@@ -1,6 +1,6 @@
 ---
 name: binky-overview
-description: Context for the Binky macOS Downloads inbox organizer app.
+description: Context for the Binky macOS folder organizer app (Downloads-first, open source).
 ---
 
 # Binky — overview

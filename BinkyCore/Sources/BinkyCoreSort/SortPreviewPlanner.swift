@@ -16,7 +16,10 @@ public enum SortPreviewPlanner {
             let standardized = raw.standardizedFileURL
             guard standardized.isFileURL else { continue }
             var isDir: ObjCBool = false
-            guard fm.fileExists(atPath: standardized.path, isDirectory: &isDir), !isDir.boolValue else { continue }
+            guard fm.fileExists(atPath: standardized.path, isDirectory: &isDir) else { continue }
+            if isDir.boolValue {
+                guard isAppBundleURL(standardized) else { continue }
+            }
 
             if looksTransientIncomplete(standardized) {
                 let sum = String(localized: "Skipped — looks like an incomplete download.", comment: "Sort preview row.")
@@ -399,6 +402,117 @@ public enum SortPreviewPlanner {
                 category: category,
                 matchedRuleName: matchedRule?.name,
                 addedTags: tagsMove,
+                planDisposition: .wouldMove
+            ))
+        }
+        return out
+    }
+
+    nonisolated public static func preview(
+        work: SortSweepWorkItems,
+        snapshot: SortPreferencesSnapshot,
+        rootOverride: [URL: URL] = [:]
+    ) async -> [SortPreviewEntry] {
+        var rows = await preview(files: work.fileURLs, snapshot: snapshot, rootOverride: rootOverride)
+        guard snapshot.sortMoveLooseFoldersEnabled else { return rows }
+        rows.append(contentsOf: looseFolderPreviewEntries(work.looseFolderURLs, snapshot: snapshot, rootOverride: rootOverride))
+        return rows
+    }
+
+    private nonisolated static func looseFolderPreviewEntries(
+        _ folderURLs: [URL],
+        snapshot: SortPreferencesSnapshot,
+        rootOverride: [URL: URL]
+    ) -> [SortPreviewEntry] {
+        let fm = FileManager.default
+        let rel = snapshot.resolvedLooseFoldersRelativePath()
+        var out: [SortPreviewEntry] = []
+
+        for raw in folderURLs {
+            let standardized = raw.standardizedFileURL
+            if looksTransientIncomplete(standardized) {
+                out.append(SortPreviewEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    proposedDestinationPath: "—",
+                    summary: String(localized: "Skipped — looks like a transient download folder.", comment: "Sort preview loose folder."),
+                    whyLine: String(localized: "Incomplete — skipped for now.", comment: "Preview why: transient folder."),
+                    category: .review,
+                    matchedRuleName: nil,
+                    addedTags: [],
+                    planDisposition: .skippedTransient
+                ))
+                continue
+            }
+
+            if SortRulesEvaluator.isExcluded(url: standardized, snapshot: snapshot) {
+                out.append(SortPreviewEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    proposedDestinationPath: "—",
+                    summary: String(localized: "Excluded — matches your ignore list.", comment: "Sort preview row."),
+                    whyLine: String(localized: "On your ignore list.", comment: "Preview why: excluded."),
+                    category: .misc,
+                    matchedRuleName: nil,
+                    addedTags: [],
+                    planDisposition: .skippedExcluded
+                ))
+                continue
+            }
+
+            if fileURLMatchesGlobalSkipTags(standardized, snapshot: snapshot) {
+                out.append(SortPreviewEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    proposedDestinationPath: "—",
+                    summary: String(localized: "Skipped — protected Finder tag.", comment: "Sort preview row."),
+                    whyLine: String(localized: "This folder has a tag on your “never sort” list.", comment: "Preview why: skip tag on folder."),
+                    category: .misc,
+                    matchedRuleName: nil,
+                    addedTags: [],
+                    planDisposition: .skippedProtectedTag
+                ))
+                continue
+            }
+
+            let (defaultRoot, _) = sortInboxContext(for: standardized, snapshot: snapshot)
+            let inboxRoot = rootOverride[standardized] ?? defaultRoot
+            let destRoot = inboxRoot.appendingPathComponent(rel, isDirectory: true)
+
+            let parent = standardized.deletingLastPathComponent().standardizedFileURL
+            if parent == destRoot.standardizedFileURL {
+                out.append(SortPreviewEntry(
+                    id: UUID(),
+                    sourcePath: standardized.path,
+                    proposedDestinationPath: standardized.path,
+                    summary: String(localized: "Loose folder — already filed.", comment: "Sort preview loose folder."),
+                    whyLine: String(localized: "Already in the Folders destination.", comment: "Preview why: loose folder in place."),
+                    category: .folders,
+                    matchedRuleName: nil,
+                    addedTags: [],
+                    planDisposition: .keptInPlace
+                ))
+                continue
+            }
+
+            try? fm.createDirectory(at: destRoot, withIntermediateDirectories: true)
+            let target = SortCollision.uniquify(destinationDirectory: destRoot, preferredFilename: standardized.lastPathComponent)
+            let baseLabel = destinationDisplayLabelForSort(root: inboxRoot, destinationDir: destRoot)
+            let destLabel = baseLabel.isEmpty
+                ? target.lastPathComponent
+                : "\(baseLabel)/\(target.lastPathComponent)"
+            out.append(SortPreviewEntry(
+                id: UUID(),
+                sourcePath: standardized.path,
+                proposedDestinationPath: destLabel,
+                summary: String.localizedStringWithFormat(
+                    String(localized: "Loose folder → %@", comment: "Sort preview: relocate folder."),
+                    destLabel
+                ),
+                whyLine: String(localized: "Moves the whole folder — nothing inside is sorted separately.", comment: "Preview why: opaque loose folder."),
+                category: .folders,
+                matchedRuleName: nil,
+                addedTags: [],
                 planDisposition: .wouldMove
             ))
         }

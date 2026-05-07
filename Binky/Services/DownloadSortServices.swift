@@ -77,46 +77,35 @@ final class DownloadsSortOrchestrator {
         SortBatchOutcome(id: UUID(), started: Date(), elapsed: 0, entries: [])
     }
 
-    func previewSort(files urls: [URL], prefs: BinkyPreferences, rootOverride: [URL: URL] = [:]) async -> [SortPreviewEntry] {
+    func previewSort(work: SortSweepWorkItems, prefs: BinkyPreferences, rootOverride: [URL: URL] = [:]) async -> [SortPreviewEntry] {
         prefs.reconcileFolderBookmarksIfNeeded()
         let snapshot = prefs.makeSortPreferencesSnapshot()
         let normalizedOverride: [URL: URL] = Dictionary(
             rootOverride.map { ($0.key.standardizedFileURL, $0.value.standardizedFileURL) },
             uniquingKeysWith: { first, _ in first }
         )
-        return await SortPreviewPlanner.preview(files: urls, snapshot: snapshot, rootOverride: normalizedOverride)
+        return await SortPreviewPlanner.preview(work: work, snapshot: snapshot, rootOverride: normalizedOverride)
+    }
+
+    func previewSort(files urls: [URL], prefs: BinkyPreferences, rootOverride: [URL: URL] = [:]) async -> [SortPreviewEntry] {
+        await previewSort(work: SortSweepWorkItems(fileURLs: urls, looseFolderURLs: []), prefs: prefs, rootOverride: rootOverride)
     }
 
     /// Files directly under `root`, plus regular files one level inside immediate subfolders when `recursiveOneLevel` is true.
     nonisolated static func collectSweepFiles(in root: URL, recursiveOneLevel: Bool, fileManager fm: FileManager = .default) -> [URL] {
-        guard let urls = try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]) else {
-            return []
-        }
-        var files: [URL] = []
-        for url in urls {
-            let vals = try? url.resourceValues(forKeys: [.isDirectoryKey])
-            if vals?.isDirectory != true {
-                files.append(url.standardizedFileURL)
-                continue
-            }
-            guard recursiveOneLevel else { continue }
-            guard let inner = try? fm.contentsOfDirectory(at: url, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]) else {
-                continue
-            }
-            for u in inner {
-                if (try? u.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == false {
-                    files.append(u.standardizedFileURL)
-                }
-            }
-        }
-        return files
+        SortSweepFilesCollection.files(in: root, recursiveOneLevel: recursiveOneLevel, fileManager: fm)
     }
 
-    /// Top-level files in each active inbox folder (global watch root + unique preset watch roots).
-    static func topLevelInboxFiles(prefs: BinkyPreferences) -> [URL] {
+    nonisolated static func collectSweepWorkItems(in root: URL, recursiveOneLevel: Bool, moveLooseFolders: Bool, fileManager fm: FileManager = .default) -> SortSweepWorkItems {
+        SortSweepFilesCollection.workItems(in: root, recursiveOneLevel: recursiveOneLevel, moveLooseFolders: moveLooseFolders, fileManager: fm)
+    }
+
+    /// Top-level work items in each active watch root (global + unique preset paths).
+    static func topLevelInboxWorkItems(prefs: BinkyPreferences) -> SortSweepWorkItems {
         prefs.reconcileFolderBookmarksIfNeeded()
         let fm = FileManager.default
         let recursive = prefs.watchRecursiveOneLevel
+        let moveLoose = prefs.sortMoveLooseFoldersEnabled
         var rootPaths: Set<String> = []
         rootPaths.insert(prefs.downloadsSortRootDirectory().path)
 
@@ -127,16 +116,25 @@ final class DownloadsSortOrchestrator {
             rootPaths.insert(normalized)
         }
 
-        var collected: [URL] = []
+        var files: [URL] = []
+        var folders: [URL] = []
         for path in rootPaths {
             let root = URL(fileURLWithPath: path)
-            collected.append(contentsOf: collectSweepFiles(in: root, recursiveOneLevel: recursive, fileManager: fm))
+            let w = collectSweepWorkItems(in: root, recursiveOneLevel: recursive, moveLooseFolders: moveLoose, fileManager: fm)
+            files.append(contentsOf: w.fileURLs)
+            folders.append(contentsOf: w.looseFolderURLs)
         }
-        return collected
+        return SortSweepWorkItems(fileURLs: files, looseFolderURLs: folders)
+    }
+
+    /// Top-level files in each active watch root (see ``topLevelInboxWorkItems`` for loose folders).
+    static func topLevelInboxFiles(prefs: BinkyPreferences) -> [URL] {
+        topLevelInboxWorkItems(prefs: prefs).fileURLs
     }
 
     func previewInbox(prefs: BinkyPreferences) async -> [SortPreviewEntry] {
-        await previewSort(files: Self.topLevelInboxFiles(prefs: prefs), prefs: prefs)
+        let work = Self.topLevelInboxWorkItems(prefs: prefs)
+        return await previewSort(work: work, prefs: prefs)
     }
 
     private func urlsEligibleForSortPass(_ urls: [URL]) -> [URL] {
@@ -146,7 +144,10 @@ final class DownloadsSortOrchestrator {
             let standardized = raw.standardizedFileURL
             guard standardized.isFileURL else { continue }
             var isDir: ObjCBool = false
-            guard fm.fileExists(atPath: standardized.path, isDirectory: &isDir), !isDir.boolValue else { continue }
+            guard fm.fileExists(atPath: standardized.path, isDirectory: &isDir) else { continue }
+            if isDir.boolValue {
+                guard isAppBundleURL(standardized) else { continue }
+            }
             ordered.append(standardized)
         }
         return ordered
@@ -154,6 +155,21 @@ final class DownloadsSortOrchestrator {
 
     func sort(
         files urls: [URL],
+        looseFolders: [URL] = [],
+        prefs: BinkyPreferences,
+        rootOverride: [URL: URL] = [:],
+        progress: (@Sendable (SortProgressEvent) -> Void)? = nil
+    ) async -> SortBatchOutcome {
+        await sort(
+            work: SortSweepWorkItems(fileURLs: urls, looseFolderURLs: looseFolders),
+            prefs: prefs,
+            rootOverride: rootOverride,
+            progress: progress
+        )
+    }
+
+    func sort(
+        work: SortSweepWorkItems,
         prefs: BinkyPreferences,
         rootOverride: [URL: URL] = [:],
         progress: (@Sendable (SortProgressEvent) -> Void)? = nil
@@ -198,7 +214,10 @@ final class DownloadsSortOrchestrator {
             uniquingKeysWith: { first, _ in first }
         )
 
-        let uniqueRoots = Set(urls.map { url -> URL in
+        let urls = work.fileURLs
+        let folderURLs = snapshot.sortMoveLooseFoldersEnabled ? work.looseFolderURLs : []
+        let allForRoots = urls + folderURLs
+        let uniqueRoots = Set(allForRoots.map { url -> URL in
             let std = url.standardizedFileURL
             return normalizedOverride[std] ?? prefs.sortContext(for: std).inboxRoot
         })
@@ -207,7 +226,8 @@ final class DownloadsSortOrchestrator {
         }
 
         let workURLs = urlsEligibleForSortPass(urls)
-        progress?(.batchStarted(total: workURLs.count))
+        let sharedDestGate = PerDestinationUniquifyGate()
+        progress?(.batchStarted(total: workURLs.count + folderURLs.count))
         defer {
             progress?(.batchEnded)
         }
@@ -226,19 +246,32 @@ final class DownloadsSortOrchestrator {
             }
         )
 
-        let loopResult = await Task.detached(priority: .utility) { [workURLs, snapshot, normalizedOverride, gate, progress, hooks] in
-            await SortWork.runSortWorkLoop(
-                workURLs: workURLs,
+        let folderPhase = await Task.detached(priority: .utility) { [folderURLs, snapshot, normalizedOverride, gate, progress, hooks, sharedDestGate] in
+            await SortWork.runLooseFolderMoves(
+                folderURLs: folderURLs,
                 snapshot: snapshot,
                 rootOverride: normalizedOverride,
+                destGate: sharedDestGate,
                 gate: gate,
                 progress: progress,
                 hooks: hooks
             )
         }.value
 
-        let rows = loopResult.rows
-        let tagWriteFailures = loopResult.tagWriteFailures
+        let loopResult = await Task.detached(priority: .utility) { [workURLs, snapshot, normalizedOverride, gate, progress, hooks, sharedDestGate] in
+            await SortWork.runSortWorkLoop(
+                workURLs: workURLs,
+                snapshot: snapshot,
+                rootOverride: normalizedOverride,
+                gate: gate,
+                progress: progress,
+                hooks: hooks,
+                destGate: sharedDestGate
+            )
+        }.value
+
+        let rows = folderPhase.rows + loopResult.rows
+        let tagWriteFailures = folderPhase.tagWriteFailures + loopResult.tagWriteFailures
 
         let elapsed = Date().timeIntervalSince(startedAt)
         lastUndoPairs = rows
@@ -622,11 +655,11 @@ final class WatchSortCoordinator {
         }
         guard !Task.isCancelled else { return }
 
-        let files = DownloadsSortOrchestrator.topLevelInboxFiles(prefs: prefs)
-        guard !files.isEmpty else { return }
+        let work = DownloadsSortOrchestrator.topLevelInboxWorkItems(prefs: prefs)
+        guard work.hasAnyWork else { return }
 
         let outcome = await DownloadsSortOrchestrator.shared.sort(
-            files: files,
+            work: work,
             prefs: prefs,
             progress: SortProgressTracker.orchestratorClosure()
         )

@@ -120,7 +120,9 @@ public struct BinkyPrefsStore: Sendable {
                     .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
                     .filter { !$0.isEmpty }
             ),
-            slowMode: defaults.object(forKey: "sort.slowModeEnabled") as? Bool ?? false
+            slowMode: defaults.object(forKey: "sort.slowModeEnabled") as? Bool ?? false,
+            sortMoveLooseFoldersEnabled: defaults.object(forKey: "sort.moveLooseFolders.enabled") as? Bool ?? false,
+            sortLooseFoldersDestinationRelative: defaults.string(forKey: "sort.moveLooseFolders.relativePath") ?? ""
         )
     }
 

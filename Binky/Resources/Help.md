@@ -72,11 +72,9 @@ Every sort run is saved in **History** (`App menu → History…`).
 
 Binky exposes a **Sort files** intent so you can chain sorting from the Shortcuts app, using the same routing rules as the main window.
 
-## Licensing (2.0)
+## Open source
 
-- **Binky 1.x** stays **free** and **open source** (MIT), including official builds.
-- **Binky 2.0** will use a **one-time license** for **official app builds**: you keep the app, with **one year of updates** included. **Renewing** later only extends how long you receive updates; it is **not** a subscription.
-- Building from **source** remains an option under MIT. Full wording: [binkyfiles.com](https://binkyfiles.com/#faq-licensing).
+Source code is on [GitHub](https://github.com/heyderekj/binky) under the MIT license.
 
 ## Privacy
 

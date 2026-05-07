@@ -317,15 +317,8 @@ final class BinkyMenuBarController: NSObject, NSMenuDelegate {
 
     @objc private func openSettings() {
         NSApp.activate()
-        // Primary path: SwiftUI scene picks up the notification and uses the `openSettings`
-        // environment action — the macOS 14+ recommended way to open the Settings scene.
-        NotificationCenter.default.post(name: .binkyOpenSettings, object: nil)
-        // AppKit fallback in case ContentView isn't currently mounted.
-        DispatchQueue.main.async {
-            let modern = Selector(("showSettingsWindow:"))
-            if !NSApp.sendAction(modern, to: nil, from: nil) {
-                NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
-            }
-        }
+        // `BinkyShortcutCommands` listens for this and calls `openWindow(id:)` — works even when
+        // the organizer window (and `ContentView`) isn’t mounted.
+        NotificationCenter.default.post(name: .binkyOpenMacPreferences, object: nil)
     }
 }

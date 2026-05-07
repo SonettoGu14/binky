@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     " is available" : {
       "comment" : "Update banner after version number.",
       "localizations" : {
@@ -81,6 +84,9 @@
     " moved" : {
       "comment" : "Suffix after size in history row."
     },
+    ", and " : {
+      "comment" : "Join rule when-clauses."
+    },
     "…" : {
       "comment" : "Ellipsis for truncated list."
     },
@@ -90,9 +96,6 @@
     },
     "“New” tag expiry" : {
       "comment" : "Routine editor section: New tag expiry."
-    },
-    "(no folder)" : {
-      "comment" : "Rule summary when destination empty."
     },
     "(not set)" : {
       "comment" : "NL preview empty destination."
@@ -180,17 +183,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@%@"
-          }
-        }
-      }
-    },
-    "%@ → %@" : {
-      "comment" : "Rule summary: conditions then arrow destination.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ → %2$@"
           }
         }
       }
@@ -301,9 +293,6 @@
           }
         }
       }
-    },
-    "%1$@ — %2$@" : {
-      "comment" : "Rule summary: action then destination subfolder."
     },
     "%1$@ %2$lld" : {
       "comment" : "Auto-generated automation name with numeric suffix."
@@ -618,9 +607,6 @@
         }
       }
     },
-    "→ %@" : {
-      "comment" : "Rule summary when no conditions; arrow to destination."
-    },
     "+%lld more in full preview" : {
       "comment" : "Inline sort preview overflow count."
     },
@@ -629,28 +615,6 @@
     },
     "1 day" : {
       "comment" : "New tag expiry choice."
-    },
-    "1.x stays free and open source (MIT). Building from source remains an option." : {
-      "comment" : "License section: open source stays.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1.x stays free and open source (MIT). Building from source remains an option."
-          }
-        }
-      }
-    },
-    "2.0 will use a one-time license for official builds. You keep the app; renewals only extend updates." : {
-      "comment" : "License section: explains paid official builds.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2.0 will use a one-time license for official builds. You keep the app; renewals only extend updates."
-          }
-        }
-      }
     },
     "A newer Binky is available." : {
       "comment" : "Manual update alert title."
@@ -734,6 +698,9 @@
           }
         }
       }
+    },
+    "Action" : {
+      "comment" : "Rule editor: what happens when rule matches."
     },
     "Activate to choose more files." : {
       "comment" : "VoiceOver hint for drop zone when a batch finished."
@@ -823,9 +790,6 @@
     },
     "Add aging rule" : {
       "comment" : "Aging rules add button."
-    },
-    "Add manually" : {
-      "comment" : "Routing rules: add blank rule."
     },
     "Add routine" : {
       "comment" : "Routines list: add row."
@@ -1187,6 +1151,9 @@
     },
     "Also watch inside immediate subfolders (one level)" : {
       "comment" : "Settings: shallow recursive watch."
+    },
+    "anything matches" : {
+      "comment" : "Rule card when no conditions set."
     },
     "App Switcher" : {
       "comment" : "System shortcut name for conflict warning.",
@@ -1554,6 +1521,161 @@
     "Auto-install DMGs" : {
       "comment" : "Routine template name.\nRoutine template."
     },
+    "Automations" : {
+      "comment" : "Settings sidebar section header.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisierungen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatizaciones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisations"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automazioni"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動化"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자동화"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatiseringen"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automações"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматизации"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otomasyonlar"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动化"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動化"
+          }
+        }
+      }
+    },
+    "Back" : {
+      "comment" : "Preferences toolbar.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atrás"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retour"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indietro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "戻る"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "뒤로"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terug"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voltar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Назад"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geri"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "返回"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "返回"
+          }
+        }
+      }
+    },
     "Batch speed" : {
       "comment" : "Settings: label for parallel compression limit picker.",
       "localizations" : {
@@ -1632,7 +1754,7 @@
       }
     },
     "Behavior" : {
-      "comment" : "Settings UI.",
+      "comment" : "Settings UI.\nSettings sidebar: behavior & Finder tags.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1799,6 +1921,9 @@
     "Binky's tidying up." : {
       "comment" : "Currently sorting sheet: generic subtitle when no per-file caption."
     },
+    "Blank" : {
+      "comment" : "Routing rule template title."
+    },
     "Blank routine" : {
       "comment" : "Routine template."
     },
@@ -1882,14 +2007,23 @@
     "Build `binky` from the `BinkyCore` folder for scripts & Shortcuts. Same rules & prefs — shared lock prevents racing the GUI." : {
       "comment" : "CLI pro tools blurble in Settings."
     },
-    "Built-in hint: %@" : {
-      "comment" : "Settings: shows default Finder tag hint for a sort type."
+    "Built-in" : {
+      "comment" : "Column header: built-in Finder tag fallback when maps are blank."
+    },
+    "By file kind" : {
+      "comment" : "Routing rule template title."
     },
     "By file type · from %@." : {
       "comment" : "Voice: taxonomy + host."
     },
     "By file type." : {
       "comment" : "Voice: automatic bucket."
+    },
+    "By Finder tag" : {
+      "comment" : "Routing rule template title."
+    },
+    "By name" : {
+      "comment" : "Routing rule template title."
     },
     "Call stack tree (JSON, truncated):\n%@" : {
       "comment" : "MetricKit crash export header plus JSON; keep newline.",
@@ -1975,7 +2109,7 @@
       "comment" : "Opens Settings to add Desktop routine."
     },
     "Cancel" : {
-      "comment" : "Alert cancel button.\nButton to cancel shortcut recording.\nRoutine editor: cancel delete.\nRule editor sheet.",
+      "comment" : "Alert cancel button.\nButton to cancel shortcut recording.\nDismiss template picker.\nRoutine editor: cancel delete.\nRule editor sheet.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2052,7 +2186,7 @@
       }
     },
     "Category" : {
-      "comment" : "Aging rule category."
+      "comment" : "Aging rule category.\nColumn header: sort category for Finder tag defaults."
     },
     "Category tags when this rule matches" : {
       "comment" : "Rule editor: Finder tag policy."
@@ -2141,7 +2275,7 @@
       "comment" : "Open panel for DMG install target."
     },
     "Choose folder" : {
-      "comment" : "Open panel: choose global default folder."
+      "comment" : "NSOpenPanel prompt for rule destination.\nOpen panel: choose global default folder."
     },
     "Choose Folder" : {
       "comment" : "Quick Sort choose folder panel."
@@ -2156,7 +2290,7 @@
       "comment" : "Open panel: automation source folder."
     },
     "Choose…" : {
-      "comment" : "Pick Applications folder for DMG installs.\nPick routine source folder.\nSettings UI.",
+      "comment" : "Pick Applications folder for DMG installs.\nPick routine source folder.\nRule editor: pick destination folder.\nSettings UI.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2554,6 +2688,9 @@
     },
     "Content match" : {
       "comment" : "Rule editor."
+    },
+    "content matches “%@”" : {
+      "comment" : "Rule card when-fragment."
     },
     "Content: %@" : {
       "comment" : "NL preview field."
@@ -3222,6 +3359,12 @@
     "Date added" : {
       "comment" : "Rule editor."
     },
+    "Date Added is more than %lld days ago" : {
+      "comment" : "Rule card when-fragment."
+    },
+    "Date Added is within the last %lld days" : {
+      "comment" : "Rule card when-fragment."
+    },
     "Days: %lld" : {
       "comment" : "Rule editor."
     },
@@ -3317,19 +3460,13 @@
     "Delete routine?" : {
       "comment" : "Routine editor: generic delete title."
     },
-    "Describe" : {
-      "comment" : "Rule editor sheet: NL section."
-    },
-    "Describe a rule (e.g. from figma.com to Design/Figma)" : {
+    "Describe in plain language (e.g. from figma.com to Design/Figma)" : {
       "comment" : "NL rule placeholder."
-    },
-    "Describe a rule…" : {
-      "comment" : "Routing rules: add via natural language."
     },
     "Desktop also loud?" : {
       "comment" : "Onboarding banner: suggest Calm my Desktop routine.\nOnboarding popover title.\nToolbar button tooltip: Desktop onboarding."
     },
-    "Destination subfolder" : {
+    "Destination (relative to watch folder)" : {
       "comment" : "Rule editor."
     },
     "Detect receipts and invoices" : {
@@ -3345,7 +3482,7 @@
       "comment" : "Organizer transient when Dinky app handoff fails."
     },
     "Dismiss" : {
-      "comment" : "Dismiss Desktop onboarding banner.\nDismiss Desktop onboarding popover.\nPost-crash sheet: close without sending.\nTooltip for dismiss review prompt banner.\nTooltip for dismiss update banner.",
+      "comment" : "Dismiss Desktop onboarding banner.\nDismiss Desktop onboarding popover.\nDismiss NL parse preview.\nPost-crash sheet: close without sending.\nTooltip for dismiss review prompt banner.\nTooltip for dismiss update banner.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3923,7 +4060,7 @@
       "comment" : "Routing rule list toggle.\nRule editor."
     },
     "Energy" : {
-      "comment" : "Settings: General tab section title.",
+      "comment" : "Settings sidebar: thermal & pacing.\nSettings: General tab section title.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3935,6 +4072,12 @@
     },
     "Example: iso, sparsebundle" : {
       "comment" : "Output settings."
+    },
+    "Existing folders" : {
+      "comment" : "Destination suggestions section: watch subtree."
+    },
+    "Expand zip and similar archives into a folder." : {
+      "comment" : "Routing rule template subtitle."
     },
     "Expanded" : {
       "comment" : "Settings UI: organizer sidebar style (detailed)."
@@ -3948,11 +4091,14 @@
     "Expires after" : {
       "comment" : "Routine editor: New tag expiry picker."
     },
-    "extension → .%@" : {
-      "comment" : "Rule summary: output extension."
-    },
     "Extensions (comma-separated, empty = any)" : {
       "comment" : "Rule editor."
+    },
+    "Extract archives" : {
+      "comment" : "Routing rule template title."
+    },
+    "extract into “%@”, then trash the archive" : {
+      "comment" : "Rule card then-fragment."
     },
     "Fan out by tag" : {
       "comment" : "Starter rule for tag fan-out template."
@@ -3969,7 +4115,7 @@
     "File kind: %@" : {
       "comment" : "NL preview field."
     },
-    "Filename contains (empty = any)" : {
+    "Filename contains" : {
       "comment" : "Rule editor."
     },
     "Files" : {
@@ -3990,9 +4136,6 @@
     },
     "Files were screaming. Binky helped." : {
       "comment" : "Organizer empty state: rotating playful tagline."
-    },
-    "Fills the sections below. You can edit every field before saving." : {
-      "comment" : "Rule editor NL footer."
     },
     "Find" : {
       "comment" : "System shortcut name for conflict warning.",
@@ -4225,14 +4368,14 @@
         }
       }
     },
-    "Finder tag: %@" : {
-      "comment" : "Rule summary: tag predicate."
-    },
     "Finder tags didn’t stick for %lld files — the sort still landed." : {
       "comment" : "Sort ancillary warning; multiple tag failures. Argument is integer count."
     },
     "Finder tags didn’t stick for one file — the sort still landed." : {
       "comment" : "Sort ancillary warning; single-file tag failure."
+    },
+    "Finder tags for %@" : {
+      "comment" : "VoiceOver label for per-category tag field."
     },
     "Finder tags: %@" : {
       "comment" : "NL preview field."
@@ -4317,6 +4460,9 @@
         }
       }
     },
+    "Folders" : {
+      "comment" : "Sort category label for Finder tag defaults.\nSort category."
+    },
     "For watch folders, routines, and full troubleshooting, open Binky Help from the Help menu (%@)." : {
       "comment" : "Settings Shortcuts tab footer; argument is help shortcut."
     },
@@ -4332,19 +4478,88 @@
     "Forget remembered files?" : {
       "comment" : "Clear hash store title."
     },
-    "From %@." : {
-      "comment" : "Review row origin."
-    },
-    "from %@%@" : {
-      "comment" : "Rule summary fragment; origin domains.",
+    "Forward" : {
+      "comment" : "Preferences toolbar.",
       "localizations" : {
-        "en" : {
+        "de" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "from %1$@%2$@"
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avanzar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avancer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avanti"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "進む"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앞으로"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vooruit"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avançar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вперёд"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İleri"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前进"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前進"
           }
         }
       }
+    },
+    "From %@." : {
+      "comment" : "Review row origin."
+    },
+    "From a website" : {
+      "comment" : "Routing rule template title."
     },
     "From phrase" : {
       "comment" : "NL rule default name."
@@ -4368,7 +4583,7 @@
       "comment" : "Organizer empty state: rotating playful tagline."
     },
     "General" : {
-      "comment" : "Settings UI.",
+      "comment" : "Settings sidebar section header.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5556,6 +5771,9 @@
         }
       }
     },
+    "Images, PDFs, video, archives, and more." : {
+      "comment" : "Routing rule template subtitle."
+    },
     "Incomplete download — skipped for now." : {
       "comment" : "Voice: transient skip."
     },
@@ -5714,10 +5932,13 @@
       }
     },
     "Install disk images" : {
-      "comment" : "Starter rule for DMG template."
+      "comment" : "Routing rule template title.\nStarter rule for DMG template."
     },
     "Install from disk images" : {
       "comment" : "DMG install target section."
+    },
+    "install from the disk image" : {
+      "comment" : "Rule card then-fragment."
     },
     "Install Update" : {
       "comment" : "Manual update alert.\nUpdate banner primary button.",
@@ -5950,6 +6171,92 @@
         }
       }
     },
+    "Interface" : {
+      "comment" : "Settings sidebar section header.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oberfläche"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interfaz"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interface"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interfaccia"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インターフェース"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "인터페이스"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interface"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interface"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Интерфейс"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arayüz"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "界面"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "介面"
+          }
+        }
+      }
+    },
+    "it has Finder tag “%@”" : {
+      "comment" : "Rule card when-fragment."
+    },
+    "it’s a %@ file" : {
+      "comment" : "Rule card when-fragment; kind filter."
+    },
+    "it’s from %1$@%2$@" : {
+      "comment" : "Rule card when-fragment: download origin."
+    },
     "Keep it" : {
       "comment" : "Cancel clear duplicate memory."
     },
@@ -6139,32 +6446,10 @@
     "Leave files tagged:" : {
       "comment" : "Skip tags row label in Never sort section."
     },
-    "License" : {
-      "comment" : "Settings: license section header.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "License"
-          }
-        }
-      }
-    },
-    "Licensing…" : {
-      "comment" : "Update banner link to licensing FAQ on site.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Licensing…"
-          }
-        }
-      }
-    },
     "Looks like a receipt." : {
       "comment" : "Voice: auto receipt routing."
     },
-    "Looks right. Save it." : {
+    "Looks right. Apply it." : {
       "comment" : "Apply NL parse to editor form."
     },
     "Loving Binky? Leave a review" : {
@@ -6175,6 +6460,9 @@
     },
     "Make a rule…" : {
       "comment" : "Review triage new rule."
+    },
+    "Match downloads from specific sites, route into a folder." : {
+      "comment" : "Routing rule template subtitle."
     },
     "Matches an identical file or a very similar image Binky already sorted." : {
       "comment" : "Duplicate footer."
@@ -6351,6 +6639,9 @@
     "Misc" : {
       "comment" : "Sort category label for Finder tag defaults.\nSort category."
     },
+    "More conditions" : {
+      "comment" : "Rule editor: disclose extensions origins etc."
+    },
     "More help" : {
       "comment" : "Settings UI.",
       "localizations" : {
@@ -6431,8 +6722,17 @@
     "Move / review summary" : {
       "comment" : "Automated sort audit title; fallback when no routine matches."
     },
+    "Move loose folders into the Folders destination" : {
+      "comment" : "Settings: relocate top-level directories as a unit."
+    },
+    "move to “%@”" : {
+      "comment" : "Rule card then-fragment."
+    },
     "Move to Duplicates folder" : {
       "comment" : "Duplicate mode."
+    },
+    "move to Trash" : {
+      "comment" : "Rule card then-fragment."
     },
     "Move to Trash" : {
       "comment" : "Duplicate mode.",
@@ -6600,9 +6900,6 @@
         }
       }
     },
-    "name has “%@”" : {
-      "comment" : "Rule summary fragment; filename substring."
-    },
     "Name: %@" : {
       "comment" : "NL preview field."
     },
@@ -6616,7 +6913,7 @@
       "comment" : "Voice: review folder."
     },
     "Never sort" : {
-      "comment" : "Output settings."
+      "comment" : "Output settings.\nSettings sidebar: skip lists."
     },
     "New" : {
       "comment" : "System shortcut name for conflict warning.",
@@ -6697,6 +6994,9 @@
     },
     "New routine" : {
       "comment" : "Default name for blank routine."
+    },
+    "New routing" : {
+      "comment" : "Routing rules template picker title.\nRouting rules: open template picker."
     },
     "New rule" : {
       "comment" : "Rule editor sheet title."
@@ -6950,7 +7250,10 @@
     "No folder yet" : {
       "comment" : "Routine row subtitle when path empty."
     },
-    "No rules yet. Use the buttons below." : {
+    "No preset; set every field yourself." : {
+      "comment" : "Routing rule template subtitle."
+    },
+    "No rules yet. Tap New routing to start from a template." : {
       "comment" : "Routing rules empty hint."
     },
     "No rules. Binky uses default sorted folders." : {
@@ -7036,8 +7339,8 @@
     "No sorts yet." : {
       "comment" : "Organizer empty activity state title."
     },
-    "Not quite. Try again." : {
-      "comment" : "Dismiss NL parse preview."
+    "No suggestions yet. Add a site under More conditions, or rescan." : {
+      "comment" : "Empty destination suggestions."
     },
     "Notes to Obsidian" : {
       "comment" : "Routine template name.\nRoutine template; txt → md style routing."
@@ -7212,7 +7515,7 @@
       }
     },
     "Notifications" : {
-      "comment" : "Settings UI.",
+      "comment" : "Settings UI.\nSettings sidebar.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7536,6 +7839,9 @@
     },
     "Only files inside your watch folder can be sorted from here." : {
       "comment" : "Organizer drop zone footnote."
+    },
+    "Open .dmg installers and copy the app, then trash the image." : {
+      "comment" : "Routing rule template subtitle."
     },
     "Open Analytics & Improvements settings…" : {
       "comment" : "Settings UI.",
@@ -7881,6 +8187,12 @@
     },
     "Opens your watch folder in Finder after each sort batch completes." : {
       "comment" : "Settings UI."
+    },
+    "Optional — comma-separated" : {
+      "comment" : "Placeholder for per-type Finder tag list (single prompt for all rows)."
+    },
+    "Optional shortcut. You can still edit every field afterward." : {
+      "comment" : "NL section footer."
     },
     "or click to browse" : {
       "comment" : "Drop zone idle hint.",
@@ -8562,6 +8874,9 @@
         }
       }
     },
+    "Preview" : {
+      "comment" : "Settings sidebar: dry-run preview."
+    },
     "Preview sort" : {
       "comment" : "Sort preview sheet title."
     },
@@ -8573,17 +8888,6 @@
     },
     "Previous session ended unexpectedly; no Apple diagnostic payload is attached yet.\n\n" : {
       "comment" : "Crash body note when MetricKit summary is unavailable."
-    },
-    "Pricing and licensing FAQ…" : {
-      "comment" : "Opens site licensing FAQ in the default browser.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pricing and licensing FAQ…"
-          }
-        }
-      }
     },
     "Print" : {
       "comment" : "System shortcut name for conflict warning.",
@@ -8663,7 +8967,7 @@
       }
     },
     "Privacy" : {
-      "comment" : "Settings UI.",
+      "comment" : "Settings UI.\nSettings sidebar.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8739,11 +9043,17 @@
         }
       }
     },
+    "Pro tools" : {
+      "comment" : "Settings sidebar: CLI."
+    },
     "Pro tools (CLI)" : {
       "comment" : "Settings: CLI section heading."
     },
     "Quick actions" : {
       "comment" : "Organizer sidebar: ad-hoc sort/preview controls."
+    },
+    "Quick phrase (experimental)" : {
+      "comment" : "Collapsed NL rule section title."
     },
     "Quick Sort" : {
       "comment" : "Main window mode segmented control.\nOrganizer sidebar: Quick Sort section title."
@@ -9012,6 +9322,9 @@
     "Reduces expressive animation in the main window." : {
       "comment" : "Settings UI."
     },
+    "Relative path under sort root (empty = “Folders”)" : {
+      "comment" : "Loose folder destination path."
+    },
     "Release the dragged items to sort files from your watch folder." : {
       "comment" : "VoiceOver hint for organizer drop zone while dragging."
     },
@@ -9096,7 +9409,10 @@
       }
     },
     "Rename" : {
-      "comment" : "Rule editor."
+      "comment" : "Rule editor sheet section.\nRule editor."
+    },
+    "rename in place" : {
+      "comment" : "Rule card then-fragment."
     },
     "Replace type defaults" : {
       "comment" : "Rule editor: replace category Finder tags."
@@ -9186,6 +9502,9 @@
     },
     "Requires “Assign Finder tags when sorting”." : {
       "comment" : "Settings UI."
+    },
+    "Rescan folders" : {
+      "comment" : "Refresh folder list for destination suggestions."
     },
     "Reset" : {
       "comment" : "Button to reset one shortcut row.",
@@ -9458,7 +9777,7 @@
       "comment" : "Settings: show only Routines main layout."
     },
     "Routing" : {
-      "comment" : "Output settings."
+      "comment" : "Output settings.\nSettings sidebar: custom routing rules."
     },
     "Routing & sorted folders…" : {
       "comment" : "Settings UI: link from General to Sorting tab for tag-related sorted folders."
@@ -9475,8 +9794,8 @@
     "Runs" : {
       "comment" : "Weekly digest stat."
     },
-    "Runs before automatic sorted folders. Trash and some actions ignore the destination path." : {
-      "comment" : "Rule action footer."
+    "Runs before automatic destinations. Add extensions, sites, or size rules only if you need them." : {
+      "comment" : "Rule editor When footer."
     },
     "Runs show up here after your first sweep." : {
       "comment" : "Quick Sort empty hint."
@@ -9566,6 +9885,9 @@
     },
     "Save PNG…" : {
       "comment" : "Save digest image panel."
+    },
+    "Scanning folders…" : {
+      "comment" : "Rule editor: scanning watch tree for paths."
     },
     "Screenshots" : {
       "comment" : "Sort category label for Finder tag defaults.\nSort category."
@@ -9739,11 +10061,14 @@
     "Sent by “%1$@” · from %2$@." : {
       "comment" : "Voice: rule + origin."
     },
+    "Separate tags with commas. Leave empty for the built-in tag." : {
+      "comment" : "VoiceOver hint for per-category Finder tag field."
+    },
     "Session summary chips" : {
       "comment" : "VoiceOver: chips for sort session highlights."
     },
     "Settings" : {
-      "comment" : "Menu: open app settings.\nOrganizer sidebar settings header.",
+      "comment" : "Menu: open app settings.\nOrganizer sidebar settings header.\nPreferences window title.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -9820,7 +10145,7 @@
       }
     },
     "Settings…" : {
-      "comment" : "Menu bar command.",
+      "comment" : "App menu: open settings.\nMenu bar command.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10083,6 +10408,9 @@
     "Shows filenames and activity for this sort." : {
       "comment" : "VoiceOver hint for sort details button."
     },
+    "Shows topic paths and folders under the watch folder." : {
+      "comment" : "VoiceOver: destination suggest menu."
+    },
     "Shows where files in your watch folder would land. Nothing moves until you sort." : {
       "comment" : "Output settings."
     },
@@ -10100,6 +10428,12 @@
     },
     "Simple shows only the Quick Sort section." : {
       "comment" : "Settings UI: organizer simple sidebar summary."
+    },
+    "size is at least %lld bytes" : {
+      "comment" : "Rule card when-fragment."
+    },
+    "size is at most %lld bytes" : {
+      "comment" : "Rule card when-fragment."
     },
     "Skipped" : {
       "comment" : "Sort audit",
@@ -10181,6 +10515,9 @@
     "Slow mode" : {
       "comment" : "Settings UI.\nSorting tab: deliberate per-file pacing."
     },
+    "Smart & pace" : {
+      "comment" : "Settings sidebar: smart sorting & slow mode."
+    },
     "Smart screenshot names (OCR)" : {
       "comment" : "Settings."
     },
@@ -10205,6 +10542,9 @@
     "Sort by Finder tag" : {
       "comment" : "Routine template name.\nRoutine template."
     },
+    "sort by Finder tag under “%@”" : {
+      "comment" : "Rule card then-fragment."
+    },
     "Sort Files" : {
       "comment" : "Shortcuts: intent title.\nShortcuts: suggested action short title."
     },
@@ -10227,7 +10567,7 @@
       "comment" : "Sort summary title; arg is routine name."
     },
     "Sorting" : {
-      "comment" : "Main pane banner title while folder sort runs.\nSettings tab: sort sorted folders and routing rules."
+      "comment" : "Main pane banner title while folder sort runs.\nSettings sidebar section header."
     },
     "Sorting is in progress." : {
       "comment" : "VoiceOver hint while sorting folder."
@@ -10322,7 +10662,7 @@
       }
     },
     "Stale files" : {
-      "comment" : "Settings section: file aging."
+      "comment" : "Settings section: file aging.\nSettings sidebar: file aging."
     },
     "Start with largest files" : {
       "comment" : "Settings: toggle to schedule big files first in a batch.",
@@ -10425,11 +10765,14 @@
     "Stopping after this file…" : {
       "comment" : "Sort caption while stop is requested and current item is finishing."
     },
+    "Suggest" : {
+      "comment" : "Rule editor: open destination path suggestions."
+    },
     "Summary" : {
       "comment" : "Sort preview table."
     },
     "Support" : {
-      "comment" : "Settings UI.",
+      "comment" : "Settings UI.\nSettings sidebar.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -10591,14 +10934,11 @@
     "Tag name" : {
       "comment" : "Routine editor: add custom Finder tag placeholder."
     },
-    "Tag the file" : {
-      "comment" : "Rule editor sheet section."
+    "Tags" : {
+      "comment" : "Column header: custom Finder tags per category.\nRule editor sheet section."
     },
     "Tags on match (comma-separated)" : {
       "comment" : "Rule editor."
-    },
-    "Tags, comma-separated" : {
-      "comment" : "Placeholder for per-type Finder tag list."
     },
     "Templates" : {
       "comment" : "Routine templates menu."
@@ -10680,8 +11020,17 @@
         }
       }
     },
-    "The fallback folder when no routine's path matches. Add routines for Desktop, Dropbox, or anything else fussy." : {
-      "comment" : "Sorting tab: global default folder footer."
+    "the extension is %@" : {
+      "comment" : "Rule card when-fragment; list like .zip, .dmg."
+    },
+    "The fallback folder when no routine's path matches. Add routines for Desktop, Dropbox, or anything else fussy. Loose folders are ordinary directories at the top of the watch folder — Binky can move them as one piece without sorting inside. That skips built-in destinations (Images, Documents, etc.) and sends app bundles to Apps." : {
+      "comment" : "Default folder section footer."
+    },
+    "the inbox root" : {
+      "comment" : "Rule card then-fragment: empty relative destination."
+    },
+    "the name contains “%@”" : {
+      "comment" : "Rule card when-fragment."
     },
     "The pacifier for your folders." : {
       "comment" : "Organizer empty state: rotating playful tagline."
@@ -10767,13 +11116,7 @@
       "comment" : "In-app updater error."
     },
     "Then" : {
-      "comment" : "Aging rule action.\nRule editor section title.\nRule editor: what happens when rule matches."
-    },
-    "Then move to" : {
-      "comment" : "Rule editor sheet section."
-    },
-    "Then rename" : {
-      "comment" : "Rule editor sheet section."
+      "comment" : "Aging rule action.\nRule editor: action and destination."
     },
     "Then: %@" : {
       "comment" : "NL preview: rule match action."
@@ -10802,11 +11145,17 @@
     "Tokens: {date}, {stem}, {ext}, {newExt}, {n}, {origin}, {ocr}, {vendor}, {amount}" : {
       "comment" : "Rule editor rename hint."
     },
-    "Top buckets" : {
+    "Top destinations" : {
       "comment" : "Weekly digest section."
+    },
+    "Topic-style" : {
+      "comment" : "Destination suggestions section: inferred topic paths."
     },
     "Trash" : {
       "comment" : "Aging action.\nAging preview: trash action.\nReview triage trash.\nSort preview duplicate / trash label."
+    },
+    "Trash and some actions ignore the destination path. Suggest path combines topic-style segments (sites, tags, other rules) with folders already under your watch folder—one folder can hold any file types." : {
+      "comment" : "Rule Then footer."
     },
     "Turn on Watch to tidy new files, or run Sort Now. You can also drop files from your watch folder here." : {
       "comment" : "Organizer empty activity hint."
@@ -11795,6 +12144,9 @@
     "Watch “%@” in Dinky →" : {
       "comment" : "Sort sheet: watch chain; folder name."
     },
+    "Watch folder" : {
+      "comment" : "Settings sidebar: default inbox & watch."
+    },
     "Watch for new files" : {
       "comment" : "Global folder watch."
     },
@@ -12048,7 +12400,10 @@
       }
     },
     "When" : {
-      "comment" : "Routine source folder section."
+      "comment" : "Routine source folder section.\nRule editor: conditions section."
+    },
+    "When %1$@, %2$@." : {
+      "comment" : "Routing rule row Zapier-style subtitle."
     },
     "When Binky sees a duplicate file" : {
       "comment" : "Settings: duplicate handling."
@@ -12139,8 +12494,11 @@
     "When on, Apple's MetricKit can deliver anonymous crash and hang diagnostics to Binky on your Mac. Nothing leaves your device until you choose to send a report. Requires “Share with App Developers” in System Settings → Privacy & Security → Analytics & Improvements." : {
       "comment" : "Settings UI."
     },
-    "When this matches" : {
-      "comment" : "Rule editor sheet section."
+    "When the file already has a Finder tag." : {
+      "comment" : "Routing rule template subtitle."
+    },
+    "When the filename contains certain text." : {
+      "comment" : "Routing rule template subtitle."
     },
     "When this routine has rules, they apply to files from its source folder (combined with other routines on the same path in list order)." : {
       "comment" : "Routine editor: rules hint."
@@ -12165,6 +12523,9 @@
     },
     "Your rules. Your Mac. No guessing." : {
       "comment" : "Weekly digest tagline."
+    },
+    "zip into “%@”" : {
+      "comment" : "Rule card then-fragment."
     }
   },
   "version" : "1.1"
