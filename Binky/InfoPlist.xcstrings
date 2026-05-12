@@ -94,6 +94,12 @@
             "state" : "new",
             "value" : "Binky"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Binky"
+          }
         }
       }
     },

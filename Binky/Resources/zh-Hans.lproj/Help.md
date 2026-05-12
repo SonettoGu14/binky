@@ -1,77 +1,81 @@
-# Binky Help
+# Binky 使用帮助
 
-> **Localization TODO:** Resync from English `Resources/Help.md` / `en.lproj/Help.md` for **Quick Sort** + **Routines** terminology.
+Binky 帮你保持**监视文件夹**整洁：它等待文件下载完成，将它们移入合理的文件夹，可选添加 Finder 标签，并显示清晰的**摘要和历史记录**，让你随时了解发生了什么。
 
-Binky keeps your **watched folder** tidy: it watches for finished files, moves them into sensible folders, optionally adds Finder tags, and shows clear **summary + history** so you always know what happened.
+## 快速开始
 
-## Quick start
+1. 在 **快速整理**（默认窗口）中指向"下载"文件夹，或拖入任何需要整理的收件箱。点击**立即整理**——无需设置例程。
+2. 将文件放入该文件夹（或通过 Finder 浏览）。Binky 会等到下载看起来**稳定**后，再整理顶层项目。
+3. 随时使用**立即整理**（`{{SK_SORT_NOW}}`）扫描活动文件夹——或停留在快速整理模式进行一次性清理。
 
-1. Leave **Watch this folder** on (defaults to your Downloads folder).
-2. Drop files into that folder. Binky waits until downloads look **stable**, then sorts them.
-3. Use **Sort Now** (`{{SK_SORT_NOW}}`) any time to sweep everything sitting at the top level of the watched folder.
+想要常驻整理？将窗口切换到**例程**（工具栏分段控件）：每个例程将一个监视文件夹与自己的整理规则配对。
 
-Optional: After a sort, use **Send to Dinky** on the summary sheet (or **Watch in Dinky** on a sorted folder) to hand off images, PDFs, and videos to [Dinky](https://dinkyapp.com) for compression, or set Dinky to watch those folders so future drops are slimmed automatically.
+可选：整理后，在摘要表上使用**发送到 Dinky**（或在已整理的文件夹上使用**在 Dinky 中监视**），将图片、PDF 和视频交给 [Dinky](https://dinkyapp.com) 压缩，或设置 Dinky 监视这些文件夹，以便以后自动压缩。
 
-## Where files go (starter profile)
+## 文件去向（默认配置）
 
-| Kind | Folder |
+| 类型 | 文件夹 |
 | --- | --- |
-| Images | Images |
-| PDFs & documents | Documents |
-| Video & audio | Media |
-| Archives (zip, etc.) | Archives |
-| Disk images / installers | Apps |
-| Screenshots | Screenshots |
-| Everything else Binky recognizes | Misc |
-| Incomplete downloads / unknown types | Review |
+| 图片 | Images |
+| PDF 和文档 | Documents |
+| 视频和音频 | Media |
+| 压缩包（zip 等） | Archives |
+| 磁盘映像 / 安装包 | Apps |
+| 截图 | Screenshots |
+| Binky 识别的其他文件 | Misc |
+| 未完成的下载 / 未知类型 | Review |
 
-## Keyboard shortcuts
+## 键盘快捷键
 
-| Action | Shortcut |
+| 操作 | 快捷键 |
 | --- | --- |
-| Open Files… | `{{SK_OPEN_FILES}}` |
-| Sort Now | `{{SK_SORT_NOW}}` |
-| Settings | `{{SK_SETTINGS}}` |
-| Binky Help | `{{SK_HELP}}` |
-| Last Sort Summary… | `{{SK_LAST_SORT}}` |
+| 打开文件… | `{{SK_OPEN_FILES}}` |
+| 立即整理 | `{{SK_SORT_NOW}}` |
+| 设置 | `{{SK_SETTINGS}}` |
+| Binky 帮助 | `{{SK_HELP}}` |
+| 上次整理摘要… | `{{SK_LAST_SORT}}` |
 
-## Finder & Services
+## Finder 和服务
 
-**Sort with Binky** appears in Finder **Services** (and as a **Quick Action**). Turn it on under **System Settings -> Keyboard -> Keyboard Shortcuts -> Services**.
+**用 Binky 整理**会出现在 Finder 的**服务**中（以及**快速操作**中）。在**系统设置 → 键盘 → 键盘快捷键 → 服务**中开启。
 
-- **Folders:** Right-click a folder and choose **Sort with Binky**. Binky treats that folder as a one-shot source folder. It sorts the **files at the top level** into the usual subfolders (`Images`, `Documents`, etc.) **inside** the folder you picked. Nested subfolders are left alone.
-- **Single files:** Same routing rules as the main window, but the file has to live **inside** the watched folder. Anything outside that folder is ignored.
+- **文件夹：** 右键点击文件夹，选择**用 Binky 整理**。Binky 将该文件夹视为一次性源文件夹。它将**顶层文件**整理到你选择的文件夹**内部**的常用子文件夹（`Images`、`Documents` 等）中。嵌套的子文件夹不会被处理。
+- **单个文件：** 与主窗口相同的路由规则，但文件必须位于**监视文件夹内**。该文件夹外的任何内容都会被忽略。
 
-Dropping **folders** or **files** onto Binky's **Dock icon** follows the same rules.
+将**文件夹**或**文件**拖到 Binky 的 **Dock 图标**上也遵循相同的规则。
 
-## Automations
+## 例程
 
-An **Automation** pairs a watched folder with its own set of sort rules and optional Finder tags.
+**例程**将一个监视文件夹与自己的整理规则和可选 Finder 标签配对。
 
-- Add automations in **Settings -> Sorting -> Automations**.
-- Each automation watches its own folder independently. Rules in one automation don't affect other folders.
-- With one automation, the menu bar and keyboard shortcut run **Sort Now** for that folder. With two or more, they become **Sort ▶** (a submenu): pick **Sort All Folders** to sweep every automation at once, or pick a specific automation by name to sweep just that folder.
+- 在**设置 → 例程**（齿轮图标）中添加例程。
+- 每个例程独立监视自己的文件夹。一个例程中的规则不影响其他文件夹。
+- 启用一个例程（且监视路径已解析）时，菜单栏快捷键运行该文件夹的**立即整理**。启用两个或更多时，快捷键变为**整理 ▶**：选择**整理所有文件夹**一次性扫描全部，或选择特定例程名称仅扫描该文件夹。
 
-## Menu bar mode
+## 菜单栏模式
 
-In **Settings -> Appearance**, keep **Show menu bar icon** on for quick access even when the window is closed.
+在**设置 → 外观**中，保持**显示菜单栏图标**开启，即使窗口关闭也能快速访问。
 
-- Turn on **Menu bar only (hide Dock icon)** if you want Binky to run from the menu bar.
-- The menu bar lets you sort watched folders, pause/resume watching, open **History**, and jump to **Settings**.
-- Watching continues while Binky is running in menu bar mode.
+- 开启**仅菜单栏模式（隐藏 Dock 图标）**，让 Binky 从菜单栏运行。
+- 菜单栏允许你整理监视文件夹、暂停/恢复监视、打开**历史记录**和跳转到**设置**。
+- 在菜单栏模式下，Binky 运行时监视持续进行。
 
-## History & undo
+## 历史记录和撤销
 
-Every sort run is saved in **History** (`App menu -> History…`).
+每次整理运行都保存在**历史记录**（`应用程序菜单 → 历史记录…`）中。
 
-- Use **Open Summary…** on a history row to reopen that run's move/review summary.
-- In a summary sheet, use **Undo moves** to put files from that run back where they were.
-- Use **Last Sort Summary…** (`{{SK_LAST_SORT}}`) to reopen the most recent summary quickly.
+- 使用历史记录行上的**打开摘要…**重新打开该次运行的移动/审核摘要。
+- 在摘要表中，使用**撤销移动**将该次运行的文件放回原处。
+- 使用**上次整理摘要…**（`{{SK_LAST_SORT}}`）快速重新打开最近的摘要。
 
-## Shortcuts app
+## 快捷指令 App
 
-Binky exposes a **Sort files** intent so you can automate sorting from the Shortcuts app, using the same routing rules as the main window.
+Binky 提供了一个**整理文件**操作，你可以在快捷指令 App 中链接整理操作，使用与主窗口相同的路由规则。
 
-## Privacy
+## 开源
 
-Nothing leaves your Mac unless **you** choose to send diagnostics from the crash reporter or open a feedback email. Learn more at **binkyfiles.com**.
+源代码在 [GitHub](https://github.com/heyderekj/binky) 上，采用 MIT 许可证。
+
+## 隐私
+
+除非**你**选择从崩溃报告器发送诊断信息或打开反馈邮件，否则任何数据都不会离开你的 Mac。更多信息请访问 **binkyfiles.com**。
