@@ -23,18 +23,24 @@ jobs:
       - name: Build and test
         run: |
           set -eo pipefail
-          for attempt in 1 2; do
-            xcodebuild \
+          for attempt in 1 2 3; do
+            # `if cmd; then` so a failing xcodebuild does not trip `set -e` before we read $?.
+            # (A bare `xcodebuild … && break` exits the whole step on failure and skips the retry.)
+            if xcodebuild \
               -project Binky.xcodeproj \
               -scheme Binky \
               -configuration Debug \
               -destination 'platform=macOS' \
               CODE_SIGN_IDENTITY=- \
               CODE_SIGNING_REQUIRED=NO \
-              test && break
+              test
+            then
+              break
+            fi
             status=$?
-            if [ "$status" -ne 65 ] || [ "$attempt" -eq 2 ]; then
+            if [ "$status" -ne 65 ] || [ "$attempt" -eq 3 ]; then
               exit "$status"
             fi
-            echo "xcodebuild exited 65 (LaunchServices test-runner flake on GitHub macOS). Retrying once..."
+            echo "xcodebuild exited 65 (LaunchServices test-runner flake on GitHub macOS). Sleeping 5s before attempt $((attempt + 1)) of 3…"
+            sleep 5
           done
