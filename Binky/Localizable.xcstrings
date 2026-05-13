@@ -1289,7 +1289,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "排序时添加“新”Finder 标签"
+            "value": "排序时添加“新”访达标签"
           }
         },
         "zh-Hant": {
@@ -1357,7 +1357,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "添加简单的 Finder 标签（“新”、类别提示），以便文件保持可搜索性。"
+            "value": "添加简单的访达标签（“新”、类别提示），以便文件保持可搜索性。"
           }
         },
         "zh-Hant": {
@@ -2095,13 +2095,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "适用于大批量和文件夹批次。阈值越低意味着性能模式开始得越早。 Mac 发热时，激进模式的完成速度更快；温和模式将减轻 CPU 和磁盘的负担。"
+            "value": "适用于大批量整理和文件夹批次。阈值越低意味着性能模式开始得越早。 Mac 发热时，激进模式的完成速度更快；温和模式将减轻 CPU 和磁盘的负担。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "適用於大批量和資料夾批次。閾值越低意味著起搏開始得越早。 Mac 熱時，激進的完成速度更快；溫和地減輕 CPU 和磁碟的負擔。"
+            "value": "適用於大批量整理和檔案夾批次。閾值越低意味著效能模式開始得越早。Mac 發熱時，積極模式完成速度更快；輕柔模式減輕 CPU 和磁碟負擔。"
           }
         }
       }
@@ -2248,13 +2248,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "整理时分配 Finder 标签"
+            "value": "整理时分配访达标签"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "排序時分配 Finder 標籤"
+            "value": "整理時分配 Finder 標籤"
           }
         }
       }
@@ -2325,7 +2325,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在系统设置 → 键盘 → 键盘快捷键 → 服务中为 Finder 的“Sort with Binky”分配快捷键。"
+            "value": "在系统设置 → 键盘 → 键盘快捷键 → 服务中为访达的“Sort with Binky”分配快捷键。"
           }
         },
         "zh-Hant": {
@@ -2982,7 +2982,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Binky 在快捷指令 App 中提供\"整理文件\"操作。从 Finder 或其他操作将文件交给 Binky——使用与主窗口相同的路由规则。"
+            "value": "Binky 在快捷指令 App 中提供\"整理文件\"操作。从访达或其他操作将文件交给 Binky——使用与主窗口相同的路由规则。"
           }
         },
         "zh-Hant": {
@@ -3067,13 +3067,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "带有这些 Finder 标签的文件 Binky 不会碰——适合你刻意保留的文件或快捷方式。"
+            "value": "带有这些访达标签的文件 Binky 不会碰——适合你刻意保留的文件或快捷方式。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "帶有這些 Finder 標籤的檔案 Binky 不會碰——適合你刻意保留的檔案或快捷方式。"
+            "value": "帶有這些 Finder 標籤的檔案 Binky 不會碰——適合你刻意保留的檔案或捷徑。"
           }
         }
       }
@@ -3314,7 +3314,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按 Finder 标签"
+            "value": "按访达标签"
           }
         },
         "zh-Hant": {
@@ -4424,13 +4424,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Finder 中复制支持的文件，或复制图像（PNG 或 TIFF），然后重试。"
+            "value": "在访达中复制支持的文件，或复制图像（PNG 或 TIFF），然后重试。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Finder 中複製支援的文件，或複製映像（PNG 或 TIFF），然後重試。"
+            "value": "在 Finder 中複製支援的檔案，或複製影像（PNG 或 TIFF），然後重試。"
           }
         }
       }
@@ -6835,7 +6835,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Finder 标签不适合 %lld 文件——排序仍然有效。"
+            "value": "访达标签不适合 %lld 文件——排序仍然有效。"
           }
         },
         "zh-Hant": {
@@ -6852,7 +6852,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Finder 标签并没有粘在一个文件上——排序仍然有效。"
+            "value": "访达标签并没有被分配在一个文件上——排序仍然有效。"
           }
         },
         "zh-Hant": {
@@ -6869,13 +6869,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ 的 Finder 标签"
+            "value": "%@ 的访达标签"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ 的查找器標籤"
+            "value": "%@ 的 Finder 標籤"
           }
         }
       }
@@ -6886,13 +6886,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Finder 标签：%@"
+            "value": "访达标签：%@"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "查找器標籤：%@"
+            "value": "Finder 標籤：%@"
           }
         }
       }
@@ -7771,13 +7771,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "有 Finder 标签（逗号分隔，任一匹配）"
+            "value": "有访达标签（逗号分隔，任一匹配）"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "有 Finder 標籤（逗號分隔，任意匹配）"
+            "value": "有 Finder 標籤（逗號分隔，任一符合）"
           }
         }
       }
@@ -8324,10 +8324,6 @@
                 }
               }
             }
-          },
-          "stringUnit": {
-            "state": "translated",
-            "value": "history_session_file_count"
           }
         }
       }
@@ -9201,7 +9197,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "它有 Finder 标签“%@”"
+            "value": "它有访达标签“%@”"
           }
         },
         "zh-Hant": {
@@ -11955,13 +11951,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Finder 中打开"
+            "value": "在访达中打开"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Finder 中打開"
+            "value": "在 Finder 中開啟"
           }
         }
       }
@@ -12049,13 +12045,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Finder 中打开待审文件夹"
+            "value": "在访达中打开待审文件夹"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Finder 中開啟評論"
+            "value": "在 Finder 中開啟待審檔案夾"
           }
         }
       }
@@ -12117,13 +12113,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "完成后在 Finder 中打开监视文件夹"
+            "value": "完成后在访达中打开监视文件夹"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "完成後在 Finder 中開啟監視資料夾"
+            "value": "完成後在 Finder 中開啟監視檔案夾"
           }
         }
       }
@@ -12228,13 +12224,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "每个整理批次完成后，在 Finder 中打开监视文件夹。"
+            "value": "每个整理批次完成后，在访达中打开监视文件夹。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "每個排序批次完成後，在 Finder 中開啟您的監視資料夾。"
+            "value": "每個整理批次完成後，在 Finder 中開啟監視檔案夾。"
           }
         }
       }
@@ -12561,7 +12557,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "您经过的路径没有被沙盒化； Finder 工作表中的书签不会传播到终端。"
+            "value": "您经过的路径没有被沙盒化； 访达工作表中的书签不会传播到终端。"
           }
         },
         "zh-Hant": {
@@ -14544,7 +14540,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Finder 中显示 %@"
+            "value": "在访达中显示 %@"
           }
         },
         "zh-Hant": {
@@ -14561,7 +14557,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Finder 中显示"
+            "value": "在访达中显示"
           }
         },
         "zh-Hant": {
@@ -15661,7 +15657,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Finder 中显示"
+            "value": "在访达中显示"
           }
         },
         "zh-Hant": {
@@ -16145,7 +16141,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按 Finder 标签整理"
+            "value": "按访达标签整理"
           }
         },
         "zh-Hant": {
@@ -16162,7 +16158,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按“%@”下的 Finder 标签排序"
+            "value": "按“%@”下的访达标签排序"
           }
         },
         "zh-Hant": {
@@ -16298,7 +16294,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "正在整理"
+            "value": "整理"
           }
         },
         "zh-Hant": {
@@ -17063,13 +17059,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "当没有例程的路径匹配时的后备文件夹。添加桌面、Dropbox 或其他任何繁琐的例程。松散文件夹是监视文件夹顶部的普通目录 - Binky 可以将它们作为一个整体移动，而无需在内部排序。这会跳过内置目标（图像、文档等）并将应用程序包发送到应用程序。"
+            "value": "后备文件夹用以处理例程整理没有路径匹配的情况。添加桌面、Dropbox 或其他任何繁琐的例程。松散文件夹是监视文件夹顶部的普通目录 - Binky 可以将它们作为一个整体移动，而无需在内部排序。这会跳过内置目标（图像、文档等）并将应用程序包发送到应用程序。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "當沒有例程的路徑匹配時的後備資料夾。加入桌面、Dropbox 或其他任何繁瑣的例程。鬆散資料夾是監視資料夾頂部的普通目錄 - Binky 可以將它們作為一個整體移動，而無需在內部排序。這會跳過內建目標（圖像、文件等）並將應用程式套件傳送到應用程式。"
+            "value": "後備檔案夾用以處理常式整理沒有路徑符合的情況。可為桌面、Dropbox 等加入常式。散落檔案夾是監視檔案夾頂層的普通目錄——Binky 可整體移入目標，不拆分內部檔案。會跳過內建目標（圖片、文件等），App 則傳送到應用程式。"
           }
         }
       }
@@ -17344,13 +17340,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "要在“焦点”或“请勿打扰”期间接收通知，请在“系统设置”→“焦点”中允许 Binky。"
+            "value": "要在“专注模式”或“请勿打扰”期间接收通知，请在“系统设置”→“专注模式”中允许 Binky。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "若要在「焦點」或「請勿打擾」期間接收通知，請在「系統設定」→「焦點」中允許 Binky。"
+            "value": "要在「專注模式」或「勿擾模式」期間接收通知，請在「系統設定」→「專注模式」中允許 Binky。"
           }
         }
       }
@@ -18084,13 +18080,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "当规则通过 Finder 标记将文件发送到子文件夹时使用。"
+            "value": "当规则通过访达标记将文件发送到子文件夹时使用。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "當規則透過 Finder 標記將檔案傳送到子資料夾時使用。"
+            "value": "當規則透過 Finder 標籤將檔案傳送到子檔案夾時使用。"
           }
         }
       }
@@ -19162,13 +19158,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "当文件已有 Finder 标签时。"
+            "value": "当文件已有访达标签时。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "當檔案已有 Finder 標籤。"
+            "value": "當檔案已有 Finder 標籤時。"
           }
         }
       }
