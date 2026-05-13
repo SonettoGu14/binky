@@ -442,7 +442,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld 檔案已排序 · %2$lld 移動 · %3$lld 運行（上週）。點擊 Binky 以取得共享卡。"
+            "value": "%1$lld 檔案已整理 · %2$lld 次移動 · %3$lld 次執行（上週）。點擊 Binky 以取得分享卡片。"
           }
         }
       }
@@ -459,7 +459,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld 已移動 · %2$lld 保留 · %3$lld 已跳過 · %4$lld 審核"
+            "value": "%1$lld 已移動 · %2$lld 保留 · %3$lld 已跳過 · %4$lld 待審"
           }
         }
       }
@@ -476,7 +476,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld 已排序 · %2$lld 已提交 · %3$lld 收據已歸檔 · %4$lld 正在審核中"
+            "value": "%1$lld 已整理 · %2$lld 已有 · %3$lld 收據已歸檔 · %4$lld 待審中"
           }
         }
       }
@@ -528,7 +528,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld已經在最後的排序中了。"
+            "value": "上次整理已有 %lld 個。"
           }
         }
       }
@@ -579,7 +579,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld 審核中"
+            "value": "%lld 個待審"
           }
         }
       }
@@ -648,7 +648,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld 次移動中的 %lld 次無法撤銷 - 檔案可能已移動或已重新命名。"
+            "value": "%2$lld 次移動中有 %1$lld 次無法撤銷 — 檔案可能已移動或已重新命名。"
           }
         }
       }
@@ -671,7 +671,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld 的 %lld 上"
+            "value": "%1$lld / %2$lld 已啟用"
           }
         }
       }
@@ -1414,7 +1414,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "激进模式"
+            "value": "激进"
           }
         },
         "zh-Hant": {
@@ -1841,13 +1841,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "任何匹配的结果"
+            "value": "任意匹配"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "任何匹配的東西"
+            "value": "任意匹配"
           }
         }
       }
@@ -2382,7 +2382,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "自动解压归档"
+            "value": "自动解压压缩包"
           }
         },
         "zh-Hant": {
@@ -2771,7 +2771,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "賓基"
+            "value": "Binky "
           }
         }
       }
@@ -3229,7 +3229,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "从 `BinkyCore` 文件夹构建 `binky` CLI，用于脚本和快捷指令。规则和偏好相同——共享锁防止与 GUI 冲突。"
+            "value": "从 `BinkyCore` 文件夹构建 `binky` CLI，用于脚本和快捷指令。规则和偏好设置相同——共享锁防止与 GUI 冲突。"
           }
         },
         "zh-Hant": {
@@ -4276,7 +4276,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "複製的PNG"
+            "value": "已複製 PNG"
           }
         }
       }
@@ -6587,13 +6587,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "文件在尖叫。Binky 搞定了。"
+            "value": "文件在乱跑，Binky 在寻找。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "檔案在尖叫。Binky 搞定了。"
+            "value": "檔案在亂跑，Binky 在尋找。"
           }
         }
       }
@@ -7233,7 +7233,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "點評來源"
+            "value": "來自待審"
           }
         }
       }
@@ -7429,7 +7429,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "温和模式"
+            "value": "温和"
           }
         },
         "zh-Hant": {
@@ -7760,7 +7760,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "前往：%@"
+            "value": "移至：%@"
           }
         }
       }
@@ -7948,7 +7948,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "這是賓基聽到的。"
+            "value": "這是 Binky 收到的。"
           }
         }
       }
@@ -9669,7 +9669,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "符合 Binky 已排序的相同檔案或非常相似的圖像。"
+            "value": "符合 Binky 已整理的相同檔案或非常相似的圖像。"
           }
         }
       }
@@ -10104,7 +10104,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "移至垃圾箱"
+            "value": "移至垃圾桶"
           }
         }
       }
@@ -11068,7 +11068,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "尚未啟用任何內容"
+            "value": "尚未啟用任何監視"
           }
         }
       }
@@ -11085,7 +11085,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "評論中沒有任何內容。 Binky 就在上面。"
+            "value": "待審區空無一物，Binky 已處理完畢。"
           }
         }
       }
@@ -12557,13 +12557,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "您经过的路径没有被沙盒化； 访达工作表中的书签不会传播到终端。"
+            "value": "您传入的路径不受沙盒限制；访达工作表中的书签不会传播到终端。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "您經過的路徑沒有被沙盒化； Finder 工作表中的書籤不會傳播到終端。"
+            "value": "您傳入的路徑不受沙盒限制；Finder 工作表中的書籤不會傳播到終端。"
           }
         }
       }
@@ -14207,13 +14207,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "需要“排序时分配查找器标签”。"
+            "value": "需要“整理时分配访达标签”。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "需要「排序時分配查找器標籤」。"
+            "value": "需要「整理時分配 Finder 標籤」。"
           }
         }
       }
@@ -14784,7 +14784,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "跑步"
+            "value": "執行次數"
           }
         }
       }
@@ -15441,7 +15441,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "什。賓基正在處理這件事。"
+            "value": "噓。Binky 正在處理。"
           }
         }
       }
@@ -15646,7 +15646,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "顯示賓基"
+            "value": "顯示 Binky"
           }
         }
       }
@@ -17116,7 +17116,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "文件夾的奶嘴。"
+            "value": "檔案夾的守護者。"
           }
         }
       }
@@ -17323,13 +17323,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "这里整洁…"
+            "value": "整理这里…"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "這裡整潔…"
+            "value": "在此整理…"
           }
         }
       }
@@ -17363,7 +17363,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "今天：%1$lld 已排序 · %2$lld 審核 · %3$lld 已跳過 · %4$lld 收據 · %5$lld 已存檔。悄悄處理。"
+            "value": "今天：%1$lld 已整理 · %2$lld 待審 · %3$lld 已跳過 · %4$lld 收據 · %5$lld 已存檔。悄悄處理。"
           }
         }
       }
@@ -18913,13 +18913,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "新功能"
+            "value": "最新动态"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "新功能"
+            "value": "最新動態"
           }
         }
       }
@@ -18990,13 +18990,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "新功能…"
+            "value": "最新动态…"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "新功能…"
+            "value": "最新動態…"
           }
         }
       }
@@ -19041,7 +19041,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "当 Binky 检测到重复文件文件时"
+            "value": "当 Binky 检测到重复文件时"
           }
         },
         "zh-Hant": {
